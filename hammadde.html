@@ -7,38 +7,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-50 pb-12 font-['Inter'] text-slate-800">
+<body class="bg-slate-50 pb-12">
     <header class="bg-indigo-900 text-white p-6 flex justify-between items-center shadow-xl">
-        <h1 class="font-black tracking-tighter">İPLİK FİYAT LİSTESİ AKTARIMI (BULUT)</h1>
-        <a href="index.html" class="bg-white text-indigo-900 px-6 py-2 rounded-lg font-bold text-sm">HESAPLAMAYA DÖN</a>
+        <h1 class="font-black">BULUT FİYAT YÖNETİMİ</h1>
+        <a href="index.html" class="bg-white text-indigo-900 px-4 py-2 rounded font-bold text-sm">Hesaplamaya Dön</a>
     </header>
 
-    <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-2xl shadow-lg border border-slate-200">
-        <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">PDF Dosyasını Bulut Veritabanına Gönder</h2>
+    <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-xl shadow-md">
+        <h2 class="text-xs font-black text-slate-400 uppercase mb-4">Yeni PDF Yükle ve Buluta Gönder</h2>
+        <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfOku(event)">
+        <button onclick="document.getElementById('pdf-file').click()" class="w-full border-2 border-dashed border-indigo-200 p-10 rounded-xl font-bold text-indigo-600 hover:bg-indigo-50 transition-all">PDF DOSYASI SEÇ</button>
         
-        <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfIsle(event)">
-        <button onclick="document.getElementById('pdf-file').click()" class="w-full border-4 border-dashed border-indigo-100 p-12 rounded-2xl font-black text-indigo-500 hover:bg-indigo-50 transition-all text-xl">PDF DOSYASI SEÇ VE YÜKLE</button>
-        
-        <div id="loading" class="hidden mt-6 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
-            <p class="mt-2 font-black text-indigo-600 animate-pulse uppercase text-xs">Veriler Buluta Yazılıyor...</p>
-        </div>
+        <div id="loading" class="hidden mt-4 text-center font-bold text-orange-500 animate-bounce">BULUTA KAYDEDİLİYOR...</div>
     </div>
 
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-        
-        const SUPABASE_URL = 'https://nejpygqdwbjuwsauacsw.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8';
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_URL = 'BURAYA_SUPABASE_URL_GELECEK';
+        const SUPABASE_KEY = 'BURAYA_SUPABASE_ANON_KEY_GELECEK';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function pdfIsle(e) {
+        async function pdfOku(e) {
             const file = e.target.files[0];
-            if (!file) return;
-            document.getElementById('loading').classList.remove('hidden');
-
             const fr = new FileReader();
             fr.onload = async function() {
                 const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
@@ -47,32 +37,28 @@
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
                     content.items.forEach(item => text += item.str + " ");
-                    text += "\n";
                 }
-                ayiklaVeKaydet(text);
+                bulutaYaz(text);
             };
             fr.readAsArrayBuffer(file);
         }
 
-        async function ayiklaVeKaydet(metin) {
-            const data = [];
-            // Fiyatları ve İplik isimlerini bulur (Satır başındaki sayıları temizler)
-            const matches = [...metin.matchAll(/(.+?)\s+(\d+[.,]\d{2,3})/g)];
-            
+        async function bulutaYaz(hamMetin) {
+            document.getElementById('loading').classList.remove('hidden');
+            const lines = hamMetin.split('\n');
+            const dataToUpload = [];
+
+            // Basit Regex ile İplik ve Fiyat ayıklama
+            const matches = [...hamMetin.matchAll(/(.+?)\s+(\d+[.,]\d{2,3})/g)];
             matches.forEach(m => {
-                let isim = m[1].trim().replace(/^\d+[\s.|\-)]+/, "").toUpperCase();
-                let fiyat = m[2].replace(',','.');
-                if (isim.length > 3) data.push({ cins: isim, fiyat: fiyat });
+                dataToUpload.push({ cins: m[1].trim().toUpperCase(), fiyat: m[2].replace(',','.') });
             });
 
-            // Upsert: Varsa güncelle, yoksa ekle (cins sütununa göre)
-            const { error } = await client.from('iplik_fiyatlari').upsert(data, { onConflict: 'cins' });
+            // Supabase'e toplu yükleme (Aynı isim varsa üzerine yazar)
+            const { error } = await supabase.from('iplik_fiyatlari').upsert(dataToUpload, { onConflict: 'cins' });
             
-            if(!error) {
-                alert(data.length + " İplik Başarıyla Buluta Kaydedildi!");
-            } else {
-                alert("Hata Oluştu: " + error.message);
-            }
+            if(!error) alert("Başarıyla Buluta Kaydedildi! Artık her cihazda güncel.");
+            else alert("Hata: " + error.message);
             document.getElementById('loading').classList.add('hidden');
         }
     </script>
