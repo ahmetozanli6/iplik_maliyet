@@ -3,191 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İplik Maliyet ERP Sistemi - Tam Sürüm</title>
+    <title>İplik ERP - Çoklu Maliyet Tablosu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .form-input { 
-            width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.625rem 0.75rem; 
-            font-size: 0.875rem; color: #0f172a; font-weight: 600; background-color: #ffffff;
-            transition: all 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .erp-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        
+        /* Excel tarzı tablo tasarımı */
+        .excel-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .excel-table th { 
+            position: sticky; top: 0; background-color: #f8fafc; z-index: 10;
+            border-bottom: 2px solid #cbd5e1; border-right: 1px solid #e2e8f0;
+            padding: 12px 8px; font-size: 10px; text-transform: uppercase; 
+            letter-spacing: 0.05em; color: #475569; font-weight: 700; white-space: nowrap;
         }
-        .form-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .form-label { display: block; font-size: 0.7rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem; }
-        .section-title { font-size: 0.875rem; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1.25rem; display: flex; items-center; gap: 0.5rem; }
-        .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed #334155; }
+        .excel-table td { 
+            border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;
+            padding: 0; background-color: #ffffff;
+        }
+        .excel-table tr:hover td { background-color: #f0fdf4; } /* Fareyle üzerine gelince yeşil vurgu */
+        
+        /* Hücre içi input tasarımı */
+        .cell-input { 
+            width: 100%; height: 100%; padding: 12px 8px; border: none; outline: none; 
+            background: transparent; font-size: 13px; font-weight: 600; color: #0f172a;
+        }
+        .cell-input:focus { background-color: #dbeafe; box-shadow: inset 0 0 0 2px #3b82f6; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        /* Readonly (Sonuç) hücreleri */
+        .cell-result { padding: 12px 8px; font-weight: 800; font-size: 14px; text-align: right; }
+        
+        /* Özel sütun renkleri */
+        .col-satis { background-color: #ecfdf5 !important; color: #059669; }
+        .col-net { background-color: #f8fafc !important; color: #334155; }
     </style>
 </head>
-<body class="text-slate-800 antialiased">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold text-white">ERP</div>
-                <div>
-                    <h1 class="text-white font-bold text-lg leading-none tracking-tight">Eksiksiz Üretim Maliyet Yönetimi</h1>
-                    <span class="text-emerald-400 text-[10px] font-bold uppercase tracking-widest">Excel Birebir Eşleşme Sürümü</span>
-                </div>
-            </div>
+    <header class="erp-header px-6 py-5 shadow-lg border-b border-slate-700 flex justify-between items-center z-50">
+        <div>
+            <h1 class="text-white font-black text-xl tracking-tighter flex items-center gap-2">
+                <span class="bg-blue-600 text-white px-2 py-1 rounded text-sm">ERP</span> 
+                İPLİK MALİYET TABLOSU
+            </h1>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Excel Entegrasyon Modülü - Canlı Hesaplama</p>
         </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <div class="lg:col-span-8 space-y-6">
-            
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                <h2 class="section-title">
-                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                    Teknik Üretim Verileri
-                </h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><label class="form-label">Denye</label><input type="number" id="m_denye" value="20" class="form-input"></div>
-                    <div><label class="form-label">Tur (Twist)</label><input type="number" id="m_tur" value="800" class="form-input"></div>
-                    <div><label class="form-label text-blue-600">Devir (RPM)</label><input type="number" id="m_devir" value="10000" class="form-input bg-blue-50/30 border-blue-200"></div>
-                    <div><label class="form-label text-blue-600">Bobin Gramaj</label><input type="number" id="m_bobin_gr" value="500" class="form-input bg-blue-50/30 border-blue-200"></div>
-                    <div><label class="form-label">MT/D</label><input type="number" id="m_mtd" value="25" class="form-input"></div>
-                    <div><label class="form-label">Günlük Üretim (Kg)</label><input type="number" id="m_gunluk_kg" value="20.48" step="0.01" class="form-input"></div>
-                    <div><label class="form-label text-emerald-600">KW / Kg Tüketimi</label><input type="number" id="m_kw_kg" value="6.5" step="0.1" class="form-input border-emerald-200 bg-emerald-50/30"></div>
-                    <div><label class="form-label text-emerald-600">Enerji Birim ($)</label><input type="number" id="m_kw_birim" value="0.20" step="0.01" class="form-input border-emerald-200 bg-emerald-50/30"></div>
-                </div>
-            </div>
+        <div class="flex items-center gap-4 bg-slate-800 p-2 rounded-lg border border-slate-700">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest ml-2">⚡ Global Elektrik Birim ($):</span>
+            <input type="number" id="global_kw" value="0.20" step="0.01" class="bg-slate-900 border border-slate-600 text-emerald-400 font-bold text-lg rounded px-3 py-1 w-24 outline-none focus:border-emerald-500 text-center">
+        </div>
+    </header>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                <h2 class="section-title">
-                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Hammadde & Direkt İşçilik
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="form-label text-emerald-700">Hammadde Fiyatı ($/Kg)</label>
-                        <input type="number" id="m_hammadde" value="0.964" step="0.001" class="form-input border-emerald-200 bg-emerald-50/30 text-emerald-800 text-lg">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="form-label text-indigo-700">Sabit İşçilik ($/Kg)</label>
-                        <input type="number" id="m_iscilik_sabit" value="0.00" step="0.001" placeholder="Örn: 0.42" class="form-input border-indigo-200 bg-indigo-50/30 text-indigo-800">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="form-label text-indigo-700">Direkt+End. Gideri ($)</label>
-                        <input type="number" id="m_iscilik_direkt" value="0.809" step="0.001" class="form-input border-indigo-200 bg-indigo-50/30 text-indigo-800">
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                <h2 class="section-title">
-                    <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Sarf Giderler & Amortisman ($ / Kg)
-                </h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                    <div><label class="form-label">Amortisman</label><input type="number" id="g_amort" value="0.385" step="0.001" class="form-input text-xs"></div>
-                    <div><label class="form-label">Bobin</label><input type="number" id="g_bobin" value="0.10" step="0.001" class="form-input text-xs"></div>
-                    <div><label class="form-label">Etiket</label><input type="number" id="g_etiket" value="0.015" step="0.001" class="form-input text-xs"></div>
-                    <div><label class="form-label">Paketleme</label><input type="number" id="g_paket" value="0.15" step="0.001" class="form-input text-xs"></div>
-                    <div><label class="form-label">Genel Gider</label><input type="number" id="g_genel" value="0.10" step="0.001" class="form-input text-xs"></div>
-                    <div><label class="form-label">Reklamasyon</label><input type="number" id="g_reklam" value="0.02" step="0.001" class="form-input text-xs"></div>
-                    <div><label class="form-label text-red-500">FİRE ORANI (%)</label><input type="number" id="g_fire" value="0" step="0.1" class="form-input text-xs bg-red-50/30 border-red-200"></div>
-                </div>
-            </div>
+    <div class="flex-1 p-4 md:p-6 overflow-hidden flex flex-col">
+        
+        <div class="bg-white rounded-xl shadow-xl border border-slate-300 overflow-auto flex-1 relative">
+            <table class="excel-table" id="maliyet_tablosu">
+                <thead>
+                    <tr>
+                        <th class="text-left w-32">İplik / Tip</th>
+                        <th>Denye</th>
+                        <th>Tur</th>
+                        <th>MT/D</th>
+                        <th>Üretim (Kg)</th>
+                        <th class="text-emerald-700 bg-emerald-50">Hammadde ($)</th>
+                        <th>KW/Kg</th>
+                        <th class="text-blue-700 bg-blue-50">İşçilik ($)</th>
+                        <th class="text-orange-600">Amortisman</th>
+                        <th class="text-orange-600">Bobin</th>
+                        <th class="text-orange-600">Etiket</th>
+                        <th class="text-orange-600">Paketleme</th>
+                        <th class="text-orange-600">G.Gider</th>
+                        <th class="text-orange-600">Reklam.</th>
+                        <th class="text-purple-600 bg-purple-50">Kâr (%)</th>
+                        <th class="text-right">NET MALİYET ($)</th>
+                        <th class="text-right bg-emerald-100 text-emerald-800">SATIŞ FİYATI ($)</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="tablo_govdesi">
+                    </tbody>
+            </table>
         </div>
 
-        <div class="lg:col-span-4">
-            <div class="bg-slate-900 rounded-lg shadow-xl text-white sticky top-24 border border-slate-700">
-                <div class="bg-slate-950 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-300">Finansal Özet Tablosu</h3>
-                </div>
-
-                <div class="p-6">
-                    <div class="space-y-1 mb-6">
-                        <div class="summary-row">
-                            <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Hammadde (Fireli)</span>
-                            <span id="res_hammadde" class="font-mono font-medium text-sm text-emerald-400">$0.000</span>
-                        </div>
-                        <div class="summary-row">
-                            <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Enerji Maliyeti</span>
-                            <span id="res_enerji" class="font-mono font-medium text-sm text-emerald-400">$0.000</span>
-                        </div>
-                        <div class="summary-row">
-                            <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Toplam İşçilik</span>
-                            <span id="res_iscilik" class="font-mono font-medium text-sm text-indigo-400">$0.000</span>
-                        </div>
-                        <div class="summary-row">
-                            <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Toplam Sarf</span>
-                            <span id="res_sarf" class="font-mono font-medium text-sm text-orange-400">$0.000</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6 bg-slate-800/80 rounded-md p-4 border border-slate-700">
-                        <span class="text-slate-400 text-[10px] uppercase font-bold tracking-widest block mb-1">NET MALİYET (Kg)</span>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-xl font-bold text-slate-500">$</span>
-                            <span id="res_net_maliyet" class="text-4xl font-black text-white tracking-tight">0.000</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4 bg-slate-950 p-3 rounded-md border border-slate-800">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">HEDEF KÂR (%)</label>
-                            <input type="number" id="m_kar" value="50" class="w-full bg-transparent border-none text-right font-bold text-xl text-white outline-none">
-                        </div>
-                        
-                        <div class="pt-4 border-t border-slate-800 text-right">
-                            <span class="text-emerald-500 text-[10px] uppercase font-bold tracking-widest block mb-1">Tavsiye Edilen Satış Fiyatı</span>
-                            <div class="flex items-baseline justify-end gap-2">
-                                <span class="text-3xl font-bold text-emerald-600/50">$</span>
-                                <span id="res_satis_fiyati" class="text-6xl font-black text-emerald-400 tracking-tighter">0.00</span>
-                            </div>
-                        </div>
-
-                        <button onclick="tamHesapla()" class="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-md transition-colors text-sm uppercase tracking-widest">
-                            HESAPLAMAYI GÜNCELLE
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="mt-4 flex justify-between items-center">
+            <button onclick="satirEkle()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all text-sm uppercase tracking-widest flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Yeni İplik Satırı Ekle
+            </button>
+            <p class="text-xs font-bold text-slate-400 uppercase">Hücrelerdeki verileri değiştirdiğiniz an hesaplama otomatik yapılır.</p>
         </div>
     </div>
 
     <script>
-        function tamHesapla() {
-            // Verileri Al
-            const hammadde = parseFloat(document.getElementById('m_hammadde').value) || 0;
-            const fireOrani = parseFloat(document.getElementById('g_fire').value) || 0;
-            const kwKg = parseFloat(document.getElementById('m_kw_kg').value) || 0; 
-            const kwBirim = parseFloat(document.getElementById('m_kw_birim').value) || 0;
-            const iscilikSabit = parseFloat(document.getElementById('m_iscilik_sabit').value) || 0;
-            const iscilikDirekt = parseFloat(document.getElementById('m_iscilik_direkt').value) || 0;
-            const karOrani = parseFloat(document.getElementById('m_kar').value) || 0;
+        // Tablo gövdesini seç
+        const tabloGovdesi = document.getElementById('tablo_govdesi');
+        const globalKwInput = document.getElementById('global_kw');
 
-            // Sarf Giderleri
-            const sarf = (parseFloat(document.getElementById('g_amort').value) || 0) +
-                         (parseFloat(document.getElementById('g_bobin').value) || 0) +
-                         (parseFloat(document.getElementById('g_etiket').value) || 0) +
-                         (parseFloat(document.getElementById('g_paket').value) || 0) +
-                         (parseFloat(document.getElementById('g_genel').value) || 0) +
-                         (parseFloat(document.getElementById('g_reklam').value) || 0);
+        // Global KW değiştiğinde tüm tabloyu yeniden hesapla
+        globalKwInput.addEventListener('input', () => {
+            const satirlar = tabloGovdesi.querySelectorAll('tr');
+            satirlar.forEach(satir => hesapla(satir));
+        });
 
-            // Formüller
-            const fireliHammadde = hammadde * (1 + (fireOrani / 100)); // Fire zammı
-            const enerjiKg = kwKg * kwBirim; 
-            const toplamIscilik = iscilikSabit + iscilikDirekt; // Excel'deki iki işçilik sütunu toplandı
+        // Tablo içindeki herhangi bir input değiştiğinde (Event Delegation)
+        tabloGovdesi.addEventListener('input', (e) => {
+            if(e.target.tagName === 'INPUT') {
+                const satir = e.target.closest('tr');
+                hesapla(satir);
+            }
+        });
+
+        // Yeni satır oluşturma fonksiyonu
+        function satirEkle(veriler = {}) {
+            const tr = document.createElement('tr');
             
-            const netMaliyet = fireliHammadde + enerjiKg + toplamIscilik + sarf;
-            const satisFiyati = netMaliyet * (1 + (karOrani / 100));
+            // Eğer veri gönderilmemişse varsayılan değerler (20 Denye örneği)
+            const d = {
+                tip: veriler.tip || 'Floş',
+                denye: veriler.denye || 20,
+                tur: veriler.tur || 800,
+                mtd: veriler.mtd || 25,
+                uretim: veriler.uretim || 20.48,
+                hammadde: veriler.hammadde || 0.964,
+                kw: veriler.kw || 6.5,
+                iscilik: veriler.iscilik || 0.809,
+                amort: veriler.amort || 0.385,
+                bobin: veriler.bobin || 0.10,
+                etiket: veriler.etiket || 0.015,
+                paket: veriler.paket || 0.15,
+                genel: veriler.genel || 0.10,
+                reklam: veriler.reklam || 0.02,
+                kar: veriler.kar || 50
+            };
 
-            // Ekrana Yazdır
-            document.getElementById('res_hammadde').innerText = "$" + fireliHammadde.toFixed(3);
-            document.getElementById('res_enerji').innerText = "$" + enerjiKg.toFixed(3);
-            document.getElementById('res_iscilik').innerText = "$" + toplamIscilik.toFixed(3);
-            document.getElementById('res_sarf').innerText = "$" + sarf.toFixed(3);
+            tr.innerHTML = `
+                <td><input type="text" class="cell-input uppercase" value="${d.tip}" placeholder="İplik Adı"></td>
+                <td><input type="number" class="cell-input text-center d-denye" value="${d.denye}"></td>
+                <td><input type="number" class="cell-input text-center d-tur" value="${d.tur}"></td>
+                <td><input type="number" class="cell-input text-center d-mtd" value="${d.mtd}"></td>
+                <td><input type="number" class="cell-input text-center d-uretim" value="${d.uretim}" step="0.01"></td>
+                <td class="bg-emerald-50"><input type="number" class="cell-input text-center text-emerald-700 d-hammadde" value="${d.hammadde}" step="0.001"></td>
+                <td><input type="number" class="cell-input text-center d-kw" value="${d.kw}" step="0.1"></td>
+                <td class="bg-blue-50"><input type="number" class="cell-input text-center text-blue-700 d-iscilik" value="${d.iscilik}" step="0.001"></td>
+                <td><input type="number" class="cell-input text-center text-slate-500 d-amort" value="${d.amort}" step="0.001"></td>
+                <td><input type="number" class="cell-input text-center text-slate-500 d-bobin" value="${d.bobin}" step="0.001"></td>
+                <td><input type="number" class="cell-input text-center text-slate-500 d-etiket" value="${d.etiket}" step="0.001"></td>
+                <td><input type="number" class="cell-input text-center text-slate-500 d-paket" value="${d.paket}" step="0.001"></td>
+                <td><input type="number" class="cell-input text-center text-slate-500 d-genel" value="${d.genel}" step="0.001"></td>
+                <td><input type="number" class="cell-input text-center text-slate-500 d-reklam" value="${d.reklam}" step="0.001"></td>
+                <td class="bg-purple-50"><input type="number" class="cell-input text-center text-purple-700 font-black d-kar" value="${d.kar}"></td>
+                <td class="col-net"><div class="cell-result res-net">$ 0.000</div></td>
+                <td class="col-satis"><div class="cell-result res-satis text-xl">$ 0.00</div></td>
+                <td class="text-center p-2">
+                    <button onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded transition-colors" title="Satırı Sil">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </td>
+            `;
             
-            document.getElementById('res_net_maliyet').innerText = netMaliyet.toFixed(3);
-            document.getElementById('res_satis_fiyati').innerText = satisFiyati.toFixed(2);
+            tabloGovdesi.appendChild(tr);
+            hesapla(tr); // Satır eklendiğinde hemen hesapla
         }
 
-        window.addEventListener('DOMContentLoaded', tamHesapla);
+        // Hesaplama Fonksiyonu (Sadece ilgili satırı hesaplar)
+        function hesapla(satir) {
+            // Global Elektrik
+            const globalKwFiyat = parseFloat(globalKwInput.value) || 0;
+
+            // Satırdaki Inputları Oku
+            const hammadde = parseFloat(satir.querySelector('.d-hammadde').value) || 0;
+            const kwKg = parseFloat(satir.querySelector('.d-kw').value) || 0;
+            const iscilik = parseFloat(satir.querySelector('.d-iscilik').value) || 0;
+            const karOrani = parseFloat(satir.querySelector('.d-kar').value) || 0;
+
+            // Sarf Giderleri
+            const sarf = (parseFloat(satir.querySelector('.d-amort').value) || 0) +
+                         (parseFloat(satir.querySelector('.d-bobin').value) || 0) +
+                         (parseFloat(satir.querySelector('.d-etiket').value) || 0) +
+                         (parseFloat(satir.querySelector('.d-paket').value) || 0) +
+                         (parseFloat(satir.querySelector('.d-genel').value) || 0) +
+                         (parseFloat(satir.querySelector('.d-reklam').value) || 0);
+
+            // Formüller
+            const enerjiMaliyeti = kwKg * globalKwFiyat;
+            const netMaliyet = hammadde + enerjiMaliyeti + iscilik + sarf;
+            const satisFiyati = netMaliyet * (1 + (karOrani / 100));
+
+            // Sonuçları Yazdır
+            satir.querySelector('.res-net').innerText = "$ " + netMaliyet.toFixed(3);
+            satir.querySelector('.res-satis').innerText = "$ " + satisFiyati.toFixed(2);
+        }
+
+        // Sayfa açıldığında örnek satırları ekle
+        window.onload = () => {
+            // 20 Denye Örneği
+            satirEkle({ tip: 'FLOŞ DÜZ', denye: 20, tur: 800, hammadde: 0.964, kw: 6.5, iscilik: 0.809, kar: 50 });
+            
+            // 50 Denye Krep Örneği
+            satirEkle({ tip: 'KREP', denye: 50, tur: 1200, hammadde: 1.250, kw: 8.0, iscilik: 1.100, kar: 45 });
+        };
     </script>
 </body>
 </html>
