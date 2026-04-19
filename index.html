@@ -49,30 +49,30 @@
                 </div>
 
                 <div class="input-card grid grid-cols-2 gap-4">
-                    <div class="col-span-2 bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-2">
+                    <div class="col-span-2 bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-2 text-center">
                         <label class="text-[10px] font-black text-emerald-600 uppercase block mb-1">Hammadde Dolar Fiyatı ($)</label>
                         <input type="number" id="v_hammadde" value="0.964" step="0.001" class="border-none bg-transparent text-3xl p-0">
                     </div>
                     <div>
-                        <label class="text-[9px] font-black text-slate-500 uppercase block mb-1">Denye</label>
+                        <label class="text-[9px] font-black text-slate-500 uppercase block mb-1 text-center">Denye</label>
                         <input type="number" id="v_denye" value="20">
                     </div>
                     <div>
-                        <label class="text-[9px] font-black text-slate-500 uppercase block mb-1">Tur (Büküm/Mt)</label>
+                        <label class="text-[9px] font-black text-slate-500 uppercase block mb-1 text-center">Tur (Büküm/Mt)</label>
                         <input type="number" id="v_tur" value="800">
                     </div>
                     <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100">
-                        <label class="text-[9px] font-black text-indigo-600 uppercase block mb-1">Hız (MT/DK)</label>
+                        <label class="text-[9px] font-black text-indigo-600 uppercase block mb-1 text-center">Hız (MT/DK)</label>
                         <input type="number" id="v_mtd" value="25" class="border-indigo-300 text-indigo-700" oninput="hizDegisti()">
                     </div>
                     <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100">
-                        <label class="text-[9px] font-black text-indigo-600 uppercase block mb-1">Devir (RPM)</label>
+                        <label class="text-[9px] font-black text-indigo-600 uppercase block mb-1 text-center">Devir (RPM)</label>
                         <input type="number" id="v_devir" value="10000" oninput="devirDegisti()">
                     </div>
                 </div>
 
                 <details class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <summary class="p-4 text-[10px] font-black text-slate-400 uppercase cursor-pointer bg-slate-50">Fabrika İşçilik ve Enerji Ayarları</summary>
+                    <summary class="p-4 text-[10px] font-black text-slate-400 uppercase cursor-pointer bg-slate-50 text-center">Fabrika İşçilik ve Enerji Ayarları</summary>
                     <div class="p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div><label class="text-[8px] font-bold uppercase">Personel</label><input type="number" id="v_personel" value="64"></div>
                         <div><label class="text-[8px] font-bold uppercase">Maaş ($)</label><input type="number" id="v_maas" value="900"></div>
@@ -95,23 +95,27 @@
 
                     <div class="space-y-4">
                         <div class="flex justify-between items-center bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
-                            <span class="text-slate-500 text-[10px] font-black uppercase">İşçilik Payı</span>
+                            <span class="text-slate-500 text-[10px] font-black uppercase tracking-widest">İşçilik Payı</span>
                             <span id="r_iscilik" class="text-orange-400 font-black text-xl">$0.000</span>
                         </div>
                         <div class="flex justify-between items-center bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
-                            <span class="text-slate-500 text-[10px] font-black uppercase">Enerji Payı</span>
+                            <span class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Enerji Payı</span>
                             <span id="r_enerji" class="text-blue-400 font-black text-xl">$0.000</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
+                            <span class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Hammadde</span>
+                            <span id="r_hammadde" class="text-emerald-400 font-black text-xl">$0.000</span>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-slate-800">
                         <div class="text-center">
                             <span class="block text-[8px] text-slate-500 uppercase font-black">Günlük Üretim</span>
-                            <span id="r_gunluk" class="text-lg font-black">0.00 Kg</span>
+                            <span id="r_gunluk" class="text-lg font-black text-white">0.00 Kg</span>
                         </div>
                         <div class="bg-emerald-600 p-4 rounded-2xl text-center shadow-lg transform active:scale-95 transition-all">
-                            <span class="block text-[8px] text-emerald-900 uppercase font-black opacity-70">Satış (%50)</span>
-                            <span id="r_satis" class="text-xl font-black">$0.00</span>
+                            <span class="block text-[8px] text-emerald-900 uppercase font-black opacity-70 tracking-widest">Satış (%50)</span>
+                            <span id="r_satis" class="text-xl font-black text-white">$0.00</span>
                         </div>
                     </div>
                 </div>
@@ -165,19 +169,19 @@
                 matches.forEach(item => {
                     const div = document.createElement('div');
                     div.className = "dropdown-item";
-                    div.innerHTML = `<span>${item.cins}</span><span class="text-blue-600">$${item.fiyat}</span>`;
+                    div.innerHTML = `<span>${item.cins}</span><span class="text-blue-600 font-black">$${item.fiyat}</span>`;
                     div.onclick = () => {
                         document.getElementById('v_iplik_tipi').value = item.cins;
                         document.getElementById('v_hammadde').value = parseFloat(item.fiyat);
                         dd.classList.add('hidden');
-                        hesapla(); // Veri geldiği an hesapla
+                        hesapla(); 
                     };
                     dd.appendChild(div);
                 });
             } else { dd.classList.add('hidden'); }
         });
 
-        // FORMÜL: Hız (MT/D) = (Devir * 2) / Tur
+        // Hız (MT/D) = (Devir * 2) / Tur
         function devirDegisti() {
             let t = parseFloat(document.getElementById('v_tur').value) || 1;
             let d = parseFloat(document.getElementById('v_devir').value) || 0;
@@ -205,15 +209,15 @@
             const makine = parseFloat(document.getElementById('v_makine').value) || 102;
             const kwFiyat = parseFloat(document.getElementById('v_kw_birim').value) || 0.148;
 
-            // 1. Kapasite (Hassas Üretim Miktarı)
+            // 1. Kapasite (Günlük Üretim)
             let gunlukKg = mtd * 60 * 24 * (denye / 9000) * ig / 1000;
             let aylikKg = gunlukKg * gun;
 
-            // 2. İşçilik Payı (64 Personel * 900$ * 1.1 / 102 Makine / Aylık KG)
+            // 2. İşçilik Payı (Personel * Maaş * 1.1 / Makine Sayısı / Aylık Üretim)
             let fabrikaYuku = person * maas * 1.1; 
             let kgIscilik = aylikKg > 0 ? (fabrikaYuku / makine) / aylikKg : 0;
 
-            // 3. Elektrik Payı (Saatlik 6.5 kW * 24 Saat / Günlük KG * Birim $)
+            // 3. Enerji Payı (Saatlik 6.5 kW * 24 Saat / Günlük KG * Birim $)
             let kgEnerji = gunlukKg > 0 ? (6.5 * 24 / gunlukKg) * kwFiyat : 0;
 
             // 4. Hammadde (Fire Dahil)
@@ -231,7 +235,7 @@
             document.getElementById('r_satis').innerText = "$" + (net * 1.5).toFixed(2);
         }
 
-        // ANLIK DİNLEYİCİ
+        // TÜM GİRDİLERİ DİNLE (ANLIK GÜNCELLEME)
         document.body.addEventListener('input', function(e) {
             if (e.target.tagName === 'INPUT' && e.target.id !== 'v_devir' && e.target.id !== 'v_mtd') {
                 hesapla();
