@@ -1296,7 +1296,7 @@ async function kaydet() {
     maliyet: maliyet,
     satis_fiyati: satis,
     kar_orani: kar_oran,
-    not: not || null
+    aciklama: not || null
   });
   showLoading(false);
 
@@ -1345,7 +1345,7 @@ function renderMaliyetler(veriler) {
       <td class="td-maliyet">$${r.maliyet ? r.maliyet.toFixed(4) : '—'}</td>
       <td class="td-satis">$${r.satis_fiyati ? r.satis_fiyati.toFixed(4) : '—'}</td>
       <td><span class="${r.kar_orani >= 50 ? 'katsayi-pos' : 'katsayi-neg'}">%${r.kar_orani}</span></td>
-      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;">${r.not || '—'}</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;">${r.aciklama || '—'}</td>
       <td style="color:var(--muted);font-size:10px;">${formatDate(r.created_at)}</td>
       <td><button class="delete-btn" onclick="event.stopPropagation();openDeleteModal(${r.id},'maliyet_kayitlari')">🗑</button></td>
     </tr>
@@ -1643,7 +1643,7 @@ function exportCSV() {
     r.tip, r.denye, r.tur, r.devir,
     r.mtd?.toFixed(3), r.gunluk_uretim?.toFixed(2),
     r.maliyet?.toFixed(4), r.satis_fiyati?.toFixed(4),
-    r.kar_orani, r.not || '', formatDate(r.created_at)
+    r.kar_orani, r.aciklama || '', formatDate(r.created_at)
   ]);
   const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
