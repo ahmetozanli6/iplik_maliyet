@@ -3,171 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İplik ERP - Temiz PDF Aktarımı</title>
+    <title>İplik ERP - Bulut Kayıt</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .erp-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-        .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; padding: 24px; }
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
-<body class="text-slate-800 pb-12">
-
-    <header class="erp-bg text-white py-6 px-6 shadow-lg mb-6 flex justify-between items-center">
-        <div>
-            <h1 class="text-2xl font-black mb-1 uppercase tracking-tighter">İplik Fiyat Listesi Aktar</h1>
-            <p class="text-emerald-400 text-xs font-bold uppercase tracking-widest mt-1 uppercase">Sıra numaraları ve sütunlar temizleniyor</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="index.html" class="bg-indigo-800 hover:bg-indigo-700 px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-md">Hesaplamaya Dön</a>
-            <button onclick="localStorage.removeItem('erp_fiyat_listesi'); location.reload();" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-bold text-sm shadow-md uppercase">Tüm Listeyi Sil</button>
-        </div>
+<body class="bg-slate-50 pb-12 font-['Inter'] text-slate-800">
+    <header class="bg-indigo-900 text-white p-6 flex justify-between items-center shadow-xl">
+        <h1 class="font-black tracking-tighter">İPLİK FİYAT LİSTESİ AKTARIMI (BULUT)</h1>
+        <a href="index.html" class="bg-white text-indigo-900 px-6 py-2 rounded-lg font-bold text-sm">HESAPLAMAYA DÖN</a>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-2xl shadow-lg border border-slate-200">
+        <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">PDF Dosyasını Bulut Veritabanına Gönder</h2>
         
-        <div class="lg:col-span-5 space-y-6">
-            <div class="card border-indigo-200 text-center">
-                <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfYukle(event)">
-                <button onclick="document.getElementById('pdf-file').click()" class="w-full bg-indigo-50 border-2 border-dashed border-indigo-300 p-8 rounded-xl hover:bg-indigo-100 transition-all">
-                    <svg class="w-10 h-10 text-indigo-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span class="block font-black text-indigo-700 uppercase text-xs">PDF Dosyası Seçin</span>
-                </button>
-                <div id="loading" class="hidden mt-4 text-indigo-600 font-bold animate-pulse text-sm">Analiz Ediliyor...</div>
-            </div>
-
-            <div class="card">
-                <h2 class="text-xs font-black text-slate-500 uppercase mb-3 uppercase">Ayrıştırılmış Veri Havuzu</h2>
-                <textarea id="raw-text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[10px] font-mono h-64 outline-none custom-scroll shadow-inner" placeholder="PDF verileri burada tek tek listelenecek..."></textarea>
-                <button onclick="metniAyikla()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg transition-all uppercase text-sm tracking-wide">Temizle ve Listeye Kaydet</button>
-            </div>
-        </div>
-
-        <div class="lg:col-span-7">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[750px]">
-                <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">İplik Fiyat Listesi</h3>
-                    <span id="kayit-sayisi" class="bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-xs font-black shadow-sm">0 Kayıt</span>
-                </div>
-                <div class="flex-1 overflow-y-auto custom-scroll">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-100 sticky top-0 z-10 border-b border-slate-200">
-                            <tr>
-                                <th class="p-4 text-[10px] font-black text-slate-500 uppercase">İplik Tipi / Cinsi</th>
-                                <th class="p-4 text-[10px] font-black text-slate-500 uppercase text-right w-32">Birim Fiyat</th>
-                            </tr>
-                        </thead>
-                        <tbody id="veri-tablosu" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
+        <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfIsle(event)">
+        <button onclick="document.getElementById('pdf-file').click()" class="w-full border-4 border-dashed border-indigo-100 p-12 rounded-2xl font-black text-indigo-500 hover:bg-indigo-50 transition-all text-xl">PDF DOSYASI SEÇ VE YÜKLE</button>
+        
+        <div id="loading" class="hidden mt-6 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+            <p class="mt-2 font-black text-indigo-600 animate-pulse uppercase text-xs">Veriler Buluta Yazılıyor...</p>
         </div>
     </div>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        
+        const SUPABASE_URL = 'https://nejpygqdwbjuwsauacsw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8';
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function pdfYukle(event) {
-            const file = event.target.files[0];
+        async function pdfIsle(e) {
+            const file = e.target.files[0];
             if (!file) return;
             document.getElementById('loading').classList.remove('hidden');
-            const fileReader = new FileReader();
-            
-            fileReader.onload = async function() {
-                const typedarray = new Uint8Array(this.result);
-                try {
-                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    let iplikListesi = [];
 
-                    for(let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        
-                        let items = textContent.items.map(item => ({
-                            str: item.str.trim(),
-                            x: item.transform[4],
-                            y: item.transform[5]
-                        })).filter(item => item.str.length > 0);
-
-                        let rows = {};
-                        items.forEach(item => {
-                            let yKey = Math.round(item.y);
-                            let closeY = Object.keys(rows).find(k => Math.abs(k - yKey) < 4);
-                            if (closeY) rows[closeY].push(item);
-                            else rows[yKey] = [item];
-                        });
-
-                        Object.keys(rows).sort((a, b) => b - a).forEach(y => {
-                            let rowItems = rows[y].sort((a, b) => a.x - b.x);
-                            let currentThread = "";
-                            for (let j = 0; j < rowItems.length; j++) {
-                                let item = rowItems[j];
-                                currentThread += item.str + " ";
-                                if (item.str.match(/^\d+[.,]\d{2,3}$/)) {
-                                    iplikListesi.push(currentThread.trim());
-                                    currentThread = ""; 
-                                }
-                            }
-                        });
-                    }
-
-                    document.getElementById('raw-text').value = iplikListesi.join('\n');
-                    metniAyikla();
-                } catch (e) { alert("Okuma Hatası!"); }
-                finally { document.getElementById('loading').classList.add('hidden'); }
-            };
-            fileReader.readAsArrayBuffer(file);
-        }
-
-        function metniAyikla() {
-            const rawText = document.getElementById('raw-text').value;
-            const lines = rawText.split('\n');
-            const finalData = [];
-
-            lines.forEach(line => {
-                line = line.trim();
-                const match = line.match(/(.+?)\s+(\d+[.,]\d{2,3})/);
-                if (match) {
-                    let isim = match[1].trim();
-                    // Baştaki sayıları temizle
-                    isim = isim.replace(/^\d+[\s.|\-)]+/, "").trim(); 
-                    isim = isim.replace(/^(USD|TL|\$)\s+/i, "");
-                    
-                    let fiyat = match[2].trim().replace(',', '.');
-                    if (isim.length > 3) {
-                        finalData.push({
-                            cins: isim.toUpperCase(),
-                            fiyat: parseFloat(fiyat).toFixed(3) + " $"
-                        });
-                    }
+            const fr = new FileReader();
+            fr.onload = async function() {
+                const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+                let text = "";
+                for(let i=1; i<=pdf.numPages; i++){
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    content.items.forEach(item => text += item.str + " ");
+                    text += "\n";
                 }
-            });
-
-            tabloyuGuncelle(finalData);
-            localStorage.setItem('erp_fiyat_listesi', JSON.stringify(finalData));
+                ayiklaVeKaydet(text);
+            };
+            fr.readAsArrayBuffer(file);
         }
 
-        function tabloyuGuncelle(veriler) {
-            const tablo = document.getElementById('veri-tablosu');
-            document.getElementById('kayit-sayisi').innerText = `${veriler.length} İplik Temizlendi`;
-            tablo.innerHTML = '';
-            veriler.forEach(veri => {
-                tablo.innerHTML += `
-                    <tr class="hover:bg-blue-50 border-b border-slate-50 transition-colors">
-                        <td class="p-4 font-bold text-[10px] text-slate-700 uppercase leading-tight">${veri.cins}</td>
-                        <td class="p-4 text-right font-mono font-black text-emerald-600 text-xs tracking-tighter">${veri.fiyat}</td>
-                    </tr>`;
+        async function ayiklaVeKaydet(metin) {
+            const data = [];
+            // Fiyatları ve İplik isimlerini bulur (Satır başındaki sayıları temizler)
+            const matches = [...metin.matchAll(/(.+?)\s+(\d+[.,]\d{2,3})/g)];
+            
+            matches.forEach(m => {
+                let isim = m[1].trim().replace(/^\d+[\s.|\-)]+/, "").toUpperCase();
+                let fiyat = m[2].replace(',','.');
+                if (isim.length > 3) data.push({ cins: isim, fiyat: fiyat });
             });
-        }
 
-        window.onload = () => {
-            const kayitli = localStorage.getItem('erp_fiyat_listesi');
-            if (kayitli) tabloyuGuncelle(JSON.parse(kayitli));
-        };
+            // Upsert: Varsa güncelle, yoksa ekle (cins sütununa göre)
+            const { error } = await client.from('iplik_fiyatlari').upsert(data, { onConflict: 'cins' });
+            
+            if(!error) {
+                alert(data.length + " İplik Başarıyla Buluta Kaydedildi!");
+            } else {
+                alert("Hata Oluştu: " + error.message);
+            }
+            document.getElementById('loading').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
