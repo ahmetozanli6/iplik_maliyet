@@ -10,9 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body class="bg-slate-50 pb-12 font-['Inter'] text-slate-800">
-    <header class="bg-indigo-900 text-white p-6 flex justify-between items-center shadow-xl">
-        <h1 class="font-black tracking-tighter">İPLİK FİYAT LİSTESİ AKTARIMI (BULUT)</h1>
-        <a href="index.html" class="bg-white text-indigo-900 px-6 py-2 rounded-lg font-bold text-sm">HESAPLAMAYA DÖN</a>
+    <header class="bg-indigo-900 text-white p-6 flex flex-col md:grow md:flex-row justify-between items-center shadow-xl gap-4">
+        <h1 class="font-black tracking-tighter uppercase text-xl text-center">İplik Fiyat Listesi Aktarımı (Bulut)</h1>
+        <div class="flex gap-2">
+            <a href="index.html" class="bg-white text-indigo-900 px-6 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-slate-100 transition-all text-center">HESAPLAMAYA DÖN</a>
+            <button onclick="if(confirm('TÜM BULUT VERİLERİNİ SİLEYİM Mİ?')) silTumu();" class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-red-600 transition-all">TÜMÜNÜ SİL</button>
+        </div>
     </header>
 
     <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-2xl shadow-lg border border-slate-200">
@@ -23,8 +26,10 @@
         
         <div id="loading" class="hidden mt-6 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
-            <p class="mt-2 font-black text-indigo-600 animate-pulse uppercase text-xs">Veriler Buluta Yazılıyor...</p>
+            <p class="mt-2 font-black text-indigo-600 animate-pulse uppercase text-xs">İşleniyor...</p>
         </div>
+        
+        <textarea id="raw-text" class="w-full mt-4 h-32 bg-slate-50 border p-3 rounded-lg font-mono text-[10px]" placeholder="Ham metin analizi..."></textarea>
     </div>
 
     <script>
@@ -46,9 +51,15 @@
                 for(let i=1; i<=pdf.numPages; i++){
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
-                    content.items.forEach(item => text += item.str + " ");
+                    let lastY = -1;
+                    content.items.sort((a,b) => b.transform[5]-a.transform[5] || a.transform[4]-b.transform[4]).forEach(item => {
+                        if(Math.abs(item.transform[5]-lastY) > 5 && lastY!==-1) text += "\n";
+                        text += item.str + " ";
+                        lastY = item.transform[5];
+                    });
                     text += "\n";
                 }
+                document.getElementById('raw-text').value = text;
                 ayiklaVeKaydet(text);
             };
             fr.readAsArrayBuffer(file);
@@ -56,24 +67,29 @@
 
         async function ayiklaVeKaydet(metin) {
             const data = [];
-            // Fiyatları ve İplik isimlerini bulur (Satır başındaki sayıları temizler)
-            const matches = [...metin.matchAll(/(.+?)\s+(\d+[.,]\d{2,3})/g)];
+            const lines = metin.split('\n');
             
-            matches.forEach(m => {
-                let isim = m[1].trim().replace(/^\d+[\s.|\-)]+/, "").toUpperCase();
-                let fiyat = m[2].replace(',','.');
-                if (isim.length > 3) data.push({ cins: isim, fiyat: fiyat });
+            lines.forEach(line => {
+                const regex = /(.+?)\s+(\d+[.,]\d{2,3})(?:\s+usd|\s+\$|\s+tl)?/gi;
+                let match;
+                while ((match = regex.exec(line)) !== null) {
+                    let isim = match[1].trim().replace(/^\d+[\s.|\-)]+/, "").toUpperCase();
+                    let fiyat = match[2].replace(',','.');
+                    if (isim.length > 3) data.push({ cins: isim, fiyat: fiyat });
+                }
             });
 
-            // Upsert: Varsa güncelle, yoksa ekle (cins sütununa göre)
             const { error } = await client.from('iplik_fiyatlari').upsert(data, { onConflict: 'cins' });
             
-            if(!error) {
-                alert(data.length + " İplik Başarıyla Buluta Kaydedildi!");
-            } else {
-                alert("Hata Oluştu: " + error.message);
-            }
+            if(!error) alert(data.length + " İplik Kaydedildi!");
+            else alert("Hata: " + error.message);
             document.getElementById('loading').classList.add('hidden');
+        }
+
+        async function silTumu() {
+            const { error } = await client.from('iplik_fiyatlari').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            if(!error) alert("Tüm bulut verileri silindi.");
+            else alert("Silme hatası.");
         }
     </script>
 </body>
