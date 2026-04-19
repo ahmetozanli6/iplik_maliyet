@@ -79,10 +79,10 @@
     </div>
 
     <script>
-        // --- BU BÖLÜMÜ SUPABASE PANELİNDEN ALDIĞINIZ BİLGİLERLE DOLDURUN ---
-        const SUPABASE_URL = 'BURAYA_PROJECT_URL_GELECEK'; 
-        const SUPABASE_ANON_KEY = 'BURAYA_API_KEY_GELECEK';
-        // -----------------------------------------------------------------
+        // --- SUPABASE BAĞLANTI BİLGİLERİ ---
+        const SUPABASE_URL = 'https://nejpygqdwbjuwsauacsw.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8';
+        // -----------------------------------
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -106,8 +106,12 @@
 
                 tablo.innerHTML = '';
 
+                if (data.length === 0) {
+                    tablo.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-orange-500 font-semibold">Veritabanında henüz iplik kaydı bulunmuyor.</td></tr>';
+                    return;
+                }
+
                 data.forEach(satir => {
-                    // Hesaplama Formülleri
                     const enerjiMaliyeti = (satir.kw_tuketim || 0) * kwFiyat;
                     const iscilikMaliyeti = (satir.iscilik || 0) * (iscilikEndeks / 100);
                     const netMaliyet = enerjiMaliyeti + iscilikMaliyeti;
@@ -127,7 +131,7 @@
                 });
             } catch (error) {
                 console.error("Hata:", error);
-                tablo.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Bağlantı hatası! Lütfen Supabase URL ve Key bilgilerinizi kontrol edin.</td></tr>';
+                tablo.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Bağlantı hatası! Lütfen Supabase URL bilginizi doğru yapıştırdığınızdan emin olun.</td></tr>';
             }
         }
     </script>
