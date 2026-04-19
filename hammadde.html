@@ -20,11 +20,11 @@
     <header class="erp-bg text-white py-6 px-6 shadow-lg mb-6 flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-black mb-1 uppercase tracking-tighter">İplik Fiyat Listesi Aktar</h1>
-            <p class="text-emerald-400 text-xs font-bold uppercase tracking-widest mt-1">Sıra numaraları ve sütun kirliliği temizleniyor</p>
+            <p class="text-emerald-400 text-xs font-bold uppercase tracking-widest mt-1 uppercase">Sıra numaraları ve sütunlar temizleniyor</p>
         </div>
         <div class="flex gap-2">
             <a href="index.html" class="bg-indigo-800 hover:bg-indigo-700 px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-md">Hesaplamaya Dön</a>
-            <button onclick="localStorage.removeItem('erp_fiyat_listesi'); location.reload();" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-bold text-sm shadow-md">TÜM LİSTEYİ SİL</button>
+            <button onclick="localStorage.removeItem('erp_fiyat_listesi'); location.reload();" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-bold text-sm shadow-md uppercase">Tüm Listeyi Sil</button>
         </div>
     </header>
 
@@ -35,22 +35,22 @@
                 <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfYukle(event)">
                 <button onclick="document.getElementById('pdf-file').click()" class="w-full bg-indigo-50 border-2 border-dashed border-indigo-300 p-8 rounded-xl hover:bg-indigo-100 transition-all">
                     <svg class="w-10 h-10 text-indigo-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span class="block font-black text-indigo-700 uppercase text-xs">Yeni PDF Dosyası Seçin</span>
+                    <span class="block font-black text-indigo-700 uppercase text-xs">PDF Dosyası Seçin</span>
                 </button>
-                <div id="loading" class="hidden mt-4 text-indigo-600 font-bold animate-pulse text-sm">Sıra Numaraları ve Tablo Analiz Ediliyor...</div>
+                <div id="loading" class="hidden mt-4 text-indigo-600 font-bold animate-pulse text-sm">Analiz Ediliyor...</div>
             </div>
 
             <div class="card">
-                <h2 class="text-xs font-black text-slate-500 uppercase mb-3">Ham Veri Görüntüsü</h2>
-                <textarea id="raw-text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[10px] font-mono h-64 outline-none custom-scroll shadow-inner" placeholder="PDF verileri burada listelenecek..."></textarea>
-                <button onclick="metniAyikla()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg transition-all uppercase text-sm tracking-wide">TEMİZLE VE LİSTEYE KAYDET</button>
+                <h2 class="text-xs font-black text-slate-500 uppercase mb-3 uppercase">Ayrıştırılmış Veri Havuzu</h2>
+                <textarea id="raw-text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[10px] font-mono h-64 outline-none custom-scroll shadow-inner" placeholder="PDF verileri burada tek tek listelenecek..."></textarea>
+                <button onclick="metniAyikla()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg transition-all uppercase text-sm tracking-wide">Temizle ve Listeye Kaydet</button>
             </div>
         </div>
 
         <div class="lg:col-span-7">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[750px]">
                 <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Temizlenmiş İplik Listesi</h3>
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">İplik Fiyat Listesi</h3>
                     <span id="kayit-sayisi" class="bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-xs font-black shadow-sm">0 Kayıt</span>
                 </div>
                 <div class="flex-1 overflow-y-auto custom-scroll">
@@ -117,7 +117,7 @@
 
                     document.getElementById('raw-text').value = iplikListesi.join('\n');
                     metniAyikla();
-                } catch (e) { alert("PDF Okuma Hatası!"); }
+                } catch (e) { alert("Okuma Hatası!"); }
                 finally { document.getElementById('loading').classList.add('hidden'); }
             };
             fileReader.readAsArrayBuffer(file);
@@ -133,13 +133,8 @@
                 const match = line.match(/(.+?)\s+(\d+[.,]\d{2,3})/);
                 if (match) {
                     let isim = match[1].trim();
-                    
-                    // --- KRİTİK TEMİZLEME: Başındaki sıra numaralarını siler ---
-                    // "4 150F288..." -> "150F288..." yapar. 
-                    // Sadece başta tek başına duran sayıları ve yanındaki boşluğu/noktayı hedefler.
+                    // Baştaki sayıları temizle
                     isim = isim.replace(/^\d+[\s.|\-)]+/, "").trim(); 
-                    
-                    // Para birimi kalıntılarını temizle
                     isim = isim.replace(/^(USD|TL|\$)\s+/i, "");
                     
                     let fiyat = match[2].trim().replace(',', '.');
@@ -158,7 +153,7 @@
 
         function tabloyuGuncelle(veriler) {
             const tablo = document.getElementById('veri-tablosu');
-            document.getElementById('kayit-sayisi').innerText = `${veriler.length} Kalem Temizlendi`;
+            document.getElementById('kayit-sayisi').innerText = `${veriler.length} İplik Temizlendi`;
             tablo.innerHTML = '';
             veriler.forEach(veri => {
                 tablo.innerHTML += `
