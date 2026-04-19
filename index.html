@@ -3,69 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İplik Üretim ERP - USD Maliyet Paneli</title>
+    <title>İplik ERP - Teknik Maliyet Paneli</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .usd-gradient { background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); }
-        .data-row:hover { background-color: #f0fdf4; transition: all 0.2s; }
+        .erp-header { background: linear-gradient(135deg, #0f172a 0%, #334155 100%); }
+        .usd-tag { background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900">
 
-    <div class="max-w-7xl mx-auto py-8 px-4">
-        <header class="usd-gradient rounded-3xl p-8 mb-8 shadow-2xl text-white relative overflow-hidden">
-            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center">
+    <div class="max-w-7xl mx-auto py-6 px-4">
+        <header class="erp-header rounded-2xl p-8 mb-6 shadow-xl text-white">
+            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
                 <div>
-                    <h1 class="text-4xl font-black tracking-tighter flex items-center gap-3">
-                        <span class="bg-white text-emerald-900 rounded-2xl w-12 h-12 flex items-center justify-center shadow-lg">$</span>
-                        Üretim Maliyet Otomasyonu
-                    </h1>
-                    <p class="mt-2 text-emerald-100 font-bold opacity-90 uppercase tracking-[0.3em] text-xs">
-                        Krep • Flash • Kar • Düz Büküm | USD Bazlı Canlı Hesaplama
-                    </p>
+                    <h1 class="text-3xl font-black tracking-tight tracking-widest">İPLİK MALİYET OTOMASYONU</h1>
+                    <p class="text-slate-400 text-sm font-bold mt-1">GÖRSELDEKİ TEKNİK FORMÜLİZASYON UYGULANMIŞTIR</p>
                 </div>
-                <div class="mt-4 md:mt-0 text-right">
-                    <span id="live_clock" class="text-sm font-mono bg-black/20 px-4 py-2 rounded-full border border-white/10"></span>
+                <div class="mt-4 md:mt-0 bg-white/10 px-6 py-3 rounded-xl border border-white/20">
+                    <span class="text-xs block text-slate-300 font-bold uppercase">Global Valuta</span>
+                    <span class="text-2xl font-black text-emerald-400">USD ($)</span>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">⚡ Enerji ($/kW)</label>
-                <input type="number" id="kw_fiyat" value="0.125" step="0.001" class="w-full text-2xl font-black text-emerald-600 outline-none">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">⚡ Elektrik Birim ($/kW)</label>
+                    <input type="number" id="kw_birim" value="0.12" step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 font-bold text-emerald-700 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">👥 İşçi Sayısı (48*1.1)</label>
+                    <input type="number" id="isci_sayisi" value="52.8" step="0.1" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 font-bold text-blue-700 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">💰 Ortalama Maaş ($)</label>
+                    <input type="number" id="maas_baz" value="666" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 font-bold text-blue-700 outline-none">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="maliyetHesapla()" class="w-full bg-slate-900 hover:bg-black text-white font-black py-3 rounded-lg shadow-lg transition-all active:scale-95 uppercase tracking-widest">
+                        HESAPLA
+                    </button>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">👥 İşçilik Endeksi (%)</label>
-                <input type="number" id="iscilik_fiyat" value="100" class="w-full text-2xl font-black text-blue-600 outline-none">
-            </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">📈 Hedef Kâr (%)</label>
-                <input type="number" id="kar_orani" value="25" class="w-full text-2xl font-black text-orange-600 outline-none">
-            </div>
-            <button onclick="maliyetHesapla()" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-3xl font-black uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all active:scale-95">
-                USD Hesapla
-            </button>
         </div>
 
-        <div class="bg-white rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-black tracking-[0.2em]">
-                            <th class="p-6">İplik Teknik Veri</th>
-                            <th class="p-6">Elektrik ($)</th>
-                            <th class="p-6">İşçilik ($)</th>
-                            <th class="p-6">Amort. + Sarf ($)</th>
-                            <th class="p-6 text-emerald-400">Net Maliyet ($)</th>
-                            <th class="p-6 text-white bg-emerald-800">Satış Fiyatı ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sonuc_tablosu" class="divide-y divide-slate-100 font-medium">
-                        </tbody>
-                </table>
-            </div>
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-900 text-slate-400 font-black uppercase text-[10px]">
+                    <tr>
+                        <th class="p-5 border-b border-slate-800">Üretim Bilgisi</th>
+                        <th class="p-5 border-b border-slate-800">Günlük Üretim (Kg)</th>
+                        <th class="p-5 border-b border-slate-800 text-emerald-400">Elektrik ($)</th>
+                        <th class="p-5 border-b border-slate-800 text-blue-400">İşçilik ($)</th>
+                        <th class="p-5 border-b border-slate-800">Sarf+Genel ($)</th>
+                        <th class="p-5 border-b border-slate-800 bg-emerald-900 text-white">YENİ MALİYET ($)</th>
+                    </tr>
+                </thead>
+                <tbody id="sonuc_tablosu" class="divide-y divide-slate-100 font-medium">
+                    </tbody>
+            </table>
         </div>
     </div>
 
@@ -74,17 +72,13 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        setInterval(() => {
-            document.getElementById('live_clock').innerText = new Date().toLocaleString('tr-TR');
-        }, 1000);
-
         async function maliyetHesapla() {
             const tablo = document.getElementById('sonuc_tablosu');
-            tablo.innerHTML = '<tr><td colspan="6" class="p-20 text-center animate-pulse text-slate-400 font-black uppercase tracking-widest text-xl">USD Verileri Hesaplanıyor...</td></tr>';
+            tablo.innerHTML = '<tr><td colspan="6" class="p-20 text-center font-bold text-slate-400 animate-pulse">VERİLER HESAPLANIYOR...</td></tr>';
 
-            const kwBirimUsd = parseFloat(document.getElementById('kw_fiyat').value) || 0;
-            const iscilikCarpan = parseFloat(document.getElementById('iscilik_fiyat').value) / 100;
-            const karOrani = 1 + (parseFloat(document.getElementById('kar_orani').value) / 100);
+            const kwFiyat = parseFloat(document.getElementById('kw_birim').value) || 0;
+            const isciSayisi = parseFloat(document.getElementById('isci_sayisi').value) || 52.8;
+            const maasBaz = parseFloat(document.getElementById('maas_baz').value) || 666;
 
             try {
                 const { data, error } = await supabaseClient.from('iplik_maliyetleri').select('*');
@@ -92,40 +86,39 @@
 
                 tablo.innerHTML = '';
                 data.forEach(s => {
-                    // EXCEL FORMÜLİZASYONU (USD BAZLI)
-                    const elektrikMaliyet = (s.kw_tuketim || 0) * kwBirimUsd;
-                    const iscilikMaliyet = (s.iscilik || 0) * iscilikCarpan;
+                    // GÖRSELDEKİ FORMÜL: ELEKTRİK = KW TÜKETİM * KW BİRİM
+                    const elektrikUsd = (s.kw_tuketim || 0) * kwFiyat;
                     
-                    // Görseldeki Sabit USD Giderleri (Kg başına)
-                    const sabitGiderler = (s.amortisman || 0.385) + (s.bobin || 0.10) + (s.paketleme || 0.15) + (s.genel_gider || 0.10) + (s.reklamasyon || 0.02);
+                    // GÖRSELDEKİ FORMÜL: İŞÇİLİK = (İŞÇİ SAYISI * MAAŞ) / AYLIK ÜRETİM
+                    // Not: Aylık üretim s.aylik_uretim sütunundan gelmeli, yoksa varsayılan alınır
+                    const aylikUretim = s.aylik_uretim || 3000; 
+                    const iscilikUsd = (isciSayisi * maasBaz) / aylikUretim;
 
-                    const netMaliyetUsd = elektrikMaliyet + iscilikMaliyet + sabitGiderler;
-                    const satisFiyatiUsd = netMaliyetUsd * karOrani;
+                    // GÖRSELDEKİ TOPLAM SARF (Bobin, Etiket, Paketleme, Amortisman, Genel Gider)
+                    const sarfGiderUsd = (s.amortisman || 0.385) + (s.bobin || 0.10) + (s.paketleme || 0.15) + (s.genel_gider || 0.10) + (s.reklamasyon || 0.02);
+
+                    const yeniMaliyet = elektrikUsd + iscilikUsd + sarfGiderUsd;
 
                     const tr = document.createElement('tr');
-                    tr.className = "data-row";
+                    tr.className = "hover:bg-slate-50 transition-colors";
                     tr.innerHTML = `
-                        <td class="p-6">
-                            <div class="flex flex-col">
-                                <span class="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">${s.iplik_tipi}</span>
-                                <span class="text-xl font-black text-slate-800">${s.denye} Denye</span>
-                                <span class="text-[10px] text-slate-400 font-bold">${s.tur || 0} TUR / ${s.mt_d || 0} MT/D</span>
-                            </div>
+                        <td class="p-5">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-tighter">${s.iplik_tipi}</span>
+                            <span class="text-base font-black text-slate-800">${s.denye} Denye</span>
+                            <span class="block text-[10px] text-blue-600 font-bold uppercase">${s.tur || 0} Tur / ${s.mt_d || 0} MT/D</span>
                         </td>
-                        <td class="p-6 font-mono text-slate-500 font-bold">$ ${elektrikMaliyet.toFixed(4)}</td>
-                        <td class="p-6 font-mono text-slate-500 font-bold">$ ${iscilikMaliyet.toFixed(4)}</td>
-                        <td class="p-6 font-mono text-slate-500 font-bold">$ ${sabitGiderler.toFixed(4)}</td>
-                        <td class="p-6 font-black text-emerald-900 text-xl">$ ${netMaliyetUsd.toFixed(3)}</td>
-                        <td class="p-6 font-black text-white bg-emerald-700/90 text-2xl shadow-inner">$ ${satisFiyatiUsd.toFixed(3)}</td>
+                        <td class="p-5 font-mono text-slate-600">${(s.gunluk_uretim || 0).toFixed(2)} Kg</td>
+                        <td class="p-5 font-mono font-bold text-emerald-600">$ ${elektrikUsd.toFixed(4)}</td>
+                        <td class="p-6 font-mono font-bold text-blue-600">$ ${iscilikUsd.toFixed(4)}</td>
+                        <td class="p-5 font-mono text-slate-500">$ ${sarfGiderUsd.toFixed(4)}</td>
+                        <td class="p-5 font-black text-white bg-emerald-800 text-xl shadow-inner">$ ${yeniMaliyet.toFixed(3)}</td>
                     `;
                     tablo.appendChild(tr);
                 });
-
             } catch (err) {
-                tablo.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-red-500 font-black">SİSTEM HATASI: VERİTABANI BAĞLANAMADI</td></tr>';
+                tablo.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-red-500 font-bold uppercase">BAĞLANTI HATASI!</td></tr>';
             }
         }
-
         maliyetHesapla();
     </script>
 </body>
