@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>İplik ERP v5.0 - Hassas Maliyet Analizi</title>
+    <title>İplik ERP v6.0 - Tam Otomatik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .erp-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .tab-active { background-color: #3b82f6 !important; color: white !important; shadow: 0 4px 6px rgba(59, 130, 246, 0.4); }
+        .tab-active { background-color: #3b82f6 !important; color: white !important; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
         #mobile-dropdown { max-height: 300px; overflow-y: auto; position: absolute; z-index: 999; width: 100%; background: white; border: 2px solid #3b82f6; border-radius: 0 0 12px 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .dropdown-item { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 700; text-transform: uppercase; cursor: pointer; color: #1e293b; }
-        .dropdown-item:active { background-color: #eff6ff; }
-        input { font-size: 16px !important; transition: all 0.2s; } 
-        input:focus { border-color: #3b82f6 !important; background-color: white !important; }
+        input { font-size: 16px !important; transition: all 0.2s; border: 2px solid #e2e8f0; } 
+        input:focus { border-color: #3b82f6 !important; background-color: white !important; outline: none; }
         input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
     </style>
 </head>
@@ -25,145 +24,83 @@
     <header class="erp-header text-white p-5 sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-col gap-4">
             <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-xl font-black tracking-tighter uppercase leading-none">İplik ERP Pro</h1>
-                    <span id="sync-status" class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Senkronize Ediliyor...</span>
-                </div>
-                <div class="flex flex-col items-end">
-                    <span class="text-[10px] font-bold text-slate-400">ÜRETİM VERİMLİLİĞİ</span>
-                    <span id="r_verim" class="text-emerald-400 font-black text-sm">%100</span>
-                </div>
+                <h1 class="text-xl font-black uppercase tracking-tighter">İplik ERP v6.0</h1>
+                <span id="sync-status" class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full uppercase">Sistem Hazır</span>
             </div>
             <nav class="flex bg-slate-800/60 p-1 rounded-xl backdrop-blur-md border border-slate-700/50">
-                <button onclick="tabDegistir('hesaplama')" id="btn-hesaplama" class="flex-1 py-3 font-bold text-[10px] rounded-lg transition-all tab-active uppercase tracking-widest">Maliyet Motoru</button>
-                <button onclick="tabDegistir('aktarma')" id="btn-aktarma" class="flex-1 py-3 font-bold text-[10px] rounded-lg transition-all text-slate-400 uppercase tracking-widest">Fiyat Aktar</button>
+                <button onclick="tabDegistir('hesaplama')" id="btn-hesaplama" class="flex-1 py-3 font-bold text-[10px] rounded-lg transition-all tab-active uppercase">Maliyet Motoru</button>
+                <button onclick="tabDegistir('aktarma')" id="btn-aktarma" class="flex-1 py-3 font-bold text-[10px] rounded-lg transition-all text-slate-400 uppercase">Fiyat Aktar</button>
             </nav>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 mt-6">
+    <main class="max-w-7xl mx-auto px-4 mt-6" id="main-container">
         
         <div id="tab-hesaplama" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
             <div class="lg:col-span-8 space-y-4">
                 
                 <div class="bg-white p-5 rounded-2xl border-2 border-blue-500 shadow-sm relative">
-                    <label class="block text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">İPLİK ARAMA VE OTOMATİK FİYAT</label>
+                    <label class="block text-[10px] font-black text-blue-600 uppercase mb-2">İPLİK SEÇİLDİĞİNDE FİYAT OTOMATİK GELİR</label>
                     <div class="relative">
-                        <input type="text" id="v_iplik_tipi" autocomplete="off" placeholder="Listeden bir iplik seçin..." 
-                               class="w-full bg-blue-50/50 border-2 border-blue-100 p-4 rounded-xl font-bold uppercase outline-none focus:ring-4 focus:ring-blue-100"
+                        <input type="text" id="v_iplik_tipi" autocomplete="off" placeholder="Aramak için yazın..." 
+                               class="w-full bg-blue-50/50 p-4 rounded-xl font-bold uppercase"
                                oninput="aramaYap(this.value)">
                         <div id="mobile-dropdown" class="hidden"></div>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase mb-4 border-b pb-2 tracking-widest">Kapasite ve Teknik Parametreler</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">İplik Denye</label>
-                            <input type="number" id="v_denye" value="20" class="w-full bg-slate-50 p-3 rounded-xl font-black text-center border" oninput="hesapla()">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Metre Büküm (TUR)</label>
-                            <input type="number" id="v_tur" value="800" class="w-full bg-slate-50 p-3 rounded-xl font-black text-center border" oninput="hesapla()">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-bold text-emerald-600 uppercase ml-1">Hız (MT/DİKKAT)</label>
-                            <input type="number" id="v_mtd" value="25" class="w-full border-2 border-emerald-200 p-3 rounded-xl font-black text-center text-emerald-700 bg-emerald-50/30" oninput="hizDegisti()">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">İğ Devri (RPM)</label>
-                            <input type="number" id="v_devir" value="10000" class="w-full border p-3 rounded-xl font-black text-center bg-slate-50" oninput="devirDegisti()">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">İğ Sayısı</label>
-                            <input type="number" id="v_ig" value="256" class="w-full border p-3 rounded-xl font-black text-center bg-slate-50" oninput="hesapla()">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Çalışma Günü</label>
-                            <input type="number" id="v_gun" value="28" class="w-full border p-3 rounded-xl font-black text-center bg-slate-50" oninput="hesapla()">
-                        </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="col-span-2 md:col-span-1 bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                        <label class="text-[9px] font-bold text-emerald-600 uppercase block mb-1">Hammadde Fiyatı ($)</label>
+                        <input type="number" id="v_hammadde" value="0.964" step="0.001" class="w-full bg-transparent font-black text-xl text-center outline-none">
                     </div>
+                    <div><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Denye</label><input type="number" id="v_denye" value="20" class="w-full p-3 rounded-xl font-black text-center border"></div>
+                    <div><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Metre Büküm (Tur)</label><input type="number" id="v_tur" value="800" class="w-full p-3 rounded-xl font-black text-center border"></div>
+                    <div><label class="text-[9px] font-bold text-emerald-600 uppercase block mb-1">Hız (MT/D)</label><input type="number" id="v_mtd" value="25" class="w-full border-2 border-emerald-300 p-3 rounded-xl font-black text-center text-emerald-700" oninput="hizDegisti()"></div>
+                    <div><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Devir (RPM)</label><input type="number" id="v_devir" value="10000" class="w-full border p-3 rounded-xl font-black text-center" oninput="devirDegisti()"></div>
+                    <div><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">İğ Sayısı</label><input type="number" id="v_ig" value="256" class="w-full border p-3 rounded-xl font-black text-center"></div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-orange-600 uppercase mb-4 border-b pb-2 tracking-widest">Excel Gider ve Personel Ayarları</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-orange-50/50 p-3 rounded-xl mb-4 border border-orange-100">
-                        <div><label class="text-[8px] font-bold text-orange-500 uppercase block mb-1 ml-1">Personel (64)</label><input type="number" id="v_personel" value="64" class="w-full border p-2 rounded-lg font-bold text-center text-sm" oninput="hesapla()"></div>
-                        <div><label class="text-[8px] font-bold text-orange-500 uppercase block mb-1 ml-1">Maaş ($)</label><input type="number" id="v_maas" value="900" class="w-full border p-2 rounded-lg font-bold text-center text-sm" oninput="hesapla()"></div>
-                        <div><label class="text-[8px] font-bold text-orange-500 uppercase block mb-1 ml-1">Çarpan (1.1)</label><input type="number" id="v_carpan" value="1.1" step="0.1" class="w-full border p-2 rounded-lg font-bold text-center text-sm" oninput="hesapla()"></div>
-                        <div><label class="text-[8px] font-bold text-orange-500 uppercase block mb-1 ml-1">Makine (102)</label><input type="number" id="v_makine" value="102" class="w-full border p-2 rounded-lg font-bold text-center text-sm border-orange-200" oninput="hesapla()"></div>
+                <details class="bg-white p-2 rounded-xl border shadow-sm">
+                    <summary class="text-[10px] font-bold text-slate-400 p-2 uppercase cursor-pointer">Personel & Enerji Detayları</summary>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-lg">
+                        <div><label class="text-[8px] font-bold">Personel</label><input type="number" id="v_personel" value="64" class="w-full border p-2 rounded font-bold text-center"></div>
+                        <div><label class="text-[8px] font-bold">Maaş ($)</label><input type="number" id="v_maas" value="900" class="w-full border p-2 rounded font-bold text-center"></div>
+                        <div><label class="text-[8px] font-bold">Makine</label><input type="number" id="v_makine" value="102" class="w-full border p-2 rounded font-bold text-center"></div>
+                        <div><label class="text-[8px] font-bold">KW ($)</label><input type="number" id="v_kw_birim" value="0.148" step="0.001" class="w-full border p-2 rounded font-bold text-center"></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
-                            <label class="text-[9px] font-bold text-emerald-600 uppercase block mb-1 ml-1">Hammadde ($/kg)</label>
-                            <input type="number" id="v_hammadde" value="0.964" step="0.001" class="w-full border-0 bg-transparent font-black text-xl text-center outline-none" oninput="hesapla()">
-                        </div>
-                        <div class="bg-red-50/50 p-3 rounded-xl border border-red-100 text-center">
-                            <label class="text-[9px] font-bold text-red-600 uppercase block mb-1 ml-1">Enerji KW/Birim ($)</label>
-                            <input type="number" id="v_kw_birim" value="0.148" step="0.001" class="w-full border-0 bg-transparent font-black text-xl text-center outline-none" oninput="hesapla()">
-                        </div>
-                    </div>
-                </div>
+                </details>
             </div>
 
             <div class="lg:col-span-4">
                 <div class="bg-slate-900 rounded-3xl p-6 text-white shadow-2xl sticky top-28 border border-slate-800">
                     <div class="text-center mb-8 border-b border-slate-800 pb-6">
                         <span class="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">1 KG NET MALİYET</span>
-                        <div class="text-7xl font-black mt-2 tracking-tighter flex justify-center items-baseline leading-none">
+                        <div class="text-6xl font-black mt-2 tracking-tighter flex justify-center items-baseline leading-none">
                             <span class="text-2xl text-blue-500 font-normal mr-1">$</span><span id="r_net">0.000</span>
                         </div>
                     </div>
-                    
-                    <div class="space-y-4 mb-8">
-                        <div class="flex justify-between items-center bg-slate-800/40 p-3 rounded-xl">
-                            <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Hammadde</span>
-                            <span id="r_hammadde" class="text-emerald-400 font-black text-sm">$0.000</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-800/40 p-3 rounded-xl">
-                            <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">İşçilik Payı</span>
-                            <span id="r_iscilik" class="text-orange-400 font-black text-sm">$0.000</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-800/40 p-3 rounded-xl">
-                            <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Enerji Gideri</span>
-                            <span id="r_enerji" class="text-blue-400 font-black text-sm">$0.000</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-800">
-                            <div class="text-center bg-indigo-900/20 p-2 rounded-lg">
-                                <span class="block text-[8px] text-indigo-400 uppercase font-black">GÜNLÜK KG</span>
-                                <span id="r_gunluk" class="text-white font-bold text-xs">0.00</span>
-                            </div>
-                            <div class="text-center bg-indigo-900/20 p-2 rounded-lg">
-                                <span class="block text-[8px] text-indigo-400 uppercase font-black">AYLIK KG</span>
-                                <span id="r_aylik" class="text-white font-bold text-xs">0.00</span>
-                            </div>
-                        </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px] font-bold">İŞÇİLİK PAYI</span><span id="r_iscilik" class="text-orange-400 font-black">$0.000</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px] font-bold">ENERJİ GİDERİ</span><span id="r_enerji" class="text-blue-400 font-black">$0.000</span></div>
+                        <div class="flex justify-between items-center border-t border-slate-800 pt-4"><span class="text-slate-500 text-[10px] font-bold">GÜNLÜK ÜRETİM</span><span id="r_gunluk" class="font-bold">0.00 Kg</span></div>
                     </div>
-
-                    <div class="bg-blue-600 p-6 rounded-2xl text-center shadow-lg transform active:scale-95 transition-all cursor-pointer">
-                        <span class="text-white text-[10px] font-black uppercase tracking-widest block mb-1 opacity-80 underline decoration-blue-300">Tavsiye Satış (%50 Kâr)</span>
+                    <div class="mt-8 bg-blue-600 p-6 rounded-2xl text-center shadow-lg">
+                        <span class="text-white text-[10px] font-black uppercase tracking-widest block mb-1 opacity-80">Satış Fiyatı (%50)</span>
                         <span id="r_satis" class="text-5xl font-black text-white tracking-tighter">0.00</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="tab-aktarma" class="hidden max-w-2xl mx-auto space-y-6">
+        <div id="tab-aktarma" class="hidden max-w-2xl mx-auto">
             <div class="bg-white p-12 rounded-3xl border-4 border-dashed border-blue-100 text-center shadow-inner">
                 <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfIsle(event)">
-                <button onclick="document.getElementById('pdf-file').click()" class="flex flex-col items-center mx-auto group">
-                    <div class="w-24 h-24 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-lg shadow-blue-100">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                    <span class="text-xl font-black text-slate-800 uppercase tracking-tighter">FİYAT LİSTESİ YÜKLE (PDF)</span>
-                    <p class="text-slate-400 text-xs mt-3 uppercase font-black leading-relaxed">PDF'deki iplik isimlerini ve fiyatlarını <br>otomatik ayıklar ve buluta kaydeder.</p>
+                <button onclick="document.getElementById('pdf-file').click()" class="flex flex-col items-center mx-auto">
+                    <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg></div>
+                    <span class="text-xl font-black text-slate-800 uppercase">PDF Fiyat Listesi Yükle</span>
                 </button>
-            </div>
-            <div id="loading" class="hidden text-center">
-                <div class="inline-block animate-spin w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
-                <p class="text-blue-600 font-black text-xs uppercase animate-pulse">Supabase Veritabanına Yazılıyor...</p>
+                <div id="loading" class="hidden mt-6 text-center animate-pulse"><p class="text-blue-600 font-black text-xs uppercase">Bulut Güncelleniyor...</p></div>
             </div>
         </div>
     </main>
@@ -173,10 +110,8 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8';
         const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let bulutHafiza = [];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        let iplikData = [];
 
-        // SEKME YÖNETİMİ
         function tabDegistir(tab) {
             document.getElementById('tab-hesaplama').classList.toggle('hidden', tab !== 'hesaplama');
             document.getElementById('tab-aktarma').classList.toggle('hidden', tab !== 'aktarma');
@@ -184,55 +119,35 @@
             document.getElementById('btn-aktarma').classList.toggle('tab-active', tab === 'aktarma');
         }
 
-        // SUPABASE VERİ ÇEKME
         async function verileriGetir() {
-            const status = document.getElementById('sync-status');
-            try {
-                const { data, error } = await client.from('iplik_fiyatlari').select('*');
-                if (data && !error) {
-                    bulutHafiza = data;
-                    status.innerText = "BULUT BAĞLANDI: " + data.length + " İPLİK";
-                    status.classList.add('text-emerald-400');
-                    const list = document.getElementById('iplik_listesi');
-                    list.innerHTML = "";
-                    data.forEach(i => {
-                        let opt = document.createElement('option');
-                        opt.value = i.cins;
-                        list.appendChild(opt);
-                    });
-                }
-            } catch (e) {
-                status.innerText = "BAĞLANTI HATASI";
-                status.classList.add('text-red-400');
-            }
+            const { data } = await client.from('iplik_fiyatlari').select('*');
+            if (data) iplikData = data;
         }
 
-        // ÖZEL MOBİL ARAMA
         function aramaYap(val) {
             const dd = document.getElementById('mobile-dropdown');
             const q = val.toUpperCase();
             dd.innerHTML = "";
             if (q.length < 1) { dd.classList.add('hidden'); return; }
 
-            const filtrelenmis = bulutHafiza.filter(i => i.cins.includes(q)).slice(0, 15);
-            if (filtrelenmis.length > 0) {
+            const matches = iplikData.filter(i => i.cins.includes(q)).slice(0, 12);
+            if (matches.length > 0) {
                 dd.classList.remove('hidden');
-                filtrelenmis.forEach(i => {
-                    const d = document.createElement('div');
-                    d.className = "dropdown-item";
-                    d.innerText = i.cins;
-                    d.onclick = () => {
-                        document.getElementById('v_iplik_tipi').value = i.cins;
-                        document.getElementById('v_hammadde').value = parseFloat(i.fiyat);
+                matches.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "dropdown-item";
+                    div.innerText = item.cins;
+                    div.onclick = () => {
+                        document.getElementById('v_iplik_tipi').value = item.cins;
+                        document.getElementById('v_hammadde').value = parseFloat(item.fiyat);
                         dd.classList.add('hidden');
-                        hesapla(); // Anında Güncelleme
+                        hesapla(); // Seçim yapıldığı an hesapla
                     };
-                    dd.appendChild(d);
+                    dd.appendChild(div);
                 });
             } else { dd.classList.add('hidden'); }
         }
 
-        // TEKNİK MATEMATİKSEL İLİŞKİLER (DEVİR/TUR/HIZ)
         function devirDegisti() {
             let t = parseFloat(document.getElementById('v_tur').value) || 1;
             let d = parseFloat(document.getElementById('v_devir').value) || 0;
@@ -247,52 +162,37 @@
             hesapla();
         }
 
-        // --- ANA MALİYET MOTORU (DETAYLI ANALİZ) ---
         function hesapla() {
-            // Girdiler
             const denye = parseFloat(document.getElementById('v_denye').value) || 0;
             const mtd = parseFloat(document.getElementById('v_mtd').value) || 0;
             const ig = parseFloat(document.getElementById('v_ig').value) || 256;
             const gun = parseFloat(document.getElementById('v_gun').value) || 28;
-            const hmd_birim = parseFloat(document.getElementById('v_hammadde').value) || 0;
-            const fire = parseFloat(document.getElementById('v_fire').value) || 0;
-            const person_sayi = parseFloat(document.getElementById('v_personel').value) || 64;
+            const hmd = parseFloat(document.getElementById('v_hammadde').value) || 0;
             const maas = parseFloat(document.getElementById('v_maas').value) || 900;
-            const carpan = parseFloat(document.getElementById('v_carpan').value) || 1.1;
+            const person = parseFloat(document.getElementById('v_personel').value) || 64;
             const makine = parseFloat(document.getElementById('v_makine').value) || 102;
-            const kw_fiyat = parseFloat(document.getElementById('v_kw_birim').value) || 0.148;
+            const kwBirim = parseFloat(document.getElementById('v_kw_birim').value) || 0.148;
 
-            // 1. Kapasite (En Önemli Veri)
             let gunlukKg = mtd * 60 * 24 * (denye / 9000) * ig / 1000;
             let aylikKg = gunlukKg * gun;
 
-            // 2. Hammadde (Fire Dahil)
-            let hmdNet = hmd_birim * (1 + (fire / 100));
+            let kgIscilik = aylikKg > 0 ? ((person * maas * 1.1) / makine) / aylikKg : 0;
+            let kgEnerji = gunlukKg > 0 ? (6.5 * 24 / gunlukKg) * kwBirim : 0;
 
-            // 3. İşçilik (Dinamik: Üretim Azaldıkça İşçilik Payı Artar)
-            let toplamGider = person_sayi * maas * carpan;
-            let kgIscilik = aylikKg > 0 ? (toplamGider / makine) / aylikKg : 0;
-
-            // 4. Enerji (6.5 kW Sabit Tüketim Üzerinden)
-            const kgEnerji = gunlukKg > 0 ? (6.5 * 24 / gunlukKg) * kw_fiyat : 0;
-
-            // 5. Sarf + Amortisman (0.45$ Tahmini)
-            const sarf = 0.45;
-
-            // NET SONUÇ
-            const netMaliyet = hmdNet + kgIscilik + kgEnerji + sarf;
+            const net = hmd + kgIscilik + kgEnerji + 0.45; // 0.45 Sabitler
             
-            // Ekranı Güncelle
-            document.getElementById('r_gunluk').innerText = gunlukKg.toFixed(2);
-            document.getElementById('r_aylik').innerText = aylikKg.toLocaleString('tr-TR');
-            document.getElementById('r_hammadde').innerText = "$" + hmdNet.toFixed(3);
+            document.getElementById('r_net').innerText = net.toFixed(3);
             document.getElementById('r_iscilik').innerText = "$" + kgIscilik.toFixed(3);
             document.getElementById('r_enerji').innerText = "$" + kgEnerji.toFixed(3);
-            document.getElementById('r_net').innerText = netMaliyet.toFixed(3);
-            document.getElementById('r_satis').innerText = (netMaliyet * 1.5).toFixed(2);
+            document.getElementById('r_gunluk').innerText = gunlukKg.toFixed(2) + " Kg";
+            document.getElementById('r_satis').innerText = (net * 1.5).toFixed(2);
         }
 
-        // PDF İŞLEME
+        // TÜM GİRDİLERİ ANLIK TAKİP ET
+        document.addEventListener('input', function(e) {
+            if(e.target.tagName === 'INPUT') hesapla();
+        });
+
         async function pdfIsle(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -300,29 +200,27 @@
             const fr = new FileReader();
             fr.onload = async function() {
                 const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-                let text = "";
+                let t = "";
                 for(let i=1; i<=pdf.numPages; i++){
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
-                    content.items.forEach(item => text += item.str + " ");
-                    text += "\n";
+                    content.items.forEach(item => t += item.str + " ");
                 }
-                const clean = [];
+                const data = [];
                 const regex = /(.+?)\s+(\d+[.,]\d{2,3})/gi;
-                let match;
-                while ((match = regex.exec(text)) !== null) {
-                    let isim = match[1].trim().replace(/^\d+[\s.|\-)]+/, "").toUpperCase();
-                    clean.push({ cins: isim, fiyat: match[2].replace(',','.') });
+                let m;
+                while ((m = regex.exec(t)) !== null) {
+                    let isim = m[1].trim().replace(/^\d+[\s.|\-)]+/, "").toUpperCase();
+                    data.push({ cins: isim, fiyat: m[2].replace(',','.') });
                 }
-                await client.from('iplik_fiyatlari').upsert(clean, { onConflict: 'cins' });
-                alert("Bulut Güncellendi!");
+                await client.from('iplik_fiyatlari').upsert(data, { onConflict: 'cins' });
+                alert("Güncellendi!");
                 location.reload();
             };
             fr.readAsArrayBuffer(file);
         }
 
         window.onload = () => { verileriGetir(); hesapla(); };
-        document.addEventListener('click', (e) => { if(!e.target.closest('.relative')) document.getElementById('mobile-dropdown').classList.add('hidden'); });
     </script>
 </body>
 </html>
