@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İplik Maliyet ve Numune Yönetimi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 p-8 text-gray-800">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-blue-800">🧵 İplik Maliyet Hesaplama Modülü</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-blue-50 rounded">
+            <div>
+                <label class="block text-sm font-medium mb-1">Güncel KW Birim Fiyatı</label>
+                <input type="number" id="kw_fiyat" value="1.5" step="0.01" class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Güncel İşçilik Endeksi</label>
+                <input type="number" id="iscilik_fiyat" value="60" class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">İplik Tipi Filtresi</label>
+                <select id="iplik_filtre" class="w-full border p-2 rounded">
+                    <option value="Tümü">Tümünü Göster</option>
+                    <option value="Düz Büküm">Düz Büküm</option>
+                    <option value="Krep">Krep</option>
+                    <option value="Flash">Flash</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="hesaplaVeGetir()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+            Maliyetleri Hesapla ve Getir
+        </button>
+
+        <div class="mt-8 overflow-x-auto">
+            <table class="min-w-full bg-white border">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="py-2 px-4 border">İplik Tipi</th>
+                        <th class="py-2 px-4 border">Denye</th>
+                        <th class="py-2 px-4 border">Yeni Elektrik Maliyeti</th>
+                        <th class="py-2 px-4 border">Yeni İşçilik</th>
+                        <th class="py-2 px-4 border">GÜNCEL TOPLAM MALİYET</th>
+                    </tr>
+                </thead>
+                <tbody id="sonuc_tablosu" class="text-center">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Bağlantı Bilgileri (Kendi projenizinkileri buraya yapıştırın)
+        const SUPABASE_URL = 'BURAYA_PROJECT_URL_GELECEK';
+        const SUPABASE_ANON_KEY = 'BURAYA_API_KEY_GELECEK';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function hesaplaVeGetir() {
+            const tablo = document.getElementById('sonuc_tablosu');
+            tablo.innerHTML = '<tr><td colspan="5" class="py-4">Veriler Supabase\'den çekiliyor...</td></tr>';
+
+            const kwFiyat = parseFloat(document.getElementById('kw_fiyat').value);
+            const iscilikEndeks = parseFloat(document.getElementById('iscilik_fiyat').value);
+            const filtre = document.getElementById('iplik_filtre').value;
+
+            // Supabase'den veriyi çekme
+            let query = supabase.from('iplik_maliyetleri').select('*');
+            if (filtre !== 'Tümü') {
+                query = query.eq('iplik_tipi', filtre);
+            }
+            
+            const { data, error } = await query;
+
+            if (error) {
+                console.error("Veri çekme hatası:", error);
+                tablo.innerHTML = '<tr><td colspan="5" class="py-4 text-red-600">Veri çekilemedi. Bağlantı ayarlarınızı kontrol edin.</td></tr>';
+                return;
+            }
+
+            tablo.innerHTML = ''; // Yükleniyor yazısını temizle
+
+            // Verileri döngüye alıp HTML tablosuna yazdırıyoruz
+            data.forEach(satir => {
+                // Dinamik Hesaplamalar
+                let yeniElektrik = satir.kw_tuketim * kwFiyat;
+                let yeniIscilik = satir.iscilik * (iscilikEndeks / 100); // Örnek formülizasyon
+                let guncelMaliyet = yeniElektrik + yeniIscilik; // Sarf malzeme vb. eklenebilir
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2 px-4 border">${satir.iplik_tipi}</td>
+                    <td class="py-2 px-4 border font-bold">${satir.denye}</td>
+                    <td class="py-2 px-4 border">${yeniElektrik.toFixed(3)} ₺</td>
+                    <td class="py-2 px-4 border">${yeniIscilik.toFixed(3)} ₺</td>
+                    <td class="py-2 px-4 border font-bold text-green-700">${guncelMaliyet.toFixed(3)} ₺</td>
+                `;
+                tablo.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
