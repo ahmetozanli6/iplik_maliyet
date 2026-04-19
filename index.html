@@ -3,66 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İplik ERP - Teknik Maliyet Paneli</title>
+    <title>İplik ERP - Hammadde & Teknik Maliyet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .erp-header { background: linear-gradient(135deg, #0f172a 0%, #334155 100%); }
-        .usd-tag { background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .erp-header { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); }
+        .input-focus:focus { ring: 2px; ring-color: #3b82f6; outline: none; border-color: transparent; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900">
 
     <div class="max-w-7xl mx-auto py-6 px-4">
-        <header class="erp-header rounded-2xl p-8 mb-6 shadow-xl text-white">
-            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-                <div>
-                    <h1 class="text-3xl font-black tracking-tight tracking-widest">İPLİK MALİYET OTOMASYONU</h1>
-                    <p class="text-slate-400 text-sm font-bold mt-1">GÖRSELDEKİ TEKNİK FORMÜLİZASYON UYGULANMIŞTIR</p>
-                </div>
-                <div class="mt-4 md:mt-0 bg-white/10 px-6 py-3 rounded-xl border border-white/20">
-                    <span class="text-xs block text-slate-300 font-bold uppercase">Global Valuta</span>
-                    <span class="text-2xl font-black text-emerald-400">USD ($)</span>
-                </div>
+        <header class="erp-header rounded-2xl p-6 mb-6 shadow-xl text-white flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-black tracking-widest">İPLİK MALİYET OTOMASYONU v2.0</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase mt-1">Denye Bazlı Hammadde & Üretim Formülizasyonu</p>
+            </div>
+            <div class="text-right">
+                <span class="text-emerald-400 font-black text-xl">USD ($)</span>
             </div>
         </header>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">⚡ Elektrik Birim ($/kW)</label>
-                    <input type="number" id="kw_birim" value="0.12" step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 font-bold text-emerald-700 outline-none focus:ring-2 focus:ring-emerald-500">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-sm font-black text-slate-700 uppercase mb-4 border-b pb-2 flex items-center gap-2">
+                    📦 Hammadde Fiyatları ($/Kg)
+                </h2>
+                <div class="space-y-4" id="hammadde_listesi">
+                    <div class="flex items-center justify-between gap-4">
+                        <label class="text-xs font-bold text-slate-500 w-20">20 Denye:</label>
+                        <input type="number" id="h_20" value="3.50" step="0.01" class="w-full bg-slate-50 border rounded-lg p-2 font-bold text-blue-600">
+                    </div>
+                    <div class="flex items-center justify-between gap-4">
+                        <label class="text-xs font-bold text-slate-500 w-20">50 Denye:</label>
+                        <input type="number" id="h_50" value="3.20" step="0.01" class="w-full bg-slate-50 border rounded-lg p-2 font-bold text-blue-600">
+                    </div>
+                    <div class="flex items-center justify-between gap-4">
+                        <label class="text-xs font-bold text-slate-500 w-20">150 Denye:</label>
+                        <input type="number" id="h_150" value="2.80" step="0.01" class="w-full bg-slate-50 border rounded-lg p-2 font-bold text-blue-600">
+                    </div>
+                    <div class="flex items-center justify-between gap-4">
+                        <label class="text-xs font-bold text-slate-500 w-20">190 Denye:</label>
+                        <input type="number" id="h_190" value="2.65" step="0.01" class="w-full bg-slate-50 border rounded-lg p-2 font-bold text-blue-600">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">👥 İşçi Sayısı (48*1.1)</label>
-                    <input type="number" id="isci_sayisi" value="52.8" step="0.1" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 font-bold text-blue-700 outline-none">
+            </div>
+
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-sm font-black text-slate-700 uppercase mb-4 border-b pb-2">⚙️ Üretim Parametreleri</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">⚡ Enerji ($/kW)</label>
+                        <input type="number" id="kw_birim" value="0.12" step="0.01" class="w-full bg-slate-50 border rounded-lg p-2.5 font-bold text-emerald-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">👥 İşçi Gideri (Maaş $)</label>
+                        <input type="number" id="maas_baz" value="666" class="w-full bg-slate-50 border rounded-lg p-2.5 font-bold text-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">📈 Kar Oranı (%)</label>
+                        <input type="number" id="kar_orani" value="20" class="w-full bg-slate-50 border rounded-lg p-2.5 font-bold text-orange-600">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">💰 Ortalama Maaş ($)</label>
-                    <input type="number" id="maas_baz" value="666" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 font-bold text-blue-700 outline-none">
-                </div>
-                <div class="flex items-end">
-                    <button onclick="maliyetHesapla()" class="w-full bg-slate-900 hover:bg-black text-white font-black py-3 rounded-lg shadow-lg transition-all active:scale-95 uppercase tracking-widest">
-                        HESAPLA
-                    </button>
-                </div>
+                <button onclick="maliyetHesapla()" class="w-full mt-6 bg-slate-900 hover:bg-black text-white font-black py-3 rounded-xl transition-all shadow-lg uppercase tracking-widest text-sm">
+                    Maliyetleri Güncelle ve Hesapla
+                </button>
             </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-            <table class="w-full text-left text-sm">
+            <table class="w-full text-left">
                 <thead class="bg-slate-900 text-slate-400 font-black uppercase text-[10px]">
                     <tr>
-                        <th class="p-5 border-b border-slate-800">Üretim Bilgisi</th>
-                        <th class="p-5 border-b border-slate-800">Günlük Üretim (Kg)</th>
-                        <th class="p-5 border-b border-slate-800 text-emerald-400">Elektrik ($)</th>
-                        <th class="p-5 border-b border-slate-800 text-blue-400">İşçilik ($)</th>
-                        <th class="p-5 border-b border-slate-800">Sarf+Genel ($)</th>
-                        <th class="p-5 border-b border-slate-800 bg-emerald-900 text-white">YENİ MALİYET ($)</th>
+                        <th class="p-4">İplik Detay</th>
+                        <th class="p-4">Hammadde ($)</th>
+                        <th class="p-4">Enerji ($)</th>
+                        <th class="p-4">İşçilik ($)</th>
+                        <th class="p-4">Sarf+Genel ($)</th>
+                        <th class="p-4 bg-emerald-900 text-white">YENİ MALİYET ($)</th>
                     </tr>
                 </thead>
-                <tbody id="sonuc_tablosu" class="divide-y divide-slate-100 font-medium">
-                    </tbody>
+                <tbody id="sonuc_tablosu" class="divide-y divide-slate-100 font-medium text-sm">
+                    <tr><td colspan="6" class="p-10 text-center text-slate-400 italic">Hesaplama başlatılmadı...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -74,11 +97,19 @@
 
         async function maliyetHesapla() {
             const tablo = document.getElementById('sonuc_tablosu');
-            tablo.innerHTML = '<tr><td colspan="6" class="p-20 text-center font-bold text-slate-400 animate-pulse">VERİLER HESAPLANIYOR...</td></tr>';
+            tablo.innerHTML = '<tr><td colspan="6" class="p-10 text-center animate-pulse">Hesaplanıyor...</td></tr>';
+
+            // Hammadde fiyatlarını çek
+            const h_prices = {
+                20: parseFloat(document.getElementById('h_20').value) || 0,
+                50: parseFloat(document.getElementById('h_50').value) || 0,
+                150: parseFloat(document.getElementById('h_150').value) || 0,
+                190: parseFloat(document.getElementById('h_190').value) || 0
+            };
 
             const kwFiyat = parseFloat(document.getElementById('kw_birim').value) || 0;
-            const isciSayisi = parseFloat(document.getElementById('isci_sayisi').value) || 52.8;
-            const maasBaz = parseFloat(document.getElementById('maas_baz').value) || 666;
+            const maasBaz = parseFloat(document.getElementById('maas_baz').value) || 0;
+            const isciSayisi = 52.8; // 48 * 1.1 çarpanı sabit
 
             try {
                 const { data, error } = await supabaseClient.from('iplik_maliyetleri').select('*');
@@ -86,37 +117,30 @@
 
                 tablo.innerHTML = '';
                 data.forEach(s => {
-                    // GÖRSELDEKİ FORMÜL: ELEKTRİK = KW TÜKETİM * KW BİRİM
+                    const hammaddeMaliyeti = h_prices[s.denye] || 0;
                     const elektrikUsd = (s.kw_tuketim || 0) * kwFiyat;
+                    const iscilikUsd = (isciSayisi * maasBaz) / (s.aylik_uretim || 3000);
+                    const sarfGiderUsd = (s.amortisman || 0.385) + (s.bobin || 0.10) + (s.paketleme || 0.15) + (s.genel_gider || 0.10);
                     
-                    // GÖRSELDEKİ FORMÜL: İŞÇİLİK = (İŞÇİ SAYISI * MAAŞ) / AYLIK ÜRETİM
-                    // Not: Aylık üretim s.aylik_uretim sütunundan gelmeli, yoksa varsayılan alınır
-                    const aylikUretim = s.aylik_uretim || 3000; 
-                    const iscilikUsd = (isciSayisi * maasBaz) / aylikUretim;
-
-                    // GÖRSELDEKİ TOPLAM SARF (Bobin, Etiket, Paketleme, Amortisman, Genel Gider)
-                    const sarfGiderUsd = (s.amortisman || 0.385) + (s.bobin || 0.10) + (s.paketleme || 0.15) + (s.genel_gider || 0.10) + (s.reklamasyon || 0.02);
-
-                    const yeniMaliyet = elektrikUsd + iscilikUsd + sarfGiderUsd;
+                    const toplamMaliyet = hammaddeMaliyeti + elektrikUsd + iscilikUsd + sarfGiderUsd;
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition-colors";
+                    tr.className = "hover:bg-slate-50";
                     tr.innerHTML = `
-                        <td class="p-5">
-                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-tighter">${s.iplik_tipi}</span>
-                            <span class="text-base font-black text-slate-800">${s.denye} Denye</span>
-                            <span class="block text-[10px] text-blue-600 font-bold uppercase">${s.tur || 0} Tur / ${s.mt_d || 0} MT/D</span>
+                        <td class="p-4">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase">${s.iplik_tipi}</span>
+                            <span class="font-black">${s.denye} Denye</span>
                         </td>
-                        <td class="p-5 font-mono text-slate-600">${(s.gunluk_uretim || 0).toFixed(2)} Kg</td>
-                        <td class="p-5 font-mono font-bold text-emerald-600">$ ${elektrikUsd.toFixed(4)}</td>
-                        <td class="p-6 font-mono font-bold text-blue-600">$ ${iscilikUsd.toFixed(4)}</td>
-                        <td class="p-5 font-mono text-slate-500">$ ${sarfGiderUsd.toFixed(4)}</td>
-                        <td class="p-5 font-black text-white bg-emerald-800 text-xl shadow-inner">$ ${yeniMaliyet.toFixed(3)}</td>
+                        <td class="p-4 font-bold text-blue-600">$ ${hammaddeMaliyeti.toFixed(2)}</td>
+                        <td class="p-4 font-mono">$ ${elektrikUsd.toFixed(3)}</td>
+                        <td class="p-4 font-mono">$ ${iscilikUsd.toFixed(3)}</td>
+                        <td class="p-4 font-mono text-slate-400">$ ${sarfGiderUsd.toFixed(3)}</td>
+                        <td class="p-4 font-black text-white bg-emerald-800 text-lg">$ ${toplamMaliyet.toFixed(3)}</td>
                     `;
                     tablo.appendChild(tr);
                 });
             } catch (err) {
-                tablo.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-red-500 font-bold uppercase">BAĞLANTI HATASI!</td></tr>';
+                tablo.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-red-500">Bağlantı hatası!</td></tr>';
             }
         }
         maliyetHesapla();
