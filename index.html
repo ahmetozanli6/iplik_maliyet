@@ -1,1020 +1,283 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>İplik Maliyet ERP</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<style>
-:root {
-  --blue:#2563eb;--blue-dk:#1d4ed8;--blue-lt:#eff6ff;--blue-mid:#dbeafe;
-  --green:#059669;--green-lt:#ecfdf5;
-  --amber:#d97706;--amber-lt:#fffbeb;
-  --red:#dc2626;--red-lt:#fef2f2;
-  --s900:#0f172a;--s800:#1e293b;--s700:#334155;--s600:#475569;
-  --s500:#64748b;--s400:#94a3b8;--s300:#cbd5e1;--s200:#e2e8f0;
-  --s100:#f1f5f9;--s50:#f8fafc;--white:#fff;
-  --sw:240px;--hh:56px;
-  --r:8px;--rl:12px;
-  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
-  --shm:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
-  --shl:0 10px 30px rgba(0,0,0,.12),0 4px 8px rgba(0,0,0,.06);
-  --f:'Inter',system-ui,sans-serif;
-  --m:'JetBrains Mono','Courier New',monospace;
-  --t:150ms ease;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:15px}
-body{font-family:var(--f);background:var(--s100);color:var(--s900);min-height:100vh;-webkit-font-smoothing:antialiased}
-button,input,select,textarea{font-family:var(--f)}
-
-/* ── APP SHELL ── */
-.app{display:grid;grid-template-columns:var(--sw) 1fr;grid-template-rows:var(--hh) 1fr;min-height:100vh}
-
-/* ── TOPBAR ── */
-.topbar{
-  grid-column:1/-1;background:var(--white);border-bottom:1px solid var(--s200);
-  display:flex;align-items:center;padding:0 20px;gap:16px;
-  position:sticky;top:0;z-index:200;box-shadow:var(--sh);
-}
-.brand{display:flex;align-items:center;gap:10px;min-width:calc(var(--sw) - 20px);text-decoration:none}
-.brand-icon{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0}
-.brand-name{font-weight:700;font-size:15px;color:var(--s900);line-height:1.1}
-.brand-name small{font-size:10px;font-weight:400;color:var(--s500);display:block;letter-spacing:.3px}
-.topbar-div{width:1px;height:28px;background:var(--s200)}
-.topbar-title{font-weight:600;font-size:14px;color:var(--s700)}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.db-pill{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:100px;font-size:11px;font-weight:500;background:var(--s100);color:var(--s600);border:1px solid var(--s200)}
-.db-dot{width:7px;height:7px;border-radius:50%;background:var(--s400)}
-.db-dot.ok{background:var(--green);box-shadow:0 0 0 2px #bbf7d0}
-.db-dot.err{background:var(--red)}
-.mb-menu{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--s200);border-radius:var(--r);background:var(--white);cursor:pointer;font-size:16px;color:var(--s700)}
-
-/* ── SIDEBAR ── */
-.sidebar{background:var(--white);border-right:1px solid var(--s200);padding:16px 0;position:sticky;top:var(--hh);height:calc(100vh - var(--hh));overflow-y:auto}
-.ns-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--s400);padding:10px 20px 6px}
-.ni{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;border-radius:var(--r);color:var(--s600);font-size:13.5px;font-weight:500;text-align:left;transition:all var(--t);cursor:pointer;margin:1px 0}
-.ni:hover{background:var(--s100);color:var(--s900)}
-.ni.on{background:var(--blue-lt);color:var(--blue);font-weight:600}
-.ni-ic{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--s100);flex-shrink:0;transition:all var(--t)}
-.ni.on .ni-ic{background:var(--blue-mid)}
-.ni-bd{margin-left:auto;background:var(--blue);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:100px;min-width:20px;text-align:center}
-.sb-div{height:1px;background:var(--s200);margin:10px 12px}
-.ns-wrap{padding:0 8px}
-
-/* ── MAIN ── */
-.main{overflow-y:auto;min-height:calc(100vh - var(--hh))}
-.page{display:none;animation:fi .15s ease}
-.page.on{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── PAGE STRUCTURE ── */
-.ph{padding:24px 28px 0;margin-bottom:20px}
-.ph h1{font-size:20px;font-weight:700;color:var(--s900)}
-.ph p{font-size:13px;color:var(--s500);margin-top:3px}
-.pb{padding:0 28px 40px}
-
-/* ── CARD ── */
-.card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden}
-.ch{padding:16px 20px;border-bottom:1px solid var(--s100);display:flex;align-items:center;gap:10px}
-.ch h2{font-size:14px;font-weight:600;color:var(--s800)}
-.ch p{font-size:12px;color:var(--s500);margin-top:1px}
-.chl{flex:1}
-.chr{display:flex;gap:8px;align-items:center;flex-shrink:0}
-.cb{padding:20px}
-.ci{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.ci.blue{background:var(--blue-lt)}.ci.green{background:var(--green-lt)}.ci.amber{background:var(--amber-lt)}
-
-/* ── STATS ── */
-.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.sc{background:var(--white);border:1px solid var(--s200);border-radius:var(--rl);padding:18px 20px;box-shadow:var(--sh)}
-.sc-lbl{font-size:11.5px;font-weight:500;color:var(--s500);margin-bottom:6px}
-.sc-val{font-size:26px;font-weight:700;color:var(--s900);line-height:1;font-family:var(--m)}
-.sc-sub{font-size:11px;color:var(--s400);margin-top:4px}
-.sc.blue .sc-val{color:var(--blue)}.sc.green .sc-val{color:var(--green)}.sc.amber .sc-val{color:var(--amber)}
-
-/* ── FORM ── */
-.fr{display:grid;gap:12px;margin-bottom:12px}
-.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c4{grid-template-columns:1fr 1fr 1fr 1fr}
-.fd{display:flex;flex-direction:column;gap:5px}
-.fd label{font-size:11.5px;font-weight:600;color:var(--s700)}
-.fd .sl{font-size:11px;color:var(--s400);font-weight:400}
-.inp{width:100%;padding:8px 11px;border:1.5px solid var(--s300);border-radius:var(--r);font-size:13.5px;color:var(--s900);background:var(--white);transition:border-color var(--t),box-shadow var(--t);-webkit-appearance:none;line-height:1.4}
-.inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
-.inp.ro,.inp[readonly]{background:var(--s50);color:var(--s600);cursor:not-allowed}
-.inp.mo{font-family:var(--m);font-size:13px}
-.inp.big{font-size:17px;font-weight:600;font-family:var(--m);padding:10px 13px}
-.inp-hint{font-size:11px;color:var(--s400)}
-
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--t);white-space:nowrap;line-height:1;font-family:var(--f)}
-.btn-sm{padding:5px 10px;font-size:12px}
-.btn-lg{padding:11px 22px;font-size:14px}
-.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dk)}
-.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#047857}
-.btn-ghost{background:var(--white);color:var(--s700);border:1.5px solid var(--s300)}.btn-ghost:hover{background:var(--s50);border-color:var(--s400)}
-.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#b91c1c}
-.btn-soft{background:var(--blue-lt);color:var(--blue);border:1px solid var(--blue-mid)}.btn-soft:hover{background:var(--blue-mid)}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.br{display:flex;gap:8px;flex-wrap:wrap}
-
-/* ── RESULT PANEL ── */
-.rp{background:var(--s900);border-radius:var(--rl);padding:20px;color:var(--white)}
-.rp-title{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--s500);margin-bottom:16px}
-.rg{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.ri-lbl{font-size:10.5px;color:var(--s500);font-weight:500;margin-bottom:3px}
-.ri-val{font-size:20px;font-weight:700;font-family:var(--m);color:var(--white);line-height:1}
-.ri-val.g{color:#6ee7b7}.ri-val.a{color:#fcd34d}.ri-val.b{color:#93c5fd}.ri-val.big{font-size:28px}
-.rdiv{height:1px;background:rgba(255,255,255,.08);grid-column:1/-1}
-
-/* ── TUR BAND ── */
-.tb{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--amber-lt);border:1px solid #fde68a;border-radius:var(--r);margin-top:14px}
-.tb-ico{font-size:18px;flex-shrink:0;margin-top:1px}
-.tb-txt{font-size:12.5px;color:var(--s800);line-height:1.5}
-
-.tcg{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:12px}
-.tt{border:1.5px solid var(--s200);border-radius:var(--r);padding:10px 8px;text-align:center;cursor:pointer;transition:all var(--t);background:var(--white)}
-.tt:hover,.tt.on{border-color:var(--blue);background:var(--blue-lt)}
-.tt .t-lbl{font-size:9.5px;font-weight:600;color:var(--s400);letter-spacing:.5px;text-transform:uppercase}
-.tt .t-tur{font-size:19px;font-weight:700;color:var(--s800);font-family:var(--m);line-height:1.2}
-.tt.on .t-tur{color:var(--blue)}
-.tt .t-fiy{font-size:11px;font-weight:600;color:var(--green);margin-top:2px;font-family:var(--m)}
-.tt .t-dif{font-size:10px;color:var(--s400)}
-.tt.hi .t-tur{color:var(--red)}.tt.lo .t-tur{color:var(--green)}
-
-/* ── TABLE ── */
-.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--s200)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead{position:sticky;top:0;z-index:2}
-thead th{background:var(--s50);color:var(--s600);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--s200);white-space:nowrap}
-tbody tr{border-bottom:1px solid var(--s100);transition:background var(--t)}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--s50)}
-tbody tr.cp{cursor:pointer}
-tbody td{padding:10px 14px;color:var(--s800);vertical-align:middle;white-space:nowrap}
-.tn{font-family:var(--m);font-weight:600}
-.tb2{color:var(--blue);font-weight:600}
-.tg{color:var(--green);font-weight:700;font-family:var(--m)}
-.ta{color:var(--amber);font-weight:600}
-.tm{color:var(--s400);font-size:12px}
-.ttr{max-width:160px;overflow:hidden;text-overflow:ellipsis}
-
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10.5px;font-weight:600;white-space:nowrap}
-.bd-blue{background:var(--blue-lt);color:var(--blue)}
-.bd-green{background:var(--green-lt);color:var(--green)}
-.bd-amber{background:var(--amber-lt);color:var(--amber)}
-.bd-red{background:var(--red-lt);color:var(--red)}
-.bd-slate{background:var(--s100);color:var(--s600)}
-.bd-purple{background:#f3e8ff;color:#7c3aed}
-.bd-pink{background:#fdf2f8;color:#be185d}
-
-/* ── FILTER BAR ── */
-.fb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 20px;border-bottom:1px solid var(--s100);background:var(--s50)}
-.fb .inp{padding:7px 10px;font-size:13px}
-.fb .inp-s{min-width:180px;flex:1}
-
-/* ── EMPTY ── */
-.empty{text-align:center;padding:50px 20px;color:var(--s400)}
-.empty .ei{font-size:36px;margin-bottom:10px;opacity:.5}
-.empty .et{font-size:14px;font-weight:600;color:var(--s600);margin-bottom:4px}
-.empty .es{font-size:12.5px}
-
-/* ── DROP ZONE ── */
-.dz{border:2px dashed var(--s300);border-radius:var(--rl);padding:32px 20px;text-align:center;cursor:pointer;transition:all var(--t);background:var(--s50)}
-.dz:hover,.dz.ov{border-color:var(--blue);background:var(--blue-lt)}
-.dz .dz-ic{font-size:32px;margin-bottom:8px}
-.dz .dz-h{font-size:14px;font-weight:600;color:var(--s700);margin-bottom:4px}
-.dz .dz-s{font-size:12px;color:var(--s500)}
-.pw{margin-top:12px;display:none}
-.pb2{background:var(--s200);border-radius:100px;height:6px;overflow:hidden}
-.pb3{background:var(--blue);height:100%;width:0;border-radius:100px;transition:width .3s}
-.ps{font-size:11.5px;color:var(--s500);margin-top:6px;text-align:center}
-
-/* ── MODALS ── */
-.mo{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:500;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
-.mo.on{display:flex}
-.md{background:var(--white);border-radius:var(--rl);padding:28px;max-width:420px;width:100%;box-shadow:var(--shl);animation:mi .15s ease}
-@keyframes mi{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
-.md h3{font-size:17px;font-weight:700;margin-bottom:8px}
-.md p{font-size:13px;color:var(--s600);line-height:1.6}
-.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:24px}
-
-/* ── LOADING ── */
-.lo{display:none;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
-.lo.on{display:flex}
-.sp{width:38px;height:38px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.lo span{color:#fff;font-size:13px;font-weight:500}
-
-/* ── TOASTS ── */
-#tw{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:6px}
-.toast{padding:11px 16px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:var(--shl);min-width:220px;max-width:300px;animation:ti .2s ease;display:flex;align-items:center;gap:8px}
-@keyframes ti{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
-.t-ok{background:var(--s900);color:#fff}.t-ok .td{color:#6ee7b7}
-.t-er{background:var(--red);color:#fff}
-.t-in{background:var(--s800);color:#fff}
-
-/* ── RAPOR ── */
-.rr{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--s100)}
-.rr:last-child{border:none}
-.rr-lbl{font-size:12.5px;font-weight:600;color:var(--s700);min-width:65px}
-.rr-bw{flex:1;background:var(--s100);border-radius:100px;height:8px;overflow:hidden}
-.rr-b{height:100%;border-radius:100px;background:var(--blue)}
-.rr-v{font-family:var(--m);font-size:12px;font-weight:600;color:var(--amber);min-width:65px;text-align:right}
-.rr-c{font-size:11px;color:var(--s400);min-width:50px;text-align:right}
-
-/* ── INFO BOX ── */
-.ib{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--blue-lt);border:1px solid var(--blue-mid);border-radius:var(--r);font-size:12.5px;color:var(--s700);line-height:1.5}
-.ib-i{font-size:16px;flex-shrink:0;margin-top:1px}
-
-/* ── GRID ── */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-.del-btn{background:none;border:none;cursor:pointer;color:var(--s400);padding:4px 6px;border-radius:5px;transition:all var(--t);font-size:14px}
-.del-btn:hover{color:var(--red);background:var(--red-lt)}
-.mt16{margin-top:16px}.mt20{margin-top:20px}
-.sep{height:1px;background:var(--s100);margin:16px 0}
-
-/* ── RESPONSIVE ── */
-@media(max-width:860px){
-  .g2,.g3{grid-template-columns:1fr}
-  .sg{grid-template-columns:repeat(2,1fr)}
-  .c3,.c4{grid-template-columns:1fr 1fr}
-}
-@media(max-width:700px){
-  .app{grid-template-columns:1fr;grid-template-rows:var(--hh) auto 1fr}
-  .sidebar{display:none}
-  .sidebar.mob{display:block;position:fixed;left:0;top:var(--hh);height:calc(100vh - var(--hh));width:var(--sw);z-index:300;box-shadow:var(--shl)}
-  .ph{padding:16px 16px 0}.pb{padding:0 16px 40px}
-  .fb{padding:10px 16px}
-  .mb-menu{display:flex !important}
-  .brand{min-width:auto}
-}
-@media(max-width:480px){
-  .sg{grid-template-columns:repeat(2,1fr)}
-  .c2,.c3,.c4{grid-template-columns:1fr}
-  .rg{grid-template-columns:1fr 1fr}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İplik ERP - Hepsi Bir Arada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .erp-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .tab-active { background-color: #2563eb; color: white; border-radius: 8px; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    </style>
 </head>
-<body>
-<div id="tw"></div>
+<body class="pb-12 text-slate-800">
 
-<div class="lo" id="lo"><div class="sp"></div><span>İşleniyor...</span></div>
-
-<div class="mo" id="del-modal">
-  <div class="md">
-    <h3>🗑 Kaydı Sil</h3>
-    <p>Bu işlem geri alınamaz. Kaydı kalıcı olarak silmek istediğinizden emin misiniz?</p>
-    <div class="ma">
-      <button class="btn btn-ghost" onclick="closeMod()">Vazgeç</button>
-      <button class="btn btn-danger" onclick="confirmDel()">Evet, Sil</button>
-    </div>
-  </div>
-</div>
-
-<div class="app">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <button class="mb-menu" onclick="toggleSidebar()">☰</button>
-    <div class="brand">
-      <div class="brand-icon">🧵</div>
-      <div class="brand-name">İplik ERP <small>Maliyet Yönetim Sistemi</small></div>
-    </div>
-    <div class="topbar-div"></div>
-    <span class="topbar-title" id="tb-title">Maliyet Hesapla</span>
-    <div class="topbar-right">
-      <div class="db-pill">
-        <div class="db-dot" id="db-dot"></div>
-        <span id="db-lbl">Bağlanıyor...</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar">
-    <div class="ns-wrap">
-      <div class="ns-label">Ana İşlemler</div>
-      <button class="ni on" onclick="go('hesap','Maliyet Hesapla')">
-        <div class="ni-ic">🧮</div>Maliyet Hesapla
-      </button>
-      <button class="ni" onclick="go('liste','Kayıtlı Maliyetler')">
-        <div class="ni-ic">📋</div>Kayıtlı Maliyetler
-        <span class="ni-bd" id="nb1">0</span>
-      </button>
-    </div>
-    <div class="sb-div"></div>
-    <div class="ns-wrap">
-      <div class="ns-label">Fiyat Yönetimi</div>
-      <button class="ni" onclick="go('iplik','İplik Fiyat Listesi')">
-        <div class="ni-ic">💰</div>İplik Fiyatları
-        <span class="ni-bd" id="nb2">0</span>
-      </button>
-    </div>
-    <div class="sb-div"></div>
-    <div class="ns-wrap">
-      <div class="ns-label">Analiz</div>
-      <button class="ni" onclick="go('rapor','Raporlar')">
-        <div class="ni-ic">📊</div>Raporlar
-      </button>
-    </div>
-  </nav>
-
-  <main class="main">
-
-    <!-- ══════════════════════════════════
-         SAYFA: MALİYET HESAPLA
-    ══════════════════════════════════ -->
-    <div class="page on" id="page-hesap">
-      <div class="ph">
-        <h1>Maliyet Hesapla</h1>
-        <p>İplik parametrelerini girin — maliyet ve satış fiyatı otomatik hesaplanır</p>
-      </div>
-      <div class="pb">
-        <div class="g2">
-
-          <!-- SOL KOLON -->
-          <div style="display:flex;flex-direction:column;gap:16px;">
-
-            <!-- ADIM 1 -->
-            <div class="card">
-              <div class="ch">
-                <div class="ci blue" style="font-weight:700;font-size:13px;">①</div>
-                <div class="chl"><h2>İplik Parametreleri</h2><p>Denye, tur ve devir bilgilerini girin</p></div>
-              </div>
-              <div class="cb">
-                <div class="ib" style="margin-bottom:14px;">
-                  <span class="ib-i">💡</span>
-                  <span><strong>Tur ↑ = Fiyat ↑</strong> — Tur (büküm) arttıkça üretim hızı düşer, birim maliyet yükselir. Mt/D otomatik hesaplanır: Mt/D = Devir ÷ Tur</span>
-                </div>
-                <div class="fr c3">
-                  <div class="fd">
-                    <label>Denye <span class="sl">— incelik (Ne)</span></label>
-                    <input class="inp big mo" type="number" id="f-denye" placeholder="75" min="1" oninput="hesapla()">
-                  </div>
-                  <div class="fd">
-                    <label>Tur <span class="sl">— büküm (tur/m)</span></label>
-                    <input class="inp big mo" type="number" id="f-tur" placeholder="1200" min="1" oninput="hesapla()">
-                  </div>
-                  <div class="fd">
-                    <label>Devir <span class="sl">— hız (d/dak)</span></label>
-                    <input class="inp big mo" type="number" id="f-devir" placeholder="10000" min="1" oninput="hesapla()">
-                  </div>
-                </div>
-                <div class="fr c3">
-                  <div class="fd">
-                    <label>Mt/D <span class="sl">— otomatik</span></label>
-                    <input class="inp mo ro" type="number" id="f-mtd" placeholder="—" readonly>
-                    <span class="inp-hint">Devir ÷ Tur × 1000</span>
-                  </div>
-                  <div class="fd">
-                    <label>İplik Tipi</label>
-                    <select class="inp" id="f-tip">
-                      <option>FDY-TXT</option><option>FLOŞ</option><option>ITY</option>
-                      <option>FDY PARLAK</option><option>LİNEN</option><option>TEKSTÜRE</option><option>DİĞER</option>
-                    </select>
-                  </div>
-                  <div class="fd">
-                    <label>Çalışma Süresi <span class="sl">— saat/gün</span></label>
-                    <input class="inp mo" type="number" id="f-sure" value="24" min="1" max="24" oninput="hesapla()">
-                  </div>
-                </div>
-              </div>
+    <header class="erp-bg text-white py-6 px-6 shadow-lg mb-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-black tracking-tight uppercase">İplik Üretim & Maliyet ERP</h1>
+                <p class="text-emerald-400 text-[10px] font-black uppercase tracking-widest mt-1">Bulut Senkronizasyonu (Supabase) Aktif</p>
             </div>
+            <nav class="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <button onclick="tabDegistir('hesaplama')" id="btn-hesaplama" class="px-6 py-2 font-bold text-sm transition-all tab-active">Maliyet Hesapla</button>
+                <button onclick="tabDegistir('aktarma')" id="btn-aktarma" class="px-6 py-2 font-bold text-sm transition-all text-slate-400">Fiyat Listesi Aktar</button>
+            </nav>
+        </div>
+    </header>
 
-            <!-- ADIM 2 -->
-            <div class="card">
-              <div class="ch">
-                <div class="ci amber" style="font-weight:700;font-size:13px;">②</div>
-                <div class="chl"><h2>Maliyet Parametreleri</h2><p>Girdi maliyetleri ve gider kalemleri</p></div>
-              </div>
-              <div class="cb">
-                <div class="fr c2">
-                  <div class="fd">
-                    <label>Ham Madde Fiyatı <span class="sl">— $/kg</span></label>
-                    <input class="inp mo" type="number" id="f-hm" placeholder="Aşağıdan seç veya gir" step="0.001" min="0" oninput="hesapla()">
-                    <span class="inp-hint">→ Aşağıdaki listeden otomatik doldurabilirsiniz</span>
-                  </div>
-                  <div class="fd">
-                    <label>Kar Oranı <span class="sl">— %</span></label>
-                    <input class="inp mo" type="number" id="f-kar" value="50" min="0" oninput="hesapla()">
-                  </div>
-                </div>
-                <div class="fr c3">
-                  <div class="fd">
-                    <label>KW Birim Fiyat <span class="sl">— $/kWh</span></label>
-                    <input class="inp mo" type="number" id="f-kw" value="0.2" step="0.01" oninput="hesapla()">
-                  </div>
-                  <div class="fd">
-                    <label>İşçilik <span class="sl">— $/kg</span></label>
-                    <input class="inp mo" type="number" id="f-isc" value="0.42" step="0.01" oninput="hesapla()">
-                  </div>
-                  <div class="fd">
-                    <label>Amortisman <span class="sl">— $/kg</span></label>
-                    <input class="inp mo" type="number" id="f-amort" value="0.385" step="0.001" oninput="hesapla()">
-                  </div>
-                </div>
-                <div class="fr c3">
-                  <div class="fd">
-                    <label>Genel Gider <span class="sl">— $/kg</span></label>
-                    <input class="inp mo" type="number" id="f-gg" value="0.1" step="0.001" oninput="hesapla()">
-                  </div>
-                  <div class="fd">
-                    <label>Bobin Gramaj <span class="sl">— gr</span></label>
-                    <input class="inp mo" type="number" id="f-bobin" value="1000" min="1" oninput="hesapla()">
-                  </div>
-                  <div class="fd">
-                    <label>Makine Sayısı</label>
-                    <input class="inp mo" type="number" id="f-mak" value="102" min="1" oninput="hesapla()">
-                  </div>
-                </div>
-                <div class="fr">
-                  <div class="fd">
-                    <label>Açıklama <span class="sl">— isteğe bağlı (müşteri, sipariş...)</span></label>
-                    <input class="inp" type="text" id="f-acik" placeholder="ör. Müşteri adı, sipariş no, renk...">
-                  </div>
-                </div>
-                <div class="br">
-                  <button class="btn btn-blue btn-lg" onclick="kaydet()">💾 Hesapla & Kaydet</button>
-                  <button class="btn btn-ghost" onclick="temizle()">↺ Temizle</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- ADIM 3: İPLİK SEÇİCİ -->
-            <div class="card">
-              <div class="ch">
-                <div class="ci green" style="font-weight:700;font-size:13px;">③</div>
-                <div class="chl"><h2>Ham Madde Seç</h2><p>Fiyat listesinden seçerek ② numaralı alana otomatik aktar</p></div>
-              </div>
-              <div class="fb" style="border-top:none;border-bottom:1px solid var(--s100);">
-                <input class="inp inp-s" type="text" id="fs-ara" placeholder="🔍  İplik ara..." oninput="fsFiltre()">
-              </div>
-              <div class="tw" style="border:none;border-top:1px solid var(--s200);border-radius:0;max-height:200px;overflow-y:auto;">
-                <table>
-                  <thead><tr><th>İplik Cinsi / Tipi</th><th>Fiyat</th><th></th></tr></thead>
-                  <tbody id="fs-body">
-                    <tr><td colspan="3" class="tm" style="padding:20px;text-align:center;">İplik listesi boş — "İplik Fiyatları" bölümünden ekleyin</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-          </div><!-- /SOL -->
-
-          <!-- SAĞ KOLON -->
-          <div style="display:flex;flex-direction:column;gap:16px;">
-
-            <!-- SONUÇLAR -->
-            <div class="card">
-              <div class="ch">
-                <div class="ci blue">📊</div>
-                <div class="chl"><h2>Hesaplama Sonuçları</h2><p>Parametreler girdikçe otomatik güncellenir</p></div>
-              </div>
-              <div class="cb">
-                <div class="rp">
-                  <div class="rp-title">SONUÇLAR</div>
-                  <div class="rg">
-                    <div style="grid-column:1/-1;">
-                      <div class="ri-lbl">TAHMİNİ SATIŞ FİYATI ($/kg)</div>
-                      <div class="ri-val g big" id="r-satis">—</div>
+    <div class="max-w-7xl mx-auto px-4">
+        
+        <div id="tab-hesaplama" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 space-y-6">
+                <div class="bg-white p-6 rounded-xl border border-blue-200 shadow-sm">
+                    <h2 class="text-blue-700 font-black text-xs uppercase mb-4 border-b pb-2 tracking-widest">1. Kapasite ve Hız Verileri</h2>
+                    <div class="mb-4">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">İplik Cinsi (Buluttan Otomatik Çeker)</label>
+                        <input type="text" id="v_iplik_tipi" list="iplik_listesi" placeholder="İplik ara..." class="w-full bg-slate-50 border p-3 rounded-lg font-bold uppercase focus:ring-2 focus:ring-blue-500 outline-none" oninput="fiyatGetir(this.value)">
+                        <datalist id="iplik_listesi"></datalist>
                     </div>
-                    <div class="rdiv"></div>
-                    <div><div class="ri-lbl">Net Maliyet ($/kg)</div><div class="ri-val a" id="r-mal">—</div></div>
-                    <div><div class="ri-lbl">Kar Tutarı ($/kg)</div><div class="ri-val b" id="r-kar">—</div></div>
-                    <div class="rdiv"></div>
-                    <div><div class="ri-lbl">Günlük Üretim</div><div class="ri-val" id="r-gun">—</div></div>
-                    <div><div class="ri-lbl">Aylık Üretim</div><div class="ri-val" id="r-ay">—</div></div>
-                    <div><div class="ri-lbl">Elektrik Maliyeti</div><div class="ri-val" id="r-elk">—</div></div>
-                    <div><div class="ri-lbl">Toplam Sarf+G.G.</div><div class="ri-val" id="r-sarf">—</div></div>
-                  </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div><label class="text-[10px] font-bold uppercase">Denye</label><input type="number" id="v_denye" value="20" class="w-full border p-2 rounded font-black bg-blue-50" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold uppercase">Tur (Büküm)</label><input type="number" id="v_tur" value="800" class="w-full border p-2 rounded font-black bg-blue-50" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold uppercase">Devir (RPM)</label><input type="number" id="v_devir" value="10000" class="w-full border p-2 rounded font-black" oninput="devirDegisti()"></div>
+                        <div><label class="text-[10px] font-bold uppercase text-emerald-600">Hız (MT/D)</label><input type="number" id="v_mtd" value="25" class="w-full border p-2 rounded font-black border-emerald-300" oninput="hizDegisti()"></div>
+                        <div><label class="text-[10px] font-bold uppercase">İğ Sayısı</label><input type="number" id="v_ig" value="256" class="w-full border p-2 rounded font-black" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold uppercase">Çalışma Günü</label><input type="number" id="v_gun" value="28" class="w-full border p-2 rounded font-black" oninput="hesapla()"></div>
+                    </div>
                 </div>
 
-                <div class="tb" id="tur-band" style="display:none;">
-                  <div class="tb-ico">⚙️</div>
-                  <div class="tb-txt" id="tur-band-txt">—</div>
+                <div class="bg-white p-6 rounded-xl border border-orange-200 shadow-sm">
+                    <h2 class="text-orange-700 font-black text-xs uppercase mb-4 border-b pb-2 tracking-widest">2. İşçilik ve Gider Sabitleri (Excel)</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-orange-50 p-4 rounded-lg mb-4">
+                        <div><label class="text-[10px] font-bold">Personel</label><input type="number" id="v_personel" value="64" class="w-full border p-2 rounded font-bold" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold">Maaş ($)</label><input type="number" id="v_maas" value="900" class="w-full border p-2 rounded font-bold" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold">Çarpan</label><input type="number" id="v_carpan" value="1.1" step="0.1" class="w-full border p-2 rounded font-bold" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold">Makine Sayısı</label><input type="number" id="v_makine" value="102" class="w-full border p-2 rounded font-bold border-orange-300" oninput="hesapla()"></div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div><label class="text-[10px] font-bold text-emerald-600">Hammadde ($)</label><input type="number" id="v_hammadde" value="0.964" step="0.001" class="w-full border p-2 rounded font-bold border-emerald-200" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold text-red-500">Fire (%)</label><input type="number" id="v_fire" value="0" class="w-full border p-2 rounded font-bold" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold">Makine KW</label><input type="number" id="v_saatlik_kw" value="6.5" class="w-full border p-2 rounded font-bold" oninput="hesapla()"></div>
+                        <div><label class="text-[10px] font-bold text-blue-600">KW Fiyat ($)</label><input type="number" id="v_kw_birim" value="0.148" class="w-full border p-2 rounded font-bold" oninput="hesapla()"></div>
+                    </div>
                 </div>
-              </div>
             </div>
 
-            <!-- TUR KARŞILAŞTIRMA -->
-            <div class="card">
-              <div class="ch">
-                <div class="ci amber">🔄</div>
-                <div class="chl"><h2>Tur Karşılaştırması</h2><p>Aynı denye — farklı tur değerlerinde satış fiyatı — tıklayarak uygula</p></div>
-              </div>
-              <div class="cb" style="padding-top:12px;">
-                <div class="tcg" id="tur-grid">
-                  <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--s400);font-size:13px;">Denye ve Devir girin...</div>
+            <div class="lg:col-span-4">
+                <div class="bg-indigo-900 rounded-xl p-6 text-white shadow-2xl sticky top-6">
+                    <h3 class="text-center text-[10px] font-black text-indigo-300 mb-6 uppercase tracking-widest border-b border-indigo-800 pb-4">MALİYET ANALİZİ (1 KG)</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-sm"><span>Hammadde (Fireli)</span><span id="r_hammadde" class="text-emerald-400 font-black">$0.000</span></div>
+                        <div class="flex justify-between text-sm"><span>Elektrik Gideri</span><span id="r_enerji" class="text-blue-300 font-black">$0.000</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-orange-400">İşçilik Gideri</span><span id="r_iscilik" class="text-orange-400 font-black">$0.000</span></div>
+                        
+                        <div class="bg-slate-800/50 p-6 rounded-lg text-center mt-6 shadow-inner border border-slate-700">
+                            <span class="text-[10px] text-slate-400 uppercase block mb-1 font-black">NET ÜRETİM MALİYETİ</span>
+                            <span id="r_net" class="text-5xl font-black tracking-tighter text-white">0.000</span>
+                        </div>
+
+                        <div class="pt-6 border-t border-slate-800">
+                            <div class="bg-emerald-500 p-6 rounded-lg text-center shadow-lg hover:scale-105 transition-transform cursor-pointer">
+                                <span class="text-indigo-900 text-[10px] block mb-1 font-black uppercase tracking-widest text-opacity-70">SATIŞ FİYATI (%50 Kâr)</span>
+                                <span id="r_satis" class="text-5xl font-black text-white tracking-tighter">0.00</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-
-          </div><!-- /SAĞ -->
-
         </div>
-      </div>
+
+        <div id="tab-aktarma" class="hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-4 border-dashed border-indigo-100 text-center">
+                <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfIsle(event)">
+                <button onclick="document.getElementById('pdf-file').click()" class="flex flex-col items-center mx-auto group">
+                    <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    </div>
+                    <span class="text-xl font-black text-indigo-900 uppercase">PDF Dosyası Seç ve Buluta Yükle</span>
+                </button>
+                <div id="loading" class="hidden mt-6 flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent"></div>
+                    <p class="mt-4 font-black text-indigo-600 animate-pulse text-xs uppercase">Bulut Senkronizasyonu Yapılıyor...</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">İşlem Kayıtları ve Temizlik</h3>
+                    <button onclick="bulutTemizle()" class="bg-red-50 text-red-600 px-4 py-2 rounded font-bold text-xs hover:bg-red-100">BULUTU TAMAMEN SİL</button>
+                </div>
+                <textarea id="raw-text" class="w-full h-48 bg-slate-50 border p-4 rounded-lg font-mono text-[10px] custom-scroll outline-none" placeholder="PDF verileri burada analiz edilecektir..."></textarea>
+            </div>
+        </div>
     </div>
 
-    <!-- ══════════════════════════════════
-         SAYFA: KAYITLI MALİYETLER
-    ══════════════════════════════════ -->
-    <div class="page" id="page-liste">
-      <div class="ph"><h1>Kayıtlı Maliyetler</h1><p>Tüm maliyet kayıtları — filtrele, sırala ve dışa aktar</p></div>
-      <div class="pb">
-        <div class="sg">
-          <div class="sc blue"><div class="sc-lbl">Toplam Kayıt</div><div class="sc-val" id="s-top">—</div><div class="sc-sub">hesaplama kaydı</div></div>
-          <div class="sc green"><div class="sc-lbl">Ortalama Satış</div><div class="sc-val" id="s-ort">—</div><div class="sc-sub">$ / kg</div></div>
-          <div class="sc amber"><div class="sc-lbl">En Yüksek Tur</div><div class="sc-val" id="s-mxt">—</div><div class="sc-sub">tur/m</div></div>
-          <div class="sc"><div class="sc-lbl">İplik Tipi</div><div class="sc-val" id="s-tip">—</div><div class="sc-sub">farklı tip</div></div>
-        </div>
-        <div class="card">
-          <div class="fb">
-            <input class="inp inp-s" type="text" id="l-ara" placeholder="🔍  Ara (denye, tip, açıklama...)" oninput="filtrele()">
-            <select class="inp" style="min-width:140px;" id="l-tip" onchange="filtrele()">
-              <option value="">Tüm Tipler</option>
-              <option>FDY-TXT</option><option>FLOŞ</option><option>ITY</option>
-              <option>FDY PARLAK</option><option>LİNEN</option><option>TEKSTÜRE</option><option>DİĞER</option>
-            </select>
-            <select class="inp" style="min-width:160px;" id="l-sir" onchange="filtrele()">
-              <option value="new">↓ En Yeni Önce</option>
-              <option value="old">↑ En Eski Önce</option>
-              <option value="sd">↓ Satış Fiyatı</option>
-              <option value="sa">↑ Satış Fiyatı</option>
-              <option value="da">↑ Denye</option>
-              <option value="ta">↑ Tur</option>
-            </select>
-            <div style="margin-left:auto;display:flex;gap:8px;">
-              <button class="btn btn-ghost btn-sm" onclick="malYukle()">🔄 Yenile</button>
-              <button class="btn btn-soft btn-sm" onclick="csvIndir()">📤 CSV</button>
-            </div>
-          </div>
-          <div class="tw" style="border:none;border-top:1px solid var(--s200);border-radius:0;">
-            <table>
-              <thead><tr>
-                <th>Tip</th><th>Denye</th><th>Tur</th><th>Devir</th><th>Mt/D</th>
-                <th>Günlük Ürt.</th><th>Net Maliyet</th><th>Satış Fiyatı</th>
-                <th>Kar %</th><th>Açıklama</th><th>Tarih</th><th></th>
-              </tr></thead>
-              <tbody id="l-body">
-                <tr><td colspan="12"><div class="empty"><div class="ei">⏳</div><div class="et">Yükleniyor...</div></div></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <script>
+        // SUPABASE YAPILANDIRMASI
+        const SUPABASE_URL = 'https://nejpygqdwbjuwsauacsw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8';
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    <!-- ══════════════════════════════════
-         SAYFA: İPLİK FİYATLARI
-    ══════════════════════════════════ -->
-    <div class="page" id="page-iplik">
-      <div class="ph"><h1>İplik Fiyat Listesi</h1><p>Ham madde birim fiyatlarını yönetin — manuel ekle veya PDF'den toplu aktar</p></div>
-      <div class="pb">
-        <div class="g2">
-          <div style="display:flex;flex-direction:column;gap:16px;">
+        let iplikVerileri = [];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-            <div class="card">
-              <div class="ch"><div class="ci blue">➕</div><div class="chl"><h2>Yeni İplik Ekle</h2><p>Tek kayıt manuel ekle</p></div></div>
-              <div class="cb">
-                <div class="fr"><div class="fd"><label>İplik Cinsi / Tipi</label><input class="inp" type="text" id="ip-c" placeholder="ör. DTY 75/36 SD FDY"></div></div>
-                <div class="fr c2">
-                  <div class="fd"><label>Birim Fiyat ($/kg)</label><input class="inp mo" type="number" id="ip-f" placeholder="0.000" step="0.001" min="0"></div>
-                  <div class="fd"><label>Para Birimi</label><select class="inp" id="ip-p"><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="TRY">TRY (₺)</option></select></div>
-                </div>
-                <div class="br">
-                  <button class="btn btn-blue" onclick="ipEkle()">💾 Kaydet</button>
-                  <button class="btn btn-ghost" onclick="ipTmz()">↺</button>
-                </div>
-              </div>
-            </div>
+        // SEKME YÖNETİMİ
+        function tabDegistir(tabAdi) {
+            document.getElementById('tab-hesaplama').classList.add('hidden');
+            document.getElementById('tab-aktarma').classList.add('hidden');
+            document.getElementById('btn-hesaplama').classList.remove('tab-active', 'text-slate-400');
+            document.getElementById('btn-aktarma').classList.remove('tab-active', 'text-slate-400');
 
-            <div class="card">
-              <div class="ch"><div class="ci green">📄</div><div class="chl"><h2>PDF'den Toplu Aktar</h2><p>Fiyat listesi PDF'ini yükle — otomatik tanı ve kaydet</p></div></div>
-              <div class="cb">
-                <div class="dz" id="dz" onclick="document.getElementById('pdf-inp').click()">
-                  <input type="file" id="pdf-inp" accept="application/pdf" style="display:none" onchange="pdfAktar(event)">
-                  <div class="dz-ic">📂</div>
-                  <div class="dz-h">PDF dosyasını buraya sürükleyin</div>
-                  <div class="dz-s">veya tıklayarak seçin — fiyatlar otomatik tanınır</div>
-                </div>
-                <div class="pw" id="pdf-pw">
-                  <div class="pb2"><div class="pb3" id="pdf-bar"></div></div>
-                  <div class="ps" id="pdf-st">Analiz ediliyor...</div>
-                </div>
-              </div>
-            </div>
+            if(tabAdi === 'hesaplama') {
+                document.getElementById('tab-hesaplama').classList.remove('hidden');
+                document.getElementById('btn-hesaplama').classList.add('tab-active');
+                document.getElementById('btn-aktarma').classList.add('text-slate-400');
+            } else {
+                document.getElementById('tab-aktarma').classList.remove('hidden');
+                document.getElementById('btn-aktarma').classList.add('tab-active');
+                document.getElementById('btn-hesaplama').classList.add('text-slate-400');
+            }
+        }
 
-          </div>
+        // HESAPLAMA MOTORU
+        function devirDegisti() {
+            let tur = parseFloat(document.getElementById('v_tur').value) || 1;
+            let devir = parseFloat(document.getElementById('v_devir').value) || 0;
+            document.getElementById('v_mtd').value = ((devir * 2) / tur).toFixed(2);
+            hesapla();
+        }
 
-          <div class="card" style="display:flex;flex-direction:column;">
-            <div class="ch">
-              <div class="ci green">💰</div>
-              <div class="chl"><h2>Mevcut Fiyatlar</h2><p id="ip-cnt">0 kayıt</p></div>
-              <div class="chr"><button class="btn btn-ghost btn-sm" onclick="ipYukle()">🔄</button></div>
-            </div>
-            <div class="fb" style="border-top:1px solid var(--s200);">
-              <input class="inp inp-s" type="text" id="ip-ara" placeholder="🔍  İplik ara..." oninput="ipFiltre()">
-            </div>
-            <div class="tw" style="flex:1;border:none;border-radius:0;border-top:1px solid var(--s200);overflow-y:auto;max-height:500px;">
-              <table>
-                <thead><tr><th>İplik Cinsi</th><th>Fiyat</th><th>Para</th><th></th></tr></thead>
-                <tbody id="ip-body">
-                  <tr><td colspan="4"><div class="empty" style="padding:30px;"><div class="ei">💰</div><div class="et">Liste boş</div><div class="es">Manuel ekle veya PDF'den aktar</div></div></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        function hizDegisti() {
+            let tur = parseFloat(document.getElementById('v_tur').value) || 1;
+            let mtd = parseFloat(document.getElementById('v_mtd').value) || 0;
+            document.getElementById('v_devir').value = Math.round((mtd * tur) / 2);
+            hesapla();
+        }
 
-    <!-- ══════════════════════════════════
-         SAYFA: RAPORLAR
-    ══════════════════════════════════ -->
-    <div class="page" id="page-rapor">
-      <div class="ph"><h1>Raporlar & Analiz</h1><p>Kayıtlı verilerin özet analizleri</p></div>
-      <div class="pb">
-        <div class="g2">
-          <div class="card">
-            <div class="ch"><div class="ci blue">📈</div><div class="chl"><h2>Denye Bazında Ortalama Satış</h2><p>Her denye grubu için ort. satış fiyatı</p></div></div>
-            <div class="cb" id="r-denye"><div class="empty"><div class="ei">📊</div><div class="et">Veri yok</div><div class="es">Maliyet kayıtları eklendikçe görünür</div></div></div>
-          </div>
-          <div class="card">
-            <div class="ch"><div class="ci amber">⚙️</div><div class="chl"><h2>Tur Seviyesi Etkisi</h2><p>Düşük / Orta / Yüksek tur karşılaştırması</p></div></div>
-            <div class="cb" id="r-tur"><div class="empty"><div class="ei">⚙️</div><div class="et">Veri yok</div></div></div>
-          </div>
-        </div>
-        <div class="card mt20">
-          <div class="ch"><div class="ci amber">🏆</div><div class="chl"><h2>En Yüksek Maliyetli İplikler — Top 10</h2><p>Satış fiyatına göre sıralı</p></div></div>
-          <div class="tw" style="border:none;border-top:1px solid var(--s200);border-radius:0;">
-            <table>
-              <thead><tr><th>#</th><th>Tip</th><th>Denye</th><th>Tur</th><th>Devir</th><th>Net Maliyet</th><th>Satış $</th><th>Kar %</th></tr></thead>
-              <tbody id="r-top"><tr><td colspan="8"><div class="empty" style="padding:30px;"><div class="et">Veri yok</div></div></td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+        async function verileriGetir() {
+            const { data, error } = await client.from('iplik_fiyatlari').select('*');
+            if (!error) {
+                iplikVerileri = data;
+                const list = document.getElementById('iplik_listesi');
+                list.innerHTML = "";
+                data.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item.cins;
+                    list.appendChild(opt);
+                });
+                document.getElementById('v_iplik_tipi').placeholder = "İplik ara...";
+            }
+        }
 
-  </main>
-</div>
+        function fiyatGetir(cins) {
+            const es = iplikVerileri.find(i => i.cins === cins.toUpperCase());
+            if(es) {
+                document.getElementById('v_hammadde').value = parseFloat(es.fiyat);
+                hesapla();
+            }
+        }
 
-<script>
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-const sb=supabase.createClient('https://nejpygqdwbjuwsauacsw.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8');
-let aM=[],aI=[],dId=null,dTbl=null;
+        function hesapla() {
+            const d = parseFloat(document.getElementById('v_denye').value) || 0;
+            const mtd = parseFloat(document.getElementById('v_mtd').value) || 0;
+            const ig = parseFloat(document.getElementById('v_ig').value) || 256;
+            const gun = parseFloat(document.getElementById('v_gun').value) || 28;
+            const hammadde = parseFloat(document.getElementById('v_hammadde').value) || 0;
+            const fire = parseFloat(document.getElementById('v_fire').value) || 0;
+            const kw = parseFloat(document.getElementById('v_saatlik_kw').value) || 6.5;
+            const kwFiyat = parseFloat(document.getElementById('v_kw_birim').value) || 0.148;
+            
+            let gunKg = mtd * 60 * 24 * (d / 9000) * ig / 1000;
+            let ayKg = gunKg * gun;
 
-window.onload=async()=>{
-  await dbTest();
-  await Promise.all([malYukle(),ipYukle()]);
-};
+            const hmdMaliyet = hammadde * (1 + (fire / 100));
+            const elkMaliyet = gunKg > 0 ? (kw * 24 / gunKg) * kwFiyat : 0;
+            
+            let personel = parseFloat(document.getElementById('v_personel').value) || 64;
+            let maas = parseFloat(document.getElementById('v_maas').value) || 900;
+            let carpan = parseFloat(document.getElementById('v_carpan').value) || 1.1;
+            let makineSayisi = parseFloat(document.getElementById('v_makine').value) || 102;
 
-async function dbTest(){
-  try{
-    const{error:e}=await sb.from('maliyet_kayitlari').select('id').limit(1);
-    const dot=document.getElementById('db-dot'),lbl=document.getElementById('db-lbl');
-    if(e&&e.code==='42P01'){dot.className='db-dot err';lbl.textContent='Tablo yok — SQL çalıştırın';}
-    else if(e){dot.className='db-dot err';lbl.textContent='Bağlantı hatası';}
-    else{dot.className='db-dot ok';lbl.textContent='Supabase bağlı';}
-  }catch{}
-}
+            let fabrikaYuku = personel * maas * carpan;
+            let kgIscilik = ayKg > 0 ? (fabrikaYuku / makineSayisi) / ayKg : 0;
 
-/* ── NAV ── */
-function go(id,title){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  document.getElementById('page-'+id).classList.add('on');
-  document.getElementById('tb-title').textContent=title;
-  document.querySelectorAll('.ni').forEach(n=>{if(n.textContent.trim().startsWith(title.slice(0,5)))n.classList.add('on');});
-  if(id==='rapor')raporOlus();
-  document.getElementById('sidebar').classList.remove('mob');
-}
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('mob');}
+            const net = hmdMaliyet + elkMaliyet + kgIscilik + 0.45;
+            
+            document.getElementById('r_hammadde').innerText = "$" + hmdMaliyet.toFixed(3);
+            document.getElementById('r_enerji').innerText = "$" + elkMaliyet.toFixed(3);
+            document.getElementById('r_iscilik').innerText = "$" + kgIscilik.toFixed(3);
+            document.getElementById('r_net').innerText = net.toFixed(3);
+            document.getElementById('r_satis').innerText = (net * 1.5).toFixed(2);
+        }
 
-/* ── HESAPLA ── */
-function v(id){return parseFloat(document.getElementById(id).value)||0;}
-function hesapla(){
-  const denye=v('f-denye'),tur=v('f-tur'),devir=v('f-devir');
-  if(!denye||!tur||!devir){clearR();return;}
-  const sure=v('f-sure')||24,kw=v('f-kw')||0.2,isc=v('f-isc')||0.42,
-        amort=v('f-amort')||0.385,gg=v('f-gg')||0.1,hm=v('f-hm'),kar=v('f-kar')||50;
-  const mtd=devir/tur;
-  document.getElementById('f-mtd').value=mtd.toFixed(3);
-  const gun=(1000*mtd/(denye*9)*60*sure)/1000;
-  const elk=(6.5*kw)/gun;
-  const sarf=isc+elk+amort+0.02+0.015+0.15+0.1+gg+(amort*0.5);
-  const mal=hm>0?hm+sarf:sarf;
-  const sat=mal*(1+kar/100);
-  const kart=sat-mal;
-  s('r-satis','$'+sat.toFixed(4));s('r-mal','$'+mal.toFixed(4));
-  s('r-kar','$'+kart.toFixed(4));s('r-gun',gun.toFixed(2)+' kg');
-  s('r-ay',(gun*26).toFixed(1)+' kg');s('r-elk','$'+elk.toFixed(4));s('r-sarf','$'+sarf.toFixed(4));
+        // PDF VE BULUT İŞLEMLERİ
+        async function pdfIsle(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('loading').classList.remove('hidden');
 
-  const band=document.getElementById('tur-band');
-  band.style.display='flex';
-  const sev=tur<800?'🟢 Düşük Tur':tur<1500?'🟡 Orta Tur':'🔴 Yüksek Tur';
-  document.getElementById('tur-band-txt').innerHTML=`<strong>${tur} tur/m</strong> — ${sev} &nbsp;|&nbsp; Sarf+GG katkısı: <strong>$${sarf.toFixed(4)}/kg</strong>`;
+            const fr = new FileReader();
+            fr.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                let fullText = "";
+                
+                for(let i=1; i<=pdf.numPages; i++){
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    let lastY = -1;
+                    content.items.sort((a,b) => b.transform[5]-a.transform[5] || a.transform[4]-b.transform[4]).forEach(item => {
+                        if(Math.abs(item.transform[5]-lastY) > 5 && lastY!==-1) fullText += "\n";
+                        fullText += item.str + " ";
+                        lastY = item.transform[5];
+                    });
+                }
+                document.getElementById('raw-text').value = fullText;
+                ayiklaVeKaydet(fullText);
+            };
+            fr.readAsArrayBuffer(file);
+        }
 
-  turCmp(denye,devir,sure,kw,isc,amort,gg,hm,kar,tur);
-}
+        async function ayiklaVeKaydet(metin) {
+            const dataToUpload = [];
+            const regex = /(.+?)\s+(\d+[.,]\d{2,3})(?:\s+usd|\s+\$|\s+tl)?/gi;
+            let match;
+            
+            while ((match = regex.exec(metin)) !== null) {
+                let isim = match[1].trim().replace(/^\d+[\s.|\-)]+/, "").toUpperCase();
+                let fiyat = match[2].replace(',','.');
+                if (isim.length > 3) dataToUpload.push({ cins: isim, fiyat: fiyat });
+            }
 
-function turCmp(denye,devir,sure,kw,isc,amort,gg,hm,kar,aktif){
-  const turler=[400,600,800,1000,1200,1500,1800,2000,2400,3200];
-  const refMtd=devir/aktif,refGun=(1000*refMtd/(denye*9)*60*sure)/1000;
-  const refSarf=isc+(6.5*kw)/refGun+amort+0.02+0.015+0.15+0.1+gg+amort*0.5;
-  const refSat=(hm>0?hm+refSarf:refSarf)*(1+kar/100);
-  document.getElementById('tur-grid').innerHTML=turler.map(t=>{
-    const mtd=devir/t,gun=(1000*mtd/(denye*9)*60*sure)/1000;
-    const sarf=isc+(6.5*kw)/gun+amort+0.02+0.015+0.15+0.1+gg+amort*0.5;
-    const sat=(hm>0?hm+sarf:sarf)*(1+kar/100);
-    const dif=sat-refSat,isA=t===aktif;
-    const cls=isA?'on':dif>0.005?'hi':dif<-0.005?'lo':'';
-    const difHtml=isA?'<div class="t-dif" style="color:var(--blue-dk);font-weight:600;">mevcut</div>'
-      :`<div class="t-dif" style="color:${dif>0?'var(--red)':'var(--green)'}">${dif>0?'+':''}${dif.toFixed(3)}</div>`;
-    return`<div class="tt ${cls}" onclick="applyTur(${t})">
-      <div class="t-lbl">TUR</div>
-      <div class="t-tur">${t}</div>
-      <div class="t-fiy">$${sat.toFixed(3)}</div>${difHtml}</div>`;
-  }).join('');
-}
-function applyTur(t){document.getElementById('f-tur').value=t;hesapla();}
+            const { error } = await client.from('iplik_fiyatlari').upsert(dataToUpload, { onConflict: 'cins' });
+            
+            if(!error) {
+                alert(dataToUpload.length + " İplik Buluta Gönderildi! Artık her cihazda güncel.");
+                verileriGetir(); // Listeyi güncelle
+            } else {
+                alert("Hata: " + error.message);
+            }
+            document.getElementById('loading').classList.add('hidden');
+        }
 
-function clearR(){
-  ['r-satis','r-mal','r-kar','r-gun','r-ay','r-elk','r-sarf'].forEach(id=>s(id,'—'));
-  document.getElementById('f-mtd').value='';
-  document.getElementById('tur-band').style.display='none';
-  document.getElementById('tur-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--s400);font-size:13px;">Denye ve Devir girin...</div>';
-}
-function temizle(){
-  ['f-denye','f-tur','f-devir','f-mtd','f-hm','f-acik'].forEach(id=>document.getElementById(id).value='');
-  clearR();
-}
+        async function bulutTemizle() {
+            if(confirm('Tüm bulut verilerini silmek üzeresiniz. Emin misiniz?')){
+                const { error } = await client.from('iplik_fiyatlari').delete().neq('cins', '0');
+                if(!error) { alert("Bulut temizlendi."); verileriGetir(); }
+            }
+        }
 
-/* ── KAYDET ── */
-async function kaydet(){
-  const denye=v('f-denye'),tur=v('f-tur'),devir=v('f-devir');
-  if(!denye||!tur||!devir){toast('Denye, Tur ve Devir zorunludur!','er');return;}
-  const sure=v('f-sure')||24,kw=v('f-kw')||0.2,isc=v('f-isc')||0.42,
-        amort=v('f-amort')||0.385,gg=v('f-gg')||0.1,hm=v('f-hm'),kar=v('f-kar')||50;
-  const tip=document.getElementById('f-tip').value,acik=document.getElementById('f-acik').value.trim();
-  const mtd=devir/tur,gun=(1000*mtd/(denye*9)*60*sure)/1000;
-  const elk=(6.5*kw)/gun,sarf=isc+elk+amort+0.02+0.015+0.15+0.1+gg+amort*0.5;
-  const mal=hm>0?hm+sarf:sarf,sat=mal*(1+kar/100);
-  load(true);
-  const{error:e}=await sb.from('maliyet_kayitlari').insert({
-    tip,denye,tur,devir,mtd,gunluk_uretim:gun,aylik_uretim:gun*26,
-    maliyet:mal,satis_fiyati:sat,kar_orani:kar,aciklama:acik||null
-  });
-  load(false);
-  if(e){toast(e.code==='42P01'?'Tablo yok! SQL çalıştırın.':e.message,'er');return;}
-  toast('Kayıt eklendi ✓','ok');
-  temizle();await malYukle();go('liste','Kayıtlı Maliyetler');
-}
-
-/* ── MALİYETLER ── */
-async function malYukle(){
-  const{data,error:e}=await sb.from('maliyet_kayitlari').select('*').order('created_at',{ascending:false});
-  if(e){rndListe([]);return;}
-  aM=data||[];rndListe(aM);updStats();
-  document.getElementById('nb1').textContent=aM.length;
-}
-
-function rndListe(rows){
-  const tb=document.getElementById('l-body');
-  if(!rows.length){
-    tb.innerHTML=`<tr><td colspan="12"><div class="empty"><div class="ei">📋</div><div class="et">Kayıt bulunamadı</div><div class="es">Hesapla ve kaydet</div></div></td></tr>`;return;
-  }
-  tb.innerHTML=rows.map(r=>`<tr class="cp" onclick="editRow(${r.id})">
-    <td>${badge(r.tip)}</td>
-    <td class="tn tb2">${r.denye}</td>
-    <td class="tn ta">${r.tur}</td>
-    <td class="tn">${r.devir}</td>
-    <td class="tn tm">${r.mtd?(+r.mtd).toFixed(2):'—'}</td>
-    <td class="tn">${r.gunluk_uretim?(+r.gunluk_uretim).toFixed(2)+' kg':'—'}</td>
-    <td class="tn">$${(+(r.maliyet||0)).toFixed(4)}</td>
-    <td class="tn tg">$${(+(r.satis_fiyati||0)).toFixed(4)}</td>
-    <td><span class="badge ${r.kar_orani>=50?'bd-green':'bd-amber'}">%${r.kar_orani}</span></td>
-    <td class="tm ttr">${r.aciklama||'—'}</td>
-    <td class="tm">${fmtD(r.created_at)}</td>
-    <td><button class="del-btn" onclick="event.stopPropagation();openDel(${r.id},'maliyet_kayitlari')">🗑</button></td>
-  </tr>`).join('');
-}
-
-function editRow(id){
-  const r=aM.find(x=>x.id===id);if(!r)return;
-  document.getElementById('f-denye').value=r.denye;
-  document.getElementById('f-tur').value=r.tur;
-  document.getElementById('f-devir').value=r.devir;
-  document.getElementById('f-kar').value=r.kar_orani;
-  if(r.tip)document.getElementById('f-tip').value=r.tip;
-  if(r.aciklama)document.getElementById('f-acik').value=r.aciklama;
-  go('hesap','Maliyet Hesapla');hesapla();
-  toast('Kayıt forma yüklendi — düzenleyip yeniden kaydedebilirsiniz','in');
-}
-
-function updStats(){
-  document.getElementById('s-top').textContent=aM.length;
-  if(!aM.length)return;
-  const ort=aM.reduce((a,b)=>a+(b.satis_fiyati||0),0)/aM.length;
-  const mxt=Math.max(...aM.map(r=>r.tur||0));
-  const tips=new Set(aM.map(r=>r.tip).filter(Boolean)).size;
-  document.getElementById('s-ort').textContent='$'+ort.toFixed(2);
-  document.getElementById('s-mxt').textContent=mxt;
-  document.getElementById('s-tip').textContent=tips;
-}
-
-function filtrele(){
-  const ara=document.getElementById('l-ara').value.toLowerCase();
-  const tip=document.getElementById('l-tip').value;
-  const sir=document.getElementById('l-sir').value;
-  let rows=aM.filter(r=>
-    (!ara||String(r.denye).includes(ara)||(r.tip||'').toLowerCase().includes(ara)||(r.aciklama||'').toLowerCase().includes(ara))&&
-    (!tip||r.tip===tip));
-  rows.sort((a,b)=>{
-    if(sir==='new')return new Date(b.created_at)-new Date(a.created_at);
-    if(sir==='old')return new Date(a.created_at)-new Date(b.created_at);
-    if(sir==='sd')return(b.satis_fiyati||0)-(a.satis_fiyati||0);
-    if(sir==='sa')return(a.satis_fiyati||0)-(b.satis_fiyati||0);
-    if(sir==='da')return(a.denye||0)-(b.denye||0);
-    if(sir==='ta')return(a.tur||0)-(b.tur||0);
-    return 0;
-  });
-  rndListe(rows);
-}
-
-function csvIndir(){
-  if(!aM.length){toast('Kayıt yok!','er');return;}
-  const hd=['Tip','Denye','Tur','Devir','Mt/D','Günlük Ürt.(kg)','Net Maliyet($)','Satış($)','Kar(%)','Açıklama','Tarih'];
-  const rows=aM.map(r=>[r.tip,r.denye,r.tur,r.devir,(r.mtd||0).toFixed(3),(r.gunluk_uretim||0).toFixed(2),(r.maliyet||0).toFixed(4),(r.satis_fiyati||0).toFixed(4),r.kar_orani,r.aciklama||'',fmtD(r.created_at)]);
-  dl(new Blob(['\uFEFF'+[hd,...rows].map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8;'}),`maliyetler_${today()}.csv`);
-}
-
-/* ── İPLİKLER ── */
-async function ipYukle(){
-  const{data,error:e}=await sb.from('iplik_fiyatlari').select('*').order('created_at',{ascending:false});
-  if(e)return;
-  aI=data||[];rndIp(aI);rndFS(aI);
-  document.getElementById('ip-cnt').textContent=aI.length+' kayıt';
-  document.getElementById('nb2').textContent=aI.length;
-}
-
-function rndIp(rows){
-  const tb=document.getElementById('ip-body');
-  if(!rows.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty" style="padding:30px;"><div class="ei">💰</div><div class="et">Liste boş</div></div></td></tr>`;return;}
-  tb.innerHTML=rows.map(r=>`<tr>
-    <td style="font-weight:600;">${r.cins}</td>
-    <td class="tn tg">$${(+r.fiyat).toFixed(3)}</td>
-    <td><span class="badge bd-slate">${r.para_birimi||'USD'}</span></td>
-    <td><button class="del-btn" onclick="openDel(${r.id},'iplik_fiyatlari')">🗑</button></td>
-  </tr>`).join('');
-}
-
-function rndFS(rows){
-  const tb=document.getElementById('fs-body');
-  if(!rows.length){tb.innerHTML=`<tr><td colspan="3" class="tm" style="padding:18px;text-align:center;">İplik listesi boş</td></tr>`;return;}
-  tb.innerHTML=rows.map(r=>`<tr class="cp" onclick="secIp(${r.fiyat},'${r.cins.replace(/'/g,"\\'")}')">
-    <td style="font-weight:500;">${r.cins}</td>
-    <td class="tn ta">$${(+r.fiyat).toFixed(3)}</td>
-    <td><button class="btn btn-soft btn-sm" onclick="event.stopPropagation();secIp(${r.fiyat},'${r.cins.replace(/'/g,"\\'")}')">Seç ↗</button></td>
-  </tr>`).join('');
-}
-
-function secIp(f,c){
-  document.getElementById('f-hm').value=f;
-  document.getElementById('f-acik').value=c;
-  toast(`${c} → $${f} seçildi`,'ok');hesapla();
-}
-function fsFiltre(){const q=document.getElementById('fs-ara').value.toLowerCase();rndFS(aI.filter(r=>r.cins.toLowerCase().includes(q)));}
-function ipFiltre(){const q=document.getElementById('ip-ara').value.toLowerCase();rndIp(aI.filter(r=>r.cins.toLowerCase().includes(q)));}
-
-async function ipEkle(){
-  const cins=document.getElementById('ip-c').value.trim().toUpperCase();
-  const fiyat=parseFloat(document.getElementById('ip-f').value);
-  const para=document.getElementById('ip-p').value;
-  if(!cins||!fiyat){toast('Cinsi ve fiyat zorunludur!','er');return;}
-  load(true);
-  const{error:e}=await sb.from('iplik_fiyatlari').insert({cins,fiyat,para_birimi:para});
-  load(false);
-  if(e){toast(e.code==='42P01'?'Tablo yok!':e.message,'er');return;}
-  toast(`${cins} eklendi ✓`,'ok');ipTmz();await ipYukle();
-}
-function ipTmz(){document.getElementById('ip-c').value='';document.getElementById('ip-f').value='';}
-
-/* ── PDF ── */
-async function pdfAktar(event){
-  const file=event.target.files[0];if(!file)return;
-  const pw=document.getElementById('pdf-pw'),bar=document.getElementById('pdf-bar'),st=document.getElementById('pdf-st');
-  pw.style.display='block';bar.style.width='5%';st.textContent='PDF okunuyor...';
-  const fr=new FileReader();
-  fr.onload=async function(){
-    const arr=new Uint8Array(this.result);
-    try{
-      const pdf=await pdfjsLib.getDocument(arr).promise;
-      let lines=[];
-      for(let i=1;i<=pdf.numPages;i++){
-        const pg=await pdf.getPage(i),tc=await pg.getTextContent();
-        bar.style.width=`${5+(i/pdf.numPages)*60}%`;
-        let items=tc.items.map(it=>({str:it.str.trim(),x:it.transform[4],y:it.transform[5]})).filter(it=>it.str);
-        let rows={};
-        items.forEach(it=>{const yk=Math.round(it.y),cy=Object.keys(rows).find(k=>Math.abs(k-yk)<4);if(cy)rows[cy].push(it);else rows[yk]=[it];});
-        Object.keys(rows).sort((a,b)=>b-a).forEach(y=>{
-          let cur='';
-          rows[y].sort((a,b)=>a.x-b.x).forEach(it=>{cur+=it.str+' ';if(it.str.match(/^\d+[.,]\d{2,3}$/)){lines.push(cur.trim());cur='';}});
-        });
-      }
-      bar.style.width='75%';st.textContent=`${lines.length} satır bulundu, kaydediliyor...`;
-      const ins=[];
-      lines.forEach(l=>{
-        const m=l.match(/(.+?)\s+(\d+[.,]\d{2,3})/);
-        if(m){let c=m[1].trim().replace(/^\d+[\s.|\-)]+/,'').replace(/^(USD|TL|\$)\s+/i,'').trim().toUpperCase();const f=parseFloat(m[2].replace(',','.'));if(c.length>3)ins.push({cins:c,fiyat:f,para_birimi:'USD'});}
-      });
-      if(ins.length){const{error:e}=await sb.from('iplik_fiyatlari').insert(ins);if(e)toast('Hata: '+e.message,'er');else{toast(`${ins.length} iplik kaydedildi ✓`,'ok');await ipYukle();}}
-      else toast("PDF'den iplik bulunamadı",'er');
-      bar.style.width='100%';st.textContent=`Tamamlandı — ${ins.length} iplik`;
-    }catch(e){toast('PDF hatası: '+e.message,'er');}
-    event.target.value='';
-    setTimeout(()=>{pw.style.display='none';bar.style.width='0%';},3000);
-  };
-  fr.readAsArrayBuffer(file);
-}
-const dzEl=document.getElementById('dz');
-dzEl.addEventListener('dragover',e=>{e.preventDefault();dzEl.classList.add('ov');});
-dzEl.addEventListener('dragleave',()=>dzEl.classList.remove('ov'));
-dzEl.addEventListener('drop',e=>{
-  e.preventDefault();dzEl.classList.remove('ov');
-  const f=e.dataTransfer.files[0];
-  if(f&&f.type==='application/pdf'){const dt=new DataTransfer();dt.items.add(f);document.getElementById('pdf-inp').files=dt.files;pdfAktar({target:{files:dt.files,value:''}});}
-});
-
-/* ── SİL ── */
-function openDel(id,tbl){dId=id;dTbl=tbl;document.getElementById('del-modal').classList.add('on');}
-function closeMod(){dId=null;dTbl=null;document.getElementById('del-modal').classList.remove('on');}
-async function confirmDel(){
-  load(true);const{error:e}=await sb.from(dTbl).delete().eq('id',dId);load(false);closeMod();
-  if(e){toast('Silme hatası: '+e.message,'er');return;}
-  toast('Kayıt silindi','ok');
-  if(dTbl==='maliyet_kayitlari')await malYukle();else await ipYukle();
-}
-
-/* ── RAPOR ── */
-function raporOlus(){
-  if(!aM.length)return;
-  const dm={};
-  aM.forEach(r=>{if(!dm[r.denye])dm[r.denye]=[];dm[r.denye].push(r.satis_fiyati||0);});
-  const maxA=Math.max(...Object.values(dm).map(v=>v.reduce((a,b)=>a+b,0)/v.length));
-  document.getElementById('r-denye').innerHTML=Object.keys(dm).sort((a,b)=>a-b).map(d=>{
-    const vals=dm[d],avg=vals.reduce((a,b)=>a+b,0)/vals.length,pct=Math.round((avg/maxA)*100);
-    return`<div class="rr"><span class="rr-lbl">${d} Ne</span><div class="rr-bw"><div class="rr-b" style="width:${pct}%"></div></div><span class="rr-v">$${avg.toFixed(3)}</span><span class="rr-c">${vals.length} kayıt</span></div>`;
-  }).join('');
-
-  const bands=[[0,800,'Düşük (0–800)','var(--green)'],[800,1500,'Orta (800–1500)','var(--amber)'],[1500,99999,'Yüksek (1500+)','var(--red)']];
-  document.getElementById('r-tur').innerHTML=bands.map(([mn,mx,lbl,clr])=>{
-    const rows=aM.filter(r=>r.tur>=mn&&r.tur<mx);if(!rows.length)return'';
-    const avg=rows.reduce((a,b)=>a+(b.satis_fiyati||0),0)/rows.length;
-    const pct=Math.round((avg/maxA)*100);
-    return`<div class="rr"><span class="rr-lbl" style="min-width:130px;font-size:11px;">${lbl}</span><div class="rr-bw"><div class="rr-b" style="width:${pct}%;background:${clr}"></div></div><span class="rr-v">$${avg.toFixed(3)}</span><span class="rr-c">${rows.length}</span></div>`;
-  }).join('')||'<div class="empty"><div class="et">Veri yok</div></div>';
-
-  const top10=[...aM].sort((a,b)=>(b.satis_fiyati||0)-(a.satis_fiyati||0)).slice(0,10);
-  document.getElementById('r-top').innerHTML=top10.map((r,i)=>`<tr>
-    <td><strong>${i+1}</strong></td><td>${badge(r.tip)}</td>
-    <td class="tn tb2">${r.denye}</td><td class="tn ta">${r.tur}</td><td class="tn">${r.devir}</td>
-    <td class="tn">$${(+(r.maliyet||0)).toFixed(4)}</td>
-    <td class="tn tg">$${(+(r.satis_fiyati||0)).toFixed(4)}</td>
-    <td><span class="badge ${r.kar_orani>=50?'bd-green':'bd-amber'}">%${r.kar_orani}</span></td>
-  </tr>`).join('');
-}
-
-/* ── UTILS ── */
-function s(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
-function badge(tip){
-  if(!tip)return'<span class="badge bd-slate">—</span>';
-  const t=tip.toUpperCase();
-  if(t.includes('FDY')&&t.includes('PARLAK'))return`<span class="badge bd-purple">${tip}</span>`;
-  if(t.includes('FDY'))return`<span class="badge bd-blue">${tip}</span>`;
-  if(t.includes('FLOŞ'))return`<span class="badge bd-red">${tip}</span>`;
-  if(t==='ITY')return`<span class="badge bd-amber">${tip}</span>`;
-  if(t.includes('LİNEN')||t.includes('LINEN'))return`<span class="badge bd-green">${tip}</span>`;
-  if(t.includes('TEKST'))return`<span class="badge bd-pink">${tip}</span>`;
-  return`<span class="badge bd-slate">${tip}</span>`;
-}
-function fmtD(iso){if(!iso)return'—';const d=new Date(iso);return`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;}
-function today(){return new Date().toISOString().slice(0,10);}
-function dl(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
-function load(show){document.getElementById('lo').classList.toggle('on',show);}
-function toast(msg,type='in'){
-  const el=document.createElement('div');
-  const cls=type==='ok'?'t-ok':type==='er'?'t-er':'t-in';
-  const dot=type==='ok'?'✓':type==='er'?'✕':'ℹ';
-  el.className=`toast ${cls}`;el.innerHTML=`<span class="td">${dot}</span>${msg}`;
-  document.getElementById('tw').appendChild(el);
-  setTimeout(()=>el.remove(),3800);
-}
-</script>
+        window.onload = () => {
+            verileriGetir();
+            hesapla();
+        };
+    </script>
 </body>
 </html>
