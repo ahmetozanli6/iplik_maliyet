@@ -1,173 +1,1703 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İplik ERP - Temiz PDF Aktarımı</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .erp-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-        .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; padding: 24px; }
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>İplik ERP — Maliyet Sistemi</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --ink: #0d0f12;
+  --paper: #f5f3ee;
+  --cream: #ede9e0;
+  --rust: #c94a2b;
+  --rust-light: #f0e8e4;
+  --gold: #b8860b;
+  --gold-light: #f7f0d8;
+  --teal: #1a5c52;
+  --teal-light: #e2eeec;
+  --border: #d4cfc5;
+  --muted: #7a7469;
+  --shadow: 0 2px 12px rgba(13,15,18,0.08), 0 1px 3px rgba(13,15,18,0.06);
+  --shadow-lg: 0 8px 32px rgba(13,15,18,0.12), 0 2px 8px rgba(13,15,18,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid var(--rust);
+}
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 3px;
+  color: var(--paper);
+  line-height: 1;
+}
+.logo span { color: var(--rust); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: transparent;
+  color: var(--paper);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
+.nav-btn.active { background: var(--rust); border-color: var(--rust); }
+
+/* ── TABS ── */
+.tabs-bar {
+  background: var(--ink);
+  display: flex;
+  gap: 0;
+  padding: 0 24px;
+  border-bottom: 1px solid #222;
+}
+.tab-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--paper); }
+.tab-btn.active { color: var(--paper); border-bottom-color: var(--rust); }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── LAYOUT ── */
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 28px 20px;
+}
+
+/* ── CARDS ── */
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: var(--ink);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-title .icon {
+  width: 28px; height: 28px;
+  background: var(--rust);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 13px;
+}
+
+/* ── FORM ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.field label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.field input, .field select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--ink);
+  background: white;
+  transition: border-color 0.15s;
+  width: 100%;
+  -webkit-appearance: none;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-light);
+}
+.field input[readonly] {
+  background: var(--cream);
+  color: var(--muted);
+  font-style: italic;
+}
+.field .hint {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-radius: 7px;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--rust); color: white; }
+.btn-primary:hover { background: #a83922; }
+.btn-secondary { background: var(--teal); color: white; }
+.btn-secondary:hover { background: #134840; }
+.btn-ghost { background: var(--cream); color: var(--ink); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--border); }
+.btn-danger { background: #dc2626; color: white; }
+.btn-danger:hover { background: #b91c1c; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* ── RESULT BOX ── */
+.result-box {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 10px;
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.result-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #999;
+}
+.result-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 1px;
+  color: var(--paper);
+  line-height: 1;
+}
+.result-value.highlight { color: #6ee7b7; }
+.result-value.warn { color: #fcd34d; }
+.result-value.danger { color: #f87171; }
+
+/* ── TUR FIYAT BAND ── */
+.tur-band {
+  background: var(--gold-light);
+  border: 1px solid #e8d88a;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.tur-band .icon { font-size: 20px; }
+.tur-band .info { flex: 1; min-width: 200px; }
+.tur-band .info strong {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 3px;
+}
+.tur-band .info span {
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ── TABLE ── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+thead {
+  background: var(--ink);
+  color: var(--paper);
+  position: sticky;
+  top: 0;
+}
+thead th {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 11px 12px;
+  text-align: left;
+  font-weight: 400;
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--cream);
+  transition: background 0.1s;
+  cursor: pointer;
+}
+tbody tr:hover { background: var(--teal-light); }
+tbody td {
+  padding: 10px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.mono { font-family: 'DM Mono', monospace; }
+.td-denye { font-weight: 600; color: var(--teal); }
+.td-tur { color: var(--rust); font-weight: 600; }
+.td-maliyet { color: var(--ink); font-weight: 600; }
+.td-satis { color: var(--gold); font-weight: 700; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.badge-fdy { background: var(--teal-light); color: var(--teal); }
+.badge-flv { background: var(--rust-light); color: var(--rust); }
+.badge-ity { background: var(--gold-light); color: var(--gold); }
+.badge-lin { background: #e0e7ff; color: #3730a3; }
+.badge-tex { background: #fce7f3; color: #be185d; }
+.badge-oth { background: var(--cream); color: var(--muted); }
+
+/* ── FILTERS ── */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.filter-bar input, .filter-bar select {
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: white;
+  color: var(--ink);
+  -webkit-appearance: none;
+}
+.filter-bar input:focus, .filter-bar select:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+.filter-bar input { min-width: 180px; }
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.stat-card .s-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.stat-card .s-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 1px;
+  color: var(--ink);
+  line-height: 1;
+}
+.stat-card .s-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+}
+.stat-card.accent-rust { border-top: 3px solid var(--rust); }
+.stat-card.accent-teal { border-top: 3px solid var(--teal); }
+.stat-card.accent-gold { border-top: 3px solid var(--gold); }
+.stat-card.accent-ink { border-top: 3px solid var(--ink); }
+
+/* ── GRID LAYOUT ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) {
+  .two-col, .three-col { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  header { padding: 12px 16px; }
+  .container { padding: 16px 14px; }
+  .logo { font-size: 22px; }
+  .result-box { grid-template-columns: 1fr 1fr; }
+  .tabs-bar { overflow-x: auto; padding: 0 12px; }
+}
+@media (max-width: 480px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .result-box { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── TOAST ── */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.2s ease;
+  max-width: 300px;
+}
+.toast-success { background: var(--teal); color: white; }
+.toast-error { background: var(--rust); color: white; }
+.toast-info { background: var(--ink); color: white; }
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ── LOADING ── */
+.loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13,15,18,0.5);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: white;
+}
+.loading-overlay.show { display: flex; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: var(--rust);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13,15,18,0.6);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+.modal-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  margin-bottom: 18px;
+  color: var(--ink);
+}
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+/* ── PDF PAGE ── */
+.pdf-drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--cream);
+}
+.pdf-drop-zone:hover, .pdf-drop-zone.drag-over {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+.pdf-drop-zone .drop-icon { font-size: 36px; margin-bottom: 10px; }
+.pdf-drop-zone p { color: var(--muted); font-size: 13px; font-family: 'DM Mono', monospace; }
+
+/* ── RANGE SLIDER ── */
+.range-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.range-wrap input[type=range] {
+  width: 100%;
+  accent-color: var(--rust);
+  height: 4px;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ── TUR KARSILASTIRMA ── */
+.tur-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.tur-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: white;
+}
+.tur-card:hover, .tur-card.selected {
+  border-color: var(--rust);
+  background: var(--rust-light);
+}
+.tur-card .t-tur {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--rust);
+  line-height: 1;
+}
+.tur-card .t-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.tur-card .t-fiyat {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+  margin-top: 4px;
+}
+
+/* ── INFO ROW ── */
+.info-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--cream);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.info-row strong { color: var(--ink); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty-state .e-icon { font-size: 48px; margin-bottom: 14px; opacity: 0.4; }
+.empty-state p { font-family: 'DM Mono', monospace; font-size: 13px; }
+
+/* ── KATSAYI BADGE ── */
+.katsayi-pos { color: #16a34a; font-weight: 700; }
+.katsayi-neg { color: #dc2626; font-weight: 700; }
+
+/* ── DELETE BTN ── */
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.1s;
+}
+.delete-btn:hover { color: #dc2626; background: #fee2e2; }
+
+.section-gap { margin-top: 24px; }
+.flex-end { display: flex; justify-content: flex-end; }
+</style>
 </head>
-<body class="text-slate-800 pb-12">
+<body>
 
-    <header class="erp-bg text-white py-6 px-6 shadow-lg mb-6 flex justify-between items-center">
-        <div>
-            <h1 class="text-2xl font-black mb-1 uppercase tracking-tighter">İplik Fiyat Listesi Aktar</h1>
-            <p class="text-emerald-400 text-xs font-bold uppercase tracking-widest mt-1 uppercase">Sıra numaraları ve sütunlar temizleniyor</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="index.html" class="bg-indigo-800 hover:bg-indigo-700 px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-md">Hesaplamaya Dön</a>
-            <button onclick="localStorage.removeItem('erp_fiyat_listesi'); location.reload();" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-bold text-sm shadow-md uppercase">Tüm Listeyi Sil</button>
-        </div>
-    </header>
+<div id="toast-container"></div>
 
-    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <div class="lg:col-span-5 space-y-6">
-            <div class="card border-indigo-200 text-center">
-                <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="pdfYukle(event)">
-                <button onclick="document.getElementById('pdf-file').click()" class="w-full bg-indigo-50 border-2 border-dashed border-indigo-300 p-8 rounded-xl hover:bg-indigo-100 transition-all">
-                    <svg class="w-10 h-10 text-indigo-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span class="block font-black text-indigo-700 uppercase text-xs">PDF Dosyası Seçin</span>
-                </button>
-                <div id="loading" class="hidden mt-4 text-indigo-600 font-bold animate-pulse text-sm">Analiz Ediliyor...</div>
-            </div>
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;">YÜKLENİYOR...</span>
+</div>
 
-            <div class="card">
-                <h2 class="text-xs font-black text-slate-500 uppercase mb-3 uppercase">Ayrıştırılmış Veri Havuzu</h2>
-                <textarea id="raw-text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[10px] font-mono h-64 outline-none custom-scroll shadow-inner" placeholder="PDF verileri burada tek tek listelenecek..."></textarea>
-                <button onclick="metniAyikla()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg transition-all uppercase text-sm tracking-wide">Temizle ve Listeye Kaydet</button>
-            </div>
-        </div>
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <div class="modal-title">⚠️ SİLMEK İSTEDİĞİNİZE EMİN MİSİNİZ?</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;">Bu kayıt kalıcı olarak silinecek ve geri alınamaz.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">İPTAL</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">🗑 SİL</button>
+    </div>
+  </div>
+</div>
 
-        <div class="lg:col-span-7">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[750px]">
-                <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">İplik Fiyat Listesi</h3>
-                    <span id="kayit-sayisi" class="bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-xs font-black shadow-sm">0 Kayıt</span>
-                </div>
-                <div class="flex-1 overflow-y-auto custom-scroll">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-100 sticky top-0 z-10 border-b border-slate-200">
-                            <tr>
-                                <th class="p-4 text-[10px] font-black text-slate-500 uppercase">İplik Tipi / Cinsi</th>
-                                <th class="p-4 text-[10px] font-black text-slate-500 uppercase text-right w-32">Birim Fiyat</th>
-                            </tr>
-                        </thead>
-                        <tbody id="veri-tablosu" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
+<!-- HEADER -->
+<header>
+  <div class="logo">İPLİK<span>ERP</span></div>
+  <div class="header-right">
+    <span id="db-status" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:#666;">⬤ BAĞLANIYOR...</span>
+    <a href="aktar.html" class="nav-btn">📥 PDF AKTAR</a>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="showTab('tab-hesap')">🧮 MALİYET HESAPLA</button>
+  <button class="tab-btn" onclick="showTab('tab-liste')">📋 KAYITLI MALİYETLER</button>
+  <button class="tab-btn" onclick="showTab('tab-iplik')">💰 İPLİK FİYAT LİSTESİ</button>
+  <button class="tab-btn" onclick="showTab('tab-rapor')">📊 RAPORLAR</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 1 — MALİYET HESAPLA -->
+<!-- ============================================================ -->
+<div id="tab-hesap" class="page active">
+<div class="container">
+
+  <div class="two-col">
+    <!-- SOL: GİRİŞ PARAMETRELERİ -->
+    <div class="card">
+      <div class="card-title"><div class="icon">🧵</div>İPLİK PARAMETRELERİ</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Denye (Ne)</label>
+          <input type="number" id="f-denye" placeholder="ör. 75" min="1" oninput="hesapla()">
         </div>
+        <div class="field">
+          <label>Tur / Büküm</label>
+          <input type="number" id="f-tur" placeholder="ör. 1200" min="1" oninput="hesapla()">
+          <span class="hint">↑ Tur artarsa maliyet artar</span>
+        </div>
+        <div class="field">
+          <label>Devir (d/dak)</label>
+          <input type="number" id="f-devir" placeholder="ör. 10000" min="1" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>Mt/D</label>
+          <input type="number" id="f-mtd" placeholder="ör. 25" step="0.1" oninput="hesapla()">
+          <span class="hint">Metre/Dakika = Devir/Tur × 1000</span>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Çalışma Süresi (saat)</label>
+          <input type="number" id="f-sure" value="24" min="1" max="24" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>Makine Sayısı</label>
+          <input type="number" id="f-makine" value="102" min="1" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>İplik Tipi</label>
+          <select id="f-tip" onchange="hesapla()">
+            <option>FDY-TXT</option>
+            <option>FLOŞ</option>
+            <option>ITY</option>
+            <option>FDY PARLAK</option>
+            <option>LİNEN</option>
+            <option>TEKSTÜRE</option>
+            <option>DİĞER</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Ham Madde Fiyatı ($)</label>
+          <input type="number" id="f-hammadde" placeholder="İplik fiyatı seç →" step="0.001" oninput="hesapla()">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>KW Birim Fiyat ($)</label>
+          <input type="number" id="f-kw" value="0.2" step="0.01" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>İşçilik ($/kg)</label>
+          <input type="number" id="f-iscilik" value="0.42" step="0.01" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>Bobin Gramaj</label>
+          <input type="number" id="f-bobin-gramaj" value="1000" min="1" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>Kar Oranı (%)</label>
+          <input type="number" id="f-kar" value="50" min="0" max="200" oninput="hesapla()">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Amortisман ($)</label>
+          <input type="number" id="f-amort" value="0.385" step="0.001" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>Genel Gider ($)</label>
+          <input type="number" id="f-genel" value="0.1" step="0.001" oninput="hesapla()">
+        </div>
+        <div class="field">
+          <label>Not / Açıklama</label>
+          <input type="text" id="f-not" placeholder="İsteğe bağlı...">
+        </div>
+        <div class="field" style="align-self:end;">
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="kaydet()">💾 KAYDET</button>
+            <button class="btn btn-ghost" onclick="temizle()">↺ TEMİZLE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TUR ETKISI GÖSTER -->
+      <div id="tur-band" class="tur-band" style="display:none;">
+        <div class="icon">⚙️</div>
+        <div class="info">
+          <strong>TUR ETKİSİ</strong>
+          <span id="tur-band-text">—</span>
+        </div>
+      </div>
     </div>
 
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    <!-- SAĞ: SONUÇLAR -->
+    <div>
+      <!-- SONUÇ KUTUSU -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><div class="icon">📊</div>MALİYET SONUÇLARI</div>
+        <div class="result-box" id="result-box">
+          <div class="result-item">
+            <div class="result-label">Günlük Üretim</div>
+            <div class="result-value" id="r-gunluk">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Aylık Üretim</div>
+            <div class="result-value" id="r-aylik">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Toplam Sarf+G.G.</div>
+            <div class="result-value warn" id="r-sarf">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Yeni Maliyet</div>
+            <div class="result-value highlight" id="r-maliyet">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Sat. Fiyatı</div>
+            <div class="result-value" id="r-satis">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Amortisman</div>
+            <div class="result-value" id="r-amort-val">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Kar Tutarı</div>
+            <div class="result-value highlight" id="r-kar-tutar">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Elektrik Maliyeti</div>
+            <div class="result-value" id="r-elektrik">—</div>
+          </div>
+        </div>
+      </div>
 
-        async function pdfYukle(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            document.getElementById('loading').classList.remove('hidden');
-            const fileReader = new FileReader();
-            
-            fileReader.onload = async function() {
-                const typedarray = new Uint8Array(this.result);
-                try {
-                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    let iplikListesi = [];
+      <!-- TUR KARŞILAŞTIRMA -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><div class="icon">🔄</div>TUR KARŞILAŞTIRMA</div>
+        <div class="info-row">
+          <strong>Tur arttıkça maliyet artar</strong> — Aynı denye için farklı tur değerlerinde tahmini satış fiyatları:
+        </div>
+        <div class="tur-compare-grid" id="tur-compare-grid">
+          <div class="empty-state" style="padding:20px;grid-column:1/-1;">
+            <p>Denye ve Devir girin...</p>
+          </div>
+        </div>
+      </div>
 
-                    for(let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        
-                        let items = textContent.items.map(item => ({
-                            str: item.str.trim(),
-                            x: item.transform[4],
-                            y: item.transform[5]
-                        })).filter(item => item.str.length > 0);
+      <!-- İPLİK FİYAT SEÇİCİ -->
+      <div class="card">
+        <div class="card-title"><div class="icon">💲</div>İPLİK FİYAT SEÇİCİ</div>
+        <div class="filter-bar">
+          <input type="text" id="fs-ara" placeholder="İplik ara..." oninput="filtreIplik()">
+        </div>
+        <div class="table-wrap" style="max-height:200px;overflow-y:auto;">
+          <table>
+            <thead><tr>
+              <th>İplik Cinsi</th>
+              <th>Birim Fiyat ($)</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="fs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                        let rows = {};
-                        items.forEach(item => {
-                            let yKey = Math.round(item.y);
-                            let closeY = Object.keys(rows).find(k => Math.abs(k - yKey) < 4);
-                            if (closeY) rows[closeY].push(item);
-                            else rows[yKey] = [item];
-                        });
+</div>
+</div>
 
-                        Object.keys(rows).sort((a, b) => b - a).forEach(y => {
-                            let rowItems = rows[y].sort((a, b) => a.x - b.x);
-                            let currentThread = "";
-                            for (let j = 0; j < rowItems.length; j++) {
-                                let item = rowItems[j];
-                                currentThread += item.str + " ";
-                                if (item.str.match(/^\d+[.,]\d{2,3}$/)) {
-                                    iplikListesi.push(currentThread.trim());
-                                    currentThread = ""; 
-                                }
-                            }
-                        });
-                    }
+<!-- ============================================================ -->
+<!-- TAB 2 — KAYITLI MALİYETLER -->
+<!-- ============================================================ -->
+<div id="tab-liste" class="page">
+<div class="container">
 
-                    document.getElementById('raw-text').value = iplikListesi.join('\n');
-                    metniAyikla();
-                } catch (e) { alert("Okuma Hatası!"); }
-                finally { document.getElementById('loading').classList.add('hidden'); }
-            };
-            fileReader.readAsArrayBuffer(file);
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card accent-rust">
+      <div class="s-label">Toplam Kayıt</div>
+      <div class="s-val" id="stat-toplam">—</div>
+      <div class="s-sub">maliyet kaydı</div>
+    </div>
+    <div class="stat-card accent-teal">
+      <div class="s-label">Ort. Satış Fiyatı</div>
+      <div class="s-val" id="stat-ort-satis">—</div>
+      <div class="s-sub">$ / kg ortalama</div>
+    </div>
+    <div class="stat-card accent-gold">
+      <div class="s-label">En Yüksek Tur</div>
+      <div class="s-val" id="stat-max-tur">—</div>
+      <div class="s-sub">devir/dakika</div>
+    </div>
+    <div class="stat-card accent-ink">
+      <div class="s-label">İplik Tipi</div>
+      <div class="s-val" id="stat-tip-sayisi">—</div>
+      <div class="s-sub">farklı tip</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">📋</div>KAYITLI MALİYETLER
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn btn-ghost" style="padding:6px 12px;font-size:10px;" onclick="maliyetleriYukle()">🔄 YENİLE</button>
+        <button class="btn btn-secondary" style="padding:6px 12px;font-size:10px;" onclick="exportCSV()">📤 CSV</button>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="l-ara" placeholder="Ara (denye, tip, not...)" oninput="filtrele()">
+      <select id="l-tip" onchange="filtrele()">
+        <option value="">Tüm Tipler</option>
+        <option>FDY-TXT</option><option>FLOŞ</option><option>ITY</option>
+        <option>FDY PARLAK</option><option>LİNEN</option><option>TEKSTÜRE</option><option>DİĞER</option>
+      </select>
+      <select id="l-sirala" onchange="filtrele()">
+        <option value="created_at_desc">↓ En Yeni</option>
+        <option value="created_at_asc">↑ En Eski</option>
+        <option value="satis_fiyati_desc">↓ Satış Fiyatı</option>
+        <option value="satis_fiyati_asc">↑ Satış Fiyatı</option>
+        <option value="denye_asc">↑ Denye</option>
+        <option value="tur_asc">↑ Tur</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Tip</th>
+          <th>Denye</th>
+          <th>Tur</th>
+          <th>Devir</th>
+          <th>Mt/D</th>
+          <th>Günlük Ürt.</th>
+          <th>Maliyet</th>
+          <th>Satış $</th>
+          <th>Kar %</th>
+          <th>Not</th>
+          <th>Tarih</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="liste-tbody">
+          <tr><td colspan="12" style="padding:40px;text-align:center;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Yükleniyor...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 3 — İPLİK FİYAT LİSTESİ -->
+<!-- ============================================================ -->
+<div id="tab-iplik" class="page">
+<div class="container">
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><div class="icon">➕</div>YENİ İPLİK EKLE</div>
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1;">
+          <label>İplik Cinsi / Tipi</label>
+          <input type="text" id="ip-cins" placeholder="ör. DTY 75/36 SD FDY" style="font-size:13px;">
+        </div>
+        <div class="field">
+          <label>Birim Fiyat ($)</label>
+          <input type="number" id="ip-fiyat" placeholder="0.000" step="0.001" min="0">
+        </div>
+        <div class="field">
+          <label>Para Birimi</label>
+          <select id="ip-para">
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="TRY">TRY (₺)</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="iplikEkle()">💾 EKLE</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('ip-cins').value='';document.getElementById('ip-fiyat').value=''">↺</button>
+      </div>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+        <div class="card-title" style="margin-bottom:12px;border:none;padding:0;font-size:14px;">📥 PDF'den Toplu Aktar</div>
+        <div class="pdf-drop-zone" id="pdf-drop" onclick="document.getElementById('pdf-input').click()">
+          <input type="file" id="pdf-input" accept="application/pdf" style="display:none" onchange="pdfAktar(event)">
+          <div class="drop-icon">📄</div>
+          <p>PDF fiyat listesi sürükle veya tıkla</p>
+          <p style="margin-top:4px;font-size:10px;">Otomatik temizleme ve kaydetme</p>
+        </div>
+        <div id="pdf-progress" style="display:none;margin-top:10px;">
+          <div style="background:var(--cream);border-radius:4px;height:6px;overflow:hidden;">
+            <div id="pdf-bar" style="background:var(--teal);height:100%;width:0%;transition:width 0.3s;border-radius:4px;"></div>
+          </div>
+          <p id="pdf-status" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px;text-align:center;">Analiz ediliyor...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="icon">💰</div>İPLİK FİYAT LİSTESİ
+        <div style="margin-left:auto;">
+          <span id="iplik-count" class="badge badge-teal" style="font-size:11px;padding:4px 10px;">0 İplik</span>
+        </div>
+      </div>
+      <div class="filter-bar" style="margin-bottom:12px;">
+        <input type="text" id="ip-ara" placeholder="İplik ara..." oninput="iplikFiltrele()" style="flex:1;">
+      </div>
+      <div class="table-wrap" style="max-height:420px;overflow-y:auto;">
+        <table>
+          <thead><tr>
+            <th>İplik Cinsi</th>
+            <th>Fiyat</th>
+            <th>Para</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="iplik-tbody">
+            <tr><td colspan="4" style="padding:30px;text-align:center;color:var(--muted);font-family:'DM Mono',monospace;">Yükleniyor...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 4 — RAPORLAR -->
+<!-- ============================================================ -->
+<div id="tab-rapor" class="page">
+<div class="container">
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><div class="icon">📈</div>DENYE BAZINDA MALİYET</div>
+      <div id="rapor-denye" style="font-family:'DM Mono',monospace;font-size:12px;line-height:2;">
+        <div class="empty-state"><div class="e-icon">📊</div><p>Veriler yükleniyor...</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">⚙️</div>TUR BAZINDA MALİYET ETKİSİ</div>
+      <div id="rapor-tur" style="font-family:'DM Mono',monospace;font-size:12px;line-height:2;">
+        <div class="empty-state"><div class="e-icon">⚙️</div><p>Veriler yükleniyor...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card section-gap">
+    <div class="card-title"><div class="icon">🏆</div>EN YÜKSEK MALİYETLİ İPLİKLER (TOP 10)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Tip</th><th>Denye</th><th>Tur</th><th>Devir</th><th>Maliyet</th><th>Satış $</th>
+        </tr></thead>
+        <tbody id="rapor-top-tbody">
+          <tr><td colspan="7" style="padding:30px;text-align:center;color:var(--muted);">Yükleniyor...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://nejpygqdwbjuwsauacsw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lanB5Z3Fkd2JqdXdzYXVhY3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTQzNzQsImV4cCI6MjA5MjE5MDM3NH0.bJuosfe7jqbu4RvsCtV2I-GK8Xsh2oeNRvIXDXoCYD8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── STATE ──
+let allMaliyetler = [];
+let allIplikler = [];
+let deleteTargetId = null;
+let deleteTargetTable = null;
+
+// ── INIT ──
+window.onload = async () => {
+  await initDB();
+  await maliyetleriYukle();
+  await ipliklerYukle();
+  raporYukle();
+};
+
+// ── DB INIT ── Create tables if not exists via API
+async function initDB() {
+  try {
+    // Test connection by fetching
+    const r1 = await sb.from('maliyet_kayitlari').select('id').limit(1);
+    const r2 = await sb.from('iplik_fiyatlari').select('id').limit(1);
+
+    if (r1.error && r1.error.code === '42P01') {
+      // Table doesn't exist — create via raw SQL not possible with anon key
+      // Show manual instruction
+      showToast('Supabase tablolarını oluşturun — Talimat için konsola bakın', 'error');
+      console.log(`
+-- Supabase SQL Editor'da şu SQL'i çalıştırın:
+CREATE TABLE IF NOT EXISTS maliyet_kayitlari (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  tip TEXT,
+  denye NUMERIC,
+  tur NUMERIC,
+  devir NUMERIC,
+  mtd NUMERIC,
+  gunluk_uretim NUMERIC,
+  aylik_uretim NUMERIC,
+  maliyet NUMERIC,
+  satis_fiyati NUMERIC,
+  kar_orani NUMERIC,
+  not TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS iplik_fiyatlari (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  cins TEXT,
+  fiyat NUMERIC,
+  para_birimi TEXT DEFAULT 'USD',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+      `);
+      document.getElementById('db-status').innerHTML = '⬤ TABLO YOK';
+      document.getElementById('db-status').style.color = '#ef4444';
+      return;
+    }
+
+    document.getElementById('db-status').innerHTML = '⬤ BAĞLANDI';
+    document.getElementById('db-status').style.color = '#6ee7b7';
+  } catch(e) {
+    document.getElementById('db-status').innerHTML = '⬤ HATA';
+    document.getElementById('db-status').style.color = '#ef4444';
+  }
+}
+
+// ── TABS ──
+function showTab(tabId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  const idx = ['tab-hesap','tab-liste','tab-iplik','tab-rapor'].indexOf(tabId);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  if (tabId === 'tab-rapor') raporYukle();
+}
+
+// ── HESAPLA ──
+function hesapla() {
+  const denye = parseFloat(document.getElementById('f-denye').value) || 0;
+  const tur = parseFloat(document.getElementById('f-tur').value) || 0;
+  const devir = parseFloat(document.getElementById('f-devir').value) || 0;
+  const mtd_input = parseFloat(document.getElementById('f-mtd').value) || 0;
+  const sure = parseFloat(document.getElementById('f-sure').value) || 24;
+  const makine = parseFloat(document.getElementById('f-makine').value) || 102;
+  const kw_birim = parseFloat(document.getElementById('f-kw').value) || 0.2;
+  const iscilik = parseFloat(document.getElementById('f-iscilik').value) || 0.42;
+  const bobin_gramaj = parseFloat(document.getElementById('f-bobin-gramaj').value) || 1000;
+  const kar_oran = parseFloat(document.getElementById('f-kar').value) || 50;
+  const amort = parseFloat(document.getElementById('f-amort').value) || 0.385;
+  const genel = parseFloat(document.getElementById('f-genel').value) || 0.1;
+  const hammadde = parseFloat(document.getElementById('f-hammadde').value) || 0;
+
+  if (!denye || !tur || !devir) {
+    clearResults();
+    return;
+  }
+
+  // Hesaplamalar
+  const mtd = tur > 0 ? devir / tur : mtd_input;
+  document.getElementById('f-mtd').value = mtd.toFixed(3);
+
+  const dk_uretim = (1000 * mtd) / (denye * 9); // g/dak
+  const gunluk_uretim_kg = (dk_uretim * 60 * sure) / 1000; // kg/gün tek makine
+  const aylik_uretim = gunluk_uretim_kg * 26; // 26 iş günü
+  const makine_aylik = aylik_uretim * makine;
+
+  // KW tüketim (formülden)
+  const kw_tuketim = 6.5; // sabit (orijinal Excel)
+  const elektrik = (kw_tuketim * kw_birim) / gunluk_uretim_kg;
+
+  // Sabit giderler
+  const bobin_gider = 0.02;
+  const etiket = 0.015;
+  const reklamasyon = 0.15;
+  const paketleme = 0.1;
+  const y_amort = amort * 0.5;
+
+  const toplam_sarf = iscilik + elektrik + amort + bobin_gider + etiket + reklamasyon + paketleme + genel + y_amort;
+
+  const maliyet = hammadde > 0 ? hammadde + toplam_sarf : toplam_sarf;
+  const satis_fiyati = maliyet * (1 + kar_oran / 100);
+  const kar_tutar = satis_fiyati - maliyet;
+
+  // Ekrana yaz
+  document.getElementById('r-gunluk').textContent = gunluk_uretim_kg.toFixed(2) + ' kg';
+  document.getElementById('r-aylik').textContent = aylik_uretim.toFixed(1) + ' kg';
+  document.getElementById('r-sarf').textContent = '$' + toplam_sarf.toFixed(4);
+  document.getElementById('r-maliyet').textContent = '$' + maliyet.toFixed(4);
+  document.getElementById('r-satis').textContent = '$' + satis_fiyati.toFixed(4);
+  document.getElementById('r-amort-val').textContent = '$' + amort.toFixed(3);
+  document.getElementById('r-kar-tutar').textContent = '$' + kar_tutar.toFixed(4);
+  document.getElementById('r-elektrik').textContent = '$' + elektrik.toFixed(4);
+
+  // TUR BANT MESAJı
+  const turBand = document.getElementById('tur-band');
+  const turText = document.getElementById('tur-band-text');
+  if (tur > 0) {
+    turBand.style.display = 'flex';
+    let seviye = tur < 800 ? '🟢 DÜŞÜK TUR' : tur < 1500 ? '🟡 ORTA TUR' : '🔴 YÜKSEK TUR';
+    turText.textContent = `${tur} tur/m — ${seviye} — Maliyet katkısı: ~$${(toplam_sarf).toFixed(3)}/kg`;
+  } else {
+    turBand.style.display = 'none';
+  }
+
+  // TUR KARŞILAŞTIRMA
+  turKarsilastir(denye, devir, makine, sure, kw_birim, iscilik, amort, genel, hammadde, kar_oran);
+}
+
+function turKarsilastir(denye, devir, makine, sure, kw_birim, iscilik, amort, genel, hammadde, kar_oran) {
+  const turValues = [400,600,800,1000,1200,1500,1800,2000,2400,3000];
+  const grid = document.getElementById('tur-compare-grid');
+  const currentTur = parseFloat(document.getElementById('f-tur').value) || 0;
+
+  grid.innerHTML = '';
+  turValues.forEach(t => {
+    const mtd = devir / t;
+    const dk_uretim = (1000 * mtd) / (denye * 9);
+    const gunluk = (dk_uretim * 60 * sure) / 1000;
+    const elektrik = 6.5 * kw_birim / gunluk;
+    const sarf = iscilik + elektrik + amort + 0.02 + 0.015 + 0.15 + 0.1 + genel + amort*0.5;
+    const maliyet = hammadde > 0 ? hammadde + sarf : sarf;
+    const satis = maliyet * (1 + kar_oran / 100);
+
+    const div = document.createElement('div');
+    div.className = 'tur-card' + (t === currentTur ? ' selected' : '');
+    div.innerHTML = `
+      <div class="t-label">TUR</div>
+      <div class="t-tur">${t}</div>
+      <div class="t-fiyat">$${satis.toFixed(3)}</div>
+    `;
+    div.onclick = () => {
+      document.getElementById('f-tur').value = t;
+      hesapla();
+    };
+    grid.appendChild(div);
+  });
+}
+
+function clearResults() {
+  ['r-gunluk','r-aylik','r-sarf','r-maliyet','r-satis','r-amort-val','r-kar-tutar','r-elektrik']
+    .forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('tur-band').style.display = 'none';
+  document.getElementById('tur-compare-grid').innerHTML = '<div class="empty-state" style="padding:20px;grid-column:1/-1;"><p>Denye ve Devir girin...</p></div>';
+}
+
+function temizle() {
+  ['f-denye','f-tur','f-devir','f-mtd','f-hammadde','f-not']
+    .forEach(id => document.getElementById(id).value = '');
+  clearResults();
+}
+
+// ── KAYDET ──
+async function kaydet() {
+  const denye = parseFloat(document.getElementById('f-denye').value);
+  const tur = parseFloat(document.getElementById('f-tur').value);
+  const devir = parseFloat(document.getElementById('f-devir').value);
+  const mtd = parseFloat(document.getElementById('f-mtd').value) || (devir/tur);
+  const sure = parseFloat(document.getElementById('f-sure').value) || 24;
+  const kw_birim = parseFloat(document.getElementById('f-kw').value) || 0.2;
+  const iscilik = parseFloat(document.getElementById('f-iscilik').value) || 0.42;
+  const amort = parseFloat(document.getElementById('f-amort').value) || 0.385;
+  const genel = parseFloat(document.getElementById('f-genel').value) || 0.1;
+  const hammadde = parseFloat(document.getElementById('f-hammadde').value) || 0;
+  const kar_oran = parseFloat(document.getElementById('f-kar').value) || 50;
+  const tip = document.getElementById('f-tip').value;
+  const not = document.getElementById('f-not').value;
+
+  if (!denye || !tur || !devir) {
+    showToast('Denye, Tur ve Devir zorunludur!', 'error');
+    return;
+  }
+
+  const dk_uretim = (1000 * mtd) / (denye * 9);
+  const gunluk = (dk_uretim * 60 * sure) / 1000;
+  const aylik = gunluk * 26;
+  const elektrik = 6.5 * kw_birim / gunluk;
+  const sarf = iscilik + elektrik + amort + 0.02 + 0.015 + 0.15 + 0.1 + genel + amort*0.5;
+  const maliyet = hammadde > 0 ? hammadde + sarf : sarf;
+  const satis = maliyet * (1 + kar_oran / 100);
+
+  showLoading(true);
+  const { error } = await sb.from('maliyet_kayitlari').insert({
+    tip, denye, tur, devir, mtd,
+    gunluk_uretim: gunluk,
+    aylik_uretim: aylik,
+    maliyet: maliyet,
+    satis_fiyati: satis,
+    kar_orani: kar_oran,
+    not: not || null
+  });
+  showLoading(false);
+
+  if (error) {
+    if (error.code === '42P01') {
+      showToast('Tablo bulunamadı! Supabase\'de SQL çalıştırın (konsol).', 'error');
+    } else {
+      showToast('Kayıt hatası: ' + error.message, 'error');
+    }
+    return;
+  }
+
+  showToast('Kayıt başarıyla eklendi ✓', 'success');
+  await maliyetleriYukle();
+  temizle();
+  showTab('tab-liste');
+}
+
+// ── MALİYETLERİ YÜKLE ──
+async function maliyetleriYukle() {
+  const { data, error } = await sb.from('maliyet_kayitlari').select('*').order('created_at', { ascending: false });
+  if (error) {
+    console.error(error);
+    document.getElementById('liste-tbody').innerHTML = `<tr><td colspan="12" style="padding:30px;text-align:center;color:var(--rust);font-family:'DM Mono',monospace;font-size:12px;">${error.message}</td></tr>`;
+    return;
+  }
+  allMaliyetler = data || [];
+  renderMaliyetler(allMaliyetler);
+  updateStats();
+}
+
+function renderMaliyetler(veriler) {
+  const tbody = document.getElementById('liste-tbody');
+  if (!veriler.length) {
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state"><div class="e-icon">📋</div><p>Henüz kayıt yok. Maliyet hesapla ve kaydet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = veriler.map(r => `
+    <tr onclick="maliyetSecTabHesap(${r.id})">
+      <td>${tipBadge(r.tip)}</td>
+      <td class="td-denye">${r.denye}</td>
+      <td class="td-tur">${r.tur}</td>
+      <td>${r.devir}</td>
+      <td>${r.mtd ? r.mtd.toFixed(2) : '—'}</td>
+      <td>${r.gunluk_uretim ? r.gunluk_uretim.toFixed(2) + ' kg' : '—'}</td>
+      <td class="td-maliyet">$${r.maliyet ? r.maliyet.toFixed(4) : '—'}</td>
+      <td class="td-satis">$${r.satis_fiyati ? r.satis_fiyati.toFixed(4) : '—'}</td>
+      <td><span class="${r.kar_orani >= 50 ? 'katsayi-pos' : 'katsayi-neg'}">%${r.kar_orani}</span></td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;">${r.not || '—'}</td>
+      <td style="color:var(--muted);font-size:10px;">${formatDate(r.created_at)}</td>
+      <td><button class="delete-btn" onclick="event.stopPropagation();openDeleteModal(${r.id},'maliyet_kayitlari')">🗑</button></td>
+    </tr>
+  `).join('');
+}
+
+function maliyetSecTabHesap(id) {
+  const r = allMaliyetler.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('f-denye').value = r.denye;
+  document.getElementById('f-tur').value = r.tur;
+  document.getElementById('f-devir').value = r.devir;
+  document.getElementById('f-kar').value = r.kar_orani;
+  if (r.tip) document.getElementById('f-tip').value = r.tip;
+  showTab('tab-hesap');
+  hesapla();
+}
+
+function updateStats() {
+  document.getElementById('stat-toplam').textContent = allMaliyetler.length;
+  if (allMaliyetler.length) {
+    const ort = allMaliyetler.reduce((a,b) => a + (b.satis_fiyati||0), 0) / allMaliyetler.length;
+    document.getElementById('stat-ort-satis').textContent = '$' + ort.toFixed(2);
+    const maxTur = Math.max(...allMaliyetler.map(r => r.tur || 0));
+    document.getElementById('stat-max-tur').textContent = maxTur;
+    const tipler = [...new Set(allMaliyetler.map(r => r.tip).filter(Boolean))];
+    document.getElementById('stat-tip-sayisi').textContent = tipler.length;
+  }
+}
+
+function filtrele() {
+  const ara = document.getElementById('l-ara').value.toLowerCase();
+  const tip = document.getElementById('l-tip').value;
+  const sirala = document.getElementById('l-sirala').value;
+
+  let filtered = allMaliyetler.filter(r => {
+    const matchAra = !ara ||
+      String(r.denye).includes(ara) ||
+      (r.tip||'').toLowerCase().includes(ara) ||
+      (r.not||'').toLowerCase().includes(ara);
+    const matchTip = !tip || r.tip === tip;
+    return matchAra && matchTip;
+  });
+
+  const [col, dir] = sirala.split('_');
+  const dirSign = dir === 'desc' ? -1 : 1;
+  filtered.sort((a, b) => {
+    if (col === 'created_at') return dirSign * (new Date(a.created_at) - new Date(b.created_at));
+    if (col === 'satis') return dirSign * ((a.satis_fiyati||0) - (b.satis_fiyati||0));
+    if (col === 'denye') return dirSign * ((a.denye||0) - (b.denye||0));
+    if (col === 'tur') return dirSign * ((a.tur||0) - (b.tur||0));
+    return 0;
+  });
+
+  renderMaliyetler(filtered);
+}
+
+// ── İPLİKLER ──
+async function ipliklerYukle() {
+  const { data, error } = await sb.from('iplik_fiyatlari').select('*').order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  allIplikler = data || [];
+  renderIplikler(allIplikler);
+  renderIplikSecici(allIplikler);
+  document.getElementById('iplik-count').textContent = `${allIplikler.length} İplik`;
+}
+
+function renderIplikler(veriler) {
+  const tbody = document.getElementById('iplik-tbody');
+  if (!veriler.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:30px;"><p>Henüz iplik yok. Ekle veya PDF aktar.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = veriler.map(r => `
+    <tr>
+      <td style="font-weight:600;color:var(--ink);">${r.cins}</td>
+      <td class="td-satis">$${Number(r.fiyat).toFixed(3)}</td>
+      <td><span class="badge badge-fdy">${r.para_birimi||'USD'}</span></td>
+      <td><button class="delete-btn" onclick="openDeleteModal(${r.id},'iplik_fiyatlari')">🗑</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderIplikSecici(veriler) {
+  const tbody = document.getElementById('fs-tbody');
+  if (!veriler.length) {
+    tbody.innerHTML = `<tr><td colspan="3" style="padding:20px;text-align:center;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;">İplik fiyat listesi boş</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = veriler.map(r => `
+    <tr onclick="iplikSec(${r.fiyat},'${r.cins.replace(/'/g,"\'")}')" title="Hesaplamaya uygula">
+      <td style="font-weight:500;">${r.cins}</td>
+      <td style="color:var(--gold);font-weight:700;">$${Number(r.fiyat).toFixed(3)}</td>
+      <td><button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;" onclick="event.stopPropagation();iplikSec(${r.fiyat},'${r.cins.replace(/'/g,"\\'")}')">↗</button></td>
+    </tr>
+  `).join('');
+}
+
+function iplikSec(fiyat, cins) {
+  document.getElementById('f-hammadde').value = fiyat;
+  document.getElementById('f-not').value = cins;
+  showToast(`${cins} → $${fiyat} seçildi`, 'success');
+  hesapla();
+}
+
+function iplikFiltrele() {
+  const ara = document.getElementById('ip-ara').value.toLowerCase();
+  renderIplikler(allIplikler.filter(r => r.cins.toLowerCase().includes(ara)));
+}
+
+function filtreIplik() {
+  const ara = document.getElementById('fs-ara').value.toLowerCase();
+  renderIplikSecici(allIplikler.filter(r => r.cins.toLowerCase().includes(ara)));
+}
+
+async function iplikEkle() {
+  const cins = document.getElementById('ip-cins').value.trim().toUpperCase();
+  const fiyat = parseFloat(document.getElementById('ip-fiyat').value);
+  const para = document.getElementById('ip-para').value;
+
+  if (!cins || !fiyat) { showToast('İplik cinsi ve fiyat gerekli!', 'error'); return; }
+
+  showLoading(true);
+  const { error } = await sb.from('iplik_fiyatlari').insert({ cins, fiyat, para_birimi: para });
+  showLoading(false);
+
+  if (error) {
+    if (error.code === '42P01') {
+      showToast('Tablo bulunamadı! Konsola bakın.', 'error');
+    } else {
+      showToast('Hata: ' + error.message, 'error');
+    }
+    return;
+  }
+
+  showToast(`${cins} başarıyla eklendi ✓`, 'success');
+  document.getElementById('ip-cins').value = '';
+  document.getElementById('ip-fiyat').value = '';
+  await ipliklerYukle();
+}
+
+// ── PDF AKTAR ──
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+async function pdfAktar(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  document.getElementById('pdf-progress').style.display = 'block';
+  document.getElementById('pdf-bar').style.width = '10%';
+  document.getElementById('pdf-status').textContent = 'PDF okunuyor...';
+
+  const fileReader = new FileReader();
+  fileReader.onload = async function() {
+    const typedarray = new Uint8Array(this.result);
+    try {
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      let iplikListesi = [];
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const tc = await page.getTextContent();
+        document.getElementById('pdf-bar').style.width = `${10 + (i/pdf.numPages)*60}%`;
+
+        let items = tc.items.map(it => ({ str: it.str.trim(), x: it.transform[4], y: it.transform[5] })).filter(it => it.str.length > 0);
+        let rows = {};
+        items.forEach(it => {
+          let yKey = Math.round(it.y);
+          let closeY = Object.keys(rows).find(k => Math.abs(k - yKey) < 4);
+          if (closeY) rows[closeY].push(it); else rows[yKey] = [it];
+        });
+        Object.keys(rows).sort((a,b) => b-a).forEach(y => {
+          let rowItems = rows[y].sort((a,b) => a.x - b.x);
+          let cur = '';
+          rowItems.forEach(it => {
+            cur += it.str + ' ';
+            if (it.str.match(/^\d+[.,]\d{2,3}$/)) { iplikListesi.push(cur.trim()); cur = ''; }
+          });
+        });
+      }
+
+      document.getElementById('pdf-bar').style.width = '80%';
+      document.getElementById('pdf-status').textContent = `${iplikListesi.length} satır bulundu. Kaydediliyor...`;
+
+      // Parse and save
+      const toInsert = [];
+      iplikListesi.forEach(line => {
+        const match = line.match(/(.+?)\s+(\d+[.,]\d{2,3})/);
+        if (match) {
+          let cins = match[1].trim().replace(/^\d+[\s.|\-)]+/, '').replace(/^(USD|TL|\$)\s+/i, '').trim().toUpperCase();
+          let fiyat = parseFloat(match[2].replace(',', '.'));
+          if (cins.length > 3) toInsert.push({ cins, fiyat, para_birimi: 'USD' });
         }
+      });
 
-        function metniAyikla() {
-            const rawText = document.getElementById('raw-text').value;
-            const lines = rawText.split('\n');
-            const finalData = [];
+      if (toInsert.length) {
+        const { error } = await sb.from('iplik_fiyatlari').insert(toInsert);
+        if (error) { showToast('Kayıt hatası: ' + error.message, 'error'); }
+        else { showToast(`${toInsert.length} iplik Supabase'e kaydedildi ✓`, 'success'); }
+      }
 
-            lines.forEach(line => {
-                line = line.trim();
-                const match = line.match(/(.+?)\s+(\d+[.,]\d{2,3})/);
-                if (match) {
-                    let isim = match[1].trim();
-                    // Baştaki sayıları temizle
-                    isim = isim.replace(/^\d+[\s.|\-)]+/, "").trim(); 
-                    isim = isim.replace(/^(USD|TL|\$)\s+/i, "");
-                    
-                    let fiyat = match[2].trim().replace(',', '.');
-                    if (isim.length > 3) {
-                        finalData.push({
-                            cins: isim.toUpperCase(),
-                            fiyat: parseFloat(fiyat).toFixed(3) + " $"
-                        });
-                    }
-                }
-            });
+      document.getElementById('pdf-bar').style.width = '100%';
+      document.getElementById('pdf-status').textContent = `Tamamlandı: ${toInsert.length} iplik eklendi`;
+      await ipliklerYukle();
+    } catch(e) {
+      showToast('PDF okuma hatası: ' + e.message, 'error');
+    }
+    event.target.value = '';
+    setTimeout(() => { document.getElementById('pdf-progress').style.display = 'none'; }, 3000);
+  };
+  fileReader.readAsArrayBuffer(file);
+}
 
-            tabloyuGuncelle(finalData);
-            localStorage.setItem('erp_fiyat_listesi', JSON.stringify(finalData));
-        }
+// ── SİL ──
+function openDeleteModal(id, table) {
+  deleteTargetId = id;
+  deleteTargetTable = table;
+  document.getElementById('delete-modal').classList.add('show');
+}
+function closeDeleteModal() {
+  deleteTargetId = null;
+  deleteTargetTable = null;
+  document.getElementById('delete-modal').classList.remove('show');
+}
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  showLoading(true);
+  const { error } = await sb.from(deleteTargetTable).delete().eq('id', deleteTargetId);
+  showLoading(false);
+  closeDeleteModal();
+  if (error) { showToast('Silme hatası: ' + error.message, 'error'); return; }
+  showToast('Kayıt silindi ✓', 'success');
+  if (deleteTargetTable === 'maliyet_kayitlari') await maliyetleriYukle();
+  else await ipliklerYukle();
+}
 
-        function tabloyuGuncelle(veriler) {
-            const tablo = document.getElementById('veri-tablosu');
-            document.getElementById('kayit-sayisi').innerText = `${veriler.length} İplik Temizlendi`;
-            tablo.innerHTML = '';
-            veriler.forEach(veri => {
-                tablo.innerHTML += `
-                    <tr class="hover:bg-blue-50 border-b border-slate-50 transition-colors">
-                        <td class="p-4 font-bold text-[10px] text-slate-700 uppercase leading-tight">${veri.cins}</td>
-                        <td class="p-4 text-right font-mono font-black text-emerald-600 text-xs tracking-tighter">${veri.fiyat}</td>
-                    </tr>`;
-            });
-        }
+// ── RAPOR ──
+async function raporYukle() {
+  if (!allMaliyetler.length) return;
 
-        window.onload = () => {
-            const kayitli = localStorage.getItem('erp_fiyat_listesi');
-            if (kayitli) tabloyuGuncelle(JSON.parse(kayitli));
-        };
-    </script>
+  // Denye raporu
+  const denyeMap = {};
+  allMaliyetler.forEach(r => {
+    if (!denyeMap[r.denye]) denyeMap[r.denye] = [];
+    denyeMap[r.denye].push(r.satis_fiyati || 0);
+  });
+  const denyeHtml = Object.keys(denyeMap).sort((a,b) => a-b).map(d => {
+    const avg = denyeMap[d].reduce((a,b)=>a+b,0)/denyeMap[d].length;
+    const max = Math.max(...denyeMap[d]);
+    const min = Math.min(...denyeMap[d]);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--cream);">
+      <span style="font-weight:700;color:var(--teal);min-width:50px;">${d} Ne</span>
+      <div style="flex:1;background:var(--cream);border-radius:4px;height:8px;overflow:hidden;">
+        <div style="background:var(--rust);height:100%;width:${Math.min(100,(avg/5)*100)}%;border-radius:4px;"></div>
+      </div>
+      <span style="color:var(--gold);font-weight:700;min-width:60px;text-align:right;">$${avg.toFixed(3)}</span>
+      <span style="color:var(--muted);font-size:10px;">(${denyeMap[d].length} kayıt)</span>
+    </div>`;
+  }).join('');
+  document.getElementById('rapor-denye').innerHTML = denyeHtml || '<p style="color:var(--muted)">Veri yok</p>';
+
+  // Tur raporu
+  const turRanges = [[0,800,'Düşük'],[800,1500,'Orta'],[1500,9999,'Yüksek']];
+  const turHtml = turRanges.map(([min,max,label]) => {
+    const filtered = allMaliyetler.filter(r => r.tur >= min && r.tur < max);
+    if (!filtered.length) return '';
+    const avg = filtered.reduce((a,b)=>a+(b.satis_fiyati||0),0)/filtered.length;
+    return `<div style="padding:12px;border-radius:8px;margin-bottom:8px;background:${min>1000?'var(--rust-light)':min>500?'var(--gold-light)':'var(--teal-light)'};">
+      <div style="font-weight:700;color:var(--ink);margin-bottom:4px;">${label} Tur (${min}-${max===9999?'∞':max})</div>
+      <div style="font-size:13px;color:var(--muted);">${filtered.length} kayıt — Ort. Satış: <strong style="color:var(--ink);">$${avg.toFixed(3)}</strong></div>
+    </div>`;
+  }).join('');
+  document.getElementById('rapor-tur').innerHTML = turHtml || '<p style="color:var(--muted)">Veri yok</p>';
+
+  // Top 10
+  const top10 = [...allMaliyetler].sort((a,b) => (b.satis_fiyati||0)-(a.satis_fiyati||0)).slice(0,10);
+  document.getElementById('rapor-top-tbody').innerHTML = top10.map((r,i) => `
+    <tr>
+      <td><strong>${i+1}</strong></td>
+      <td>${tipBadge(r.tip)}</td>
+      <td class="td-denye">${r.denye}</td>
+      <td class="td-tur">${r.tur}</td>
+      <td>${r.devir}</td>
+      <td>$${(r.maliyet||0).toFixed(4)}</td>
+      <td class="td-satis">$${(r.satis_fiyati||0).toFixed(4)}</td>
+    </tr>
+  `).join('');
+}
+
+// ── CSV EXPORT ──
+function exportCSV() {
+  if (!allMaliyetler.length) { showToast('Kayıt yok!', 'error'); return; }
+  const headers = ['Tip','Denye','Tur','Devir','Mt/D','Günlük Ürt.','Maliyet','Satış $','Kar %','Not','Tarih'];
+  const rows = allMaliyetler.map(r => [
+    r.tip, r.denye, r.tur, r.devir,
+    r.mtd?.toFixed(3), r.gunluk_uretim?.toFixed(2),
+    r.maliyet?.toFixed(4), r.satis_fiyati?.toFixed(4),
+    r.kar_orani, r.not || '', formatDate(r.created_at)
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `iplik_maliyetler_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── UTILS ──
+function tipBadge(tip) {
+  if (!tip) return '<span class="badge badge-oth">—</span>';
+  const t = tip.toUpperCase();
+  if (t.includes('FDY')) return `<span class="badge badge-fdy">${tip}</span>`;
+  if (t.includes('FLOŞ') || t.includes('FLO')) return `<span class="badge badge-flv">${tip}</span>`;
+  if (t === 'ITY') return `<span class="badge badge-ity">${tip}</span>`;
+  if (t.includes('LİNEN') || t.includes('LINEN')) return `<span class="badge badge-lin">${tip}</span>`;
+  if (t.includes('TEKST')) return `<span class="badge badge-tex">${tip}</span>`;
+  return `<span class="badge badge-oth">${tip}</span>`;
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
+}
+
+function showLoading(show) {
+  document.getElementById('loading-overlay').classList.toggle('show', show);
+}
+
+function showToast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// Drag & Drop PDF
+const dropZone = document.getElementById('pdf-drop');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('pdf-input').files = dt.files;
+    pdfAktar({ target: { files: dt.files, value: '' } });
+  }
+});
+</script>
 </body>
 </html>
