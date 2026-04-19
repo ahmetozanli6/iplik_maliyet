@@ -18,7 +18,7 @@
         <header class="erp-gradient rounded-3xl p-8 mb-8 shadow-2xl text-white flex flex-col md:flex-row justify-between items-center border border-white/10">
             <div>
                 <h1 class="text-3xl font-black tracking-tighter">🧵 SERBEST MALİYET SİMÜLATÖRÜ</h1>
-                <p class="text-emerald-400 text-sm font-bold uppercase tracking-widest mt-2">İstediğiniz Denye, Tur ve Parametreyi Özgürce Girin</p>
+                <p class="text-emerald-400 text-sm font-bold uppercase tracking-widest mt-2">Düz Büküm: 20 Denye / 800 Tur (Referans Değerler Yüklü)</p>
             </div>
             <div class="mt-4 md:mt-0 flex items-center gap-4">
                 <div class="bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl">
@@ -38,27 +38,27 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
                             <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest block">Denye</label>
-                            <input type="number" id="m_denye" placeholder="Örn: 20, 50, 150" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-black text-xl text-slate-800 outline-none">
+                            <input type="number" id="m_denye" value="20" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-black text-xl text-slate-800 outline-none">
                         </div>
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
                             <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest block">Tur (Twist)</label>
-                            <input type="number" id="m_tur" placeholder="Örn: 800, 1200" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-black text-xl text-slate-800 outline-none">
+                            <input type="number" id="m_tur" value="800" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-black text-xl text-slate-800 outline-none">
                         </div>
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
                             <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest block">Günlük Üretim (Kg)</label>
-                            <input type="number" id="m_gunluk_kg" placeholder="Örn: 20.48" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-black text-xl text-slate-800 outline-none">
+                            <input type="number" id="m_gunluk_kg" value="20.48" step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-black text-xl text-slate-800 outline-none">
                         </div>
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
                             <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest block">MT/D (Hız)</label>
-                            <input type="number" id="m_mtd" placeholder="Örn: 25" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold text-lg outline-none">
+                            <input type="number" id="m_mtd" value="25" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold text-lg outline-none">
                         </div>
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
-                            <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest block">Günlük Toplam KW</label>
-                            <input type="number" id="m_kw_toplam" placeholder="Örn: 133.12" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold text-lg outline-none">
+                            <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest block">KW Tüketim (Kg Başına)</label>
+                            <input type="number" id="m_kw_kg" value="6.5" step="0.1" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold text-lg outline-none">
                         </div>
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
                             <label class="text-[11px] font-black text-emerald-600 uppercase tracking-widest block">KW Birim Fiyat ($)</label>
-                            <input type="number" id="m_kw_birim" placeholder="Örn: 0.20" class="w-full bg-emerald-50 border border-emerald-200 rounded-xl p-4 font-black text-lg text-emerald-700 outline-none">
+                            <input type="number" id="m_kw_birim" value="0.20" step="0.01" class="w-full bg-emerald-50 border border-emerald-200 rounded-xl p-4 font-black text-lg text-emerald-700 outline-none">
                         </div>
                     </div>
                 </div>
@@ -70,11 +70,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
                             <label class="text-xs font-black text-emerald-600 uppercase tracking-widest block">Hammadde Birim Fiyatı ($)</label>
-                            <input type="number" id="m_hammadde" placeholder="Örn: 0.964" class="w-full bg-emerald-50 border border-emerald-200 rounded-xl p-5 font-black text-emerald-800 text-2xl outline-none">
+                            <input type="number" id="m_hammadde" value="0.964" step="0.001" class="w-full bg-emerald-50 border border-emerald-200 rounded-xl p-5 font-black text-emerald-800 text-2xl outline-none">
                         </div>
                         <div class="space-y-2 focus-glow rounded-xl transition-all">
                             <label class="text-xs font-black text-blue-600 uppercase tracking-widest block">İşçilik Gideri ($)</label>
-                            <input type="number" id="m_iscilik" placeholder="Örn: 0.809" class="w-full bg-blue-50 border border-blue-200 rounded-xl p-5 font-black text-blue-800 text-2xl outline-none">
+                            <input type="number" id="m_iscilik" value="0.809" step="0.001" class="w-full bg-blue-50 border border-blue-200 rounded-xl p-5 font-black text-blue-800 text-2xl outline-none">
                         </div>
                     </div>
                 </div>
@@ -86,27 +86,27 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         <div class="space-y-2 focus-glow">
                             <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Amortisman</label>
-                            <input type="number" id="g_amort" placeholder="Örn: 0.385" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
+                            <input type="number" id="g_amort" value="0.385" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
                         </div>
                         <div class="space-y-2 focus-glow">
                             <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Bobin</label>
-                            <input type="number" id="g_bobin" placeholder="Örn: 0.10" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
+                            <input type="number" id="g_bobin" value="0.10" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
                         </div>
                         <div class="space-y-2 focus-glow">
                             <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Etiket</label>
-                            <input type="number" id="g_etiket" placeholder="Örn: 0.015" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
+                            <input type="number" id="g_etiket" value="0.015" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
                         </div>
                         <div class="space-y-2 focus-glow">
                             <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Paketleme</label>
-                            <input type="number" id="g_paket" placeholder="Örn: 0.15" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
+                            <input type="number" id="g_paket" value="0.15" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
                         </div>
                         <div class="space-y-2 focus-glow">
                             <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Genel Gider</label>
-                            <input type="number" id="g_genel" placeholder="Örn: 0.10" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
+                            <input type="number" id="g_genel" value="0.10" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
                         </div>
                         <div class="space-y-2 focus-glow">
                             <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Reklamasyon</label>
-                            <input type="number" id="g_reklam" placeholder="Örn: 0.02" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
+                            <input type="number" id="g_reklam" value="0.02" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-bold outline-none">
                         </div>
                     </div>
                 </div>
@@ -138,7 +138,7 @@
                         <div class="space-y-4 pt-8 border-t border-white/10">
                             <div class="space-y-2 text-center">
                                 <label class="text-xs font-black text-orange-400 uppercase tracking-widest">Kâr Oranı (%)</label>
-                                <input type="number" id="m_kar" placeholder="Örn: 50" class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 font-black text-white text-3xl text-center outline-none focus:border-orange-500 transition-colors">
+                                <input type="number" id="m_kar" value="50" class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 font-black text-white text-3xl text-center outline-none focus:border-orange-500 transition-colors">
                             </div>
                             <button onclick="tamHesapla()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-5 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest text-lg mt-4">
                                 HESAPLA & GÜNCELLE
@@ -159,13 +159,12 @@
         function tamHesapla() {
             // Ana Girdileri Al
             const hammadde = parseFloat(document.getElementById('m_hammadde').value) || 0;
-            const kwToplam = parseFloat(document.getElementById('m_kw_toplam').value) || 0;
+            const kwKg = parseFloat(document.getElementById('m_kw_kg').value) || 0; // Kg başına tüketim (Excel'de 6.5)
             const kwBirim = parseFloat(document.getElementById('m_kw_birim').value) || 0;
-            const gunlukKg = parseFloat(document.getElementById('m_gunluk_kg').value) || 1; // Sıfıra bölünmeyi engeller
             const iscilik = parseFloat(document.getElementById('m_iscilik').value) || 0;
             const karOrani = parseFloat(document.getElementById('m_kar').value) || 0;
 
-            // Sarf Giderleri Al (Eğer boş bırakılırsa 0 sayılır)
+            // Sarf Giderleri Al
             const sarf = (parseFloat(document.getElementById('g_amort').value) || 0) +
                          (parseFloat(document.getElementById('g_bobin').value) || 0) +
                          (parseFloat(document.getElementById('g_etiket').value) || 0) +
@@ -174,21 +173,17 @@
                          (parseFloat(document.getElementById('g_reklam').value) || 0);
 
             // Matematiksel Formüller (Excel ile Birebir)
-            let enerjiKg = 0;
-            if(gunlukKg > 0) {
-                enerjiKg = (kwToplam * kwBirim) / gunlukKg;
-            }
-            
+            const enerjiKg = kwKg * kwBirim; // Direkt 6.5 * 0.20 = 1.30
             const isciSarfToplam = iscilik + sarf;
             const netMaliyet = hammadde + enerjiKg + isciSarfToplam;
             const satisFiyati = netMaliyet * (1 + (karOrani / 100));
 
-            // Sonuçları Siyah Ekrana Yazdır (Virgülden sonra detaylı gösterim)
+            // Sonuçları Siyah Ekrana Yazdır
             document.getElementById('res_hammadde').innerText = `$ ${hammadde.toFixed(3)}`;
             document.getElementById('res_enerji').innerText = `$ ${enerjiKg.toFixed(3)}`;
             document.getElementById('res_iscilik_sarf').innerText = `$ ${isciSarfToplam.toFixed(3)}`;
             document.getElementById('res_net_maliyet').innerText = `$ ${netMaliyet.toFixed(3)}`;
-            document.getElementById('res_satis_fiyati').innerText = `$ ${satisFiyati.toFixed(2)}`; // Satış fiyatı 2 hane yeterlidir
+            document.getElementById('res_satis_fiyati').innerText = `$ ${satisFiyati.toFixed(2)}`;
 
             // Animasyon Efekti
             const panel1 = document.getElementById('res_net_maliyet');
@@ -201,6 +196,9 @@
                 panel2.classList.remove('scale-105', 'text-white');
             }, 300);
         }
+
+        // Sayfa açıldığında ilk hesaplamayı çalıştır ki 5.76 hazır gelsin
+        window.onload = tamHesapla;
     </script>
 </body>
 </html>
