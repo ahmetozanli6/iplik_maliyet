@@ -974,9 +974,32 @@ function closeDd() {
 }
 
 searchInp.addEventListener('input', function() {
-  const q = this.value.trim().toUpperCase();
-  if (!q) { closeDd(); return; }
-  const hits = iplikler.filter(i => i.cins && i.cins.toUpperCase().includes(q)).slice(0, 20);
+  const raw = this.value.trim();
+  if (!raw) { closeDd(); return; }
+
+  // Türkçe dahil tüm karakterleri koru, sadece büyük harfe çevir
+  // Boşluklara göre token'lara böl
+  const tokens = raw.toUpperCase().split(/\s+/).filter(Boolean);
+  // örnek: "50 36 teks" → ["50","36","TEKS"]
+  // örnek: "36"         → ["36"]
+
+  const hits = iplikler
+    .map(i => {
+      const cins = (i.cins || '').toUpperCase();
+      // Her token cins içinde geçiyor mu?
+      const matched = tokens.filter(t => cins.includes(t));
+      return { item: i, matched: matched.length, total: tokens.length };
+    })
+    .filter(x => x.matched > 0)           // en az 1 token eşleşmeli
+    .sort((a, b) => {
+      // Önce: kaç token eşleşti (fazla olan önce)
+      if (b.matched !== a.matched) return b.matched - a.matched;
+      // Eşitse: alfabetik sırala
+      return a.item.cins.localeCompare(b.item.cins, 'tr');
+    })
+    .slice(0, 25)
+    .map(x => x.item);
+
   if (!hits.length) { closeDd(); return; }
 
   // innerHTML ile oluştur — event delegation ile tıklama al
