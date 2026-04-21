@@ -366,6 +366,36 @@ hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
         <div class="sales-val">$<span id="o-satis">—</span></div>
       </div>
 
+      <!-- Süre Kartı -->
+      <div id="sure-card" style="background:#1a1a2e;border-radius:var(--rl);padding:18px 22px;margin-bottom:14px;display:none">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8892b0;margin-bottom:12px">⏱ Üretim Süresi</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px">
+            <div style="font-size:11px;color:#8892b0;margin-bottom:4px">Hedef Miktar</div>
+            <div style="font-size:20px;font-weight:700;color:#ccd6f6"><span id="o-hedef-kg">—</span> <span style="font-size:12px;font-weight:400">kg</span></div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px">
+            <div style="font-size:11px;color:#8892b0;margin-bottom:4px">Bobin Adedi</div>
+            <div style="font-size:20px;font-weight:700;color:#ccd6f6"><span id="o-bobin-adet">—</span> <span style="font-size:12px;font-weight:400">adet</span></div>
+          </div>
+        </div>
+        <div style="background:rgba(100,255,218,.08);border:1px solid rgba(100,255,218,.2);border-radius:var(--r);padding:14px 16px;text-align:center">
+          <div style="font-size:11px;color:#64ffda;margin-bottom:6px;font-weight:600">TOPLAM SÜRE</div>
+          <div style="font-size:36px;font-weight:800;color:#64ffda;letter-spacing:-1px" id="o-sure-main">—</div>
+          <div style="font-size:12px;color:rgba(100,255,218,.6);margin-top:4px" id="o-sure-alt">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+          <div style="background:rgba(255,255,255,.04);border-radius:var(--rs);padding:10px 12px">
+            <div style="font-size:10px;color:#8892b0">Tek İğ Süresi</div>
+            <div style="font-size:14px;font-weight:600;color:#ccd6f6;margin-top:3px" id="o-tek-ig">—</div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border-radius:var(--rs);padding:10px 12px">
+            <div style="font-size:10px;color:#8892b0">Tüm Makine</div>
+            <div style="font-size:14px;font-weight:600;color:#ccd6f6;margin-top:3px" id="o-tum-makine">—</div>
+          </div>
+        </div>
+      </div>
+
       <button class="kaydet-btn" onclick="hesabiKaydet()">💾 Bu Hesabı Geçmişe Kaydet</button>
     </div><!-- /SAĞ -->
 
@@ -572,6 +602,50 @@ function hesapla() {
     setSeg('seg-enj', enerji  /net*100);
     setSeg('seg-dgr', diger   /net*100);
   }
+
+  // ── ÜRETİM SÜRESİ HESABI ──────────────────────────────────
+  // Tek bir iğin kg/dk üretimi:
+  //   hiz (mt/dk) × (denye / 9000) / 1000  → kg/dk (tek iğ)
+  // Toplam makine üretimi:
+  //   tek_ig_kgdak × ig  → kg/dk (tüm iğler)
+  const hedef    = gv('v-hedef');      // kg
+  const bobinGr  = gv('v-bobin-gr');   // gr/bobin (0 ise bobin hesabı yok)
+
+  const sureCard = document.getElementById('sure-card');
+
+  if (hedef > 0 && hiz > 0 && denye > 0 && ig > 0) {
+    sureCard.style.display = 'block';
+
+    // Tek iğ kg/dk
+    const tekIgKgDk   = hiz * (denye / 9000) / 1000;
+    // Tüm iğler kg/dk
+    const tumIgKgDk   = tekIgKgDk * ig;
+
+    // Tek iğ için hedef kgı üretme süresi (dk)
+    const tekIgSureDk = tekIgKgDk > 0 ? (hedef / tekIgKgDk) : 0;
+    // Tüm makine ile hedef kgı üretme süresi (dk)
+    const tumSureDk   = tumIgKgDk > 0 ? (hedef / tumIgKgDk) : 0;
+
+    // Bobin adedi (bobin gramajı girilmişse)
+    let bobinAdetStr = '—';
+    if (bobinGr > 0) {
+      const adet = Math.ceil((hedef * 1000) / bobinGr);
+      bobinAdetStr = adet.toLocaleString('tr-TR');
+    }
+
+    // Ana gösterim: tüm makinenin hedefi üretme süresi
+    const anaStr  = formatSure(tumSureDk);
+    const altStr  = `${f(tumIgKgDk * 60, 2)} kg/saat hızıyla`;
+
+    st('o-hedef-kg',    hedef.toLocaleString('tr-TR'));
+    st('o-bobin-adet',  bobinAdetStr);
+    st('o-sure-main',   anaStr);
+    st('o-sure-alt',    altStr);
+    st('o-tek-ig',      formatSure(tekIgSureDk));
+    st('o-tum-makine',  formatSure(tumSureDk));
+  } else {
+    sureCard.style.display = 'none';
+  }
 }
 
 function setSeg(id, pct) {
@@ -580,6 +654,21 @@ function setSeg(id, pct) {
   const p = Math.max(0, Math.min(100, +pct || 0));
   el.style.width = p.toFixed(1) + '%';
   el.textContent = p > 9 ? Math.round(p) + '%' : '';
+}
+
+// Dakikayı okunabilir formata çevirir
+// 90 dk → "1s 30dk"  |  3600 dk → "2g 12s"  |  30 dk → "30 dk"
+function formatSure(dk) {
+  if (!dk || dk <= 0) return '—';
+  dk = Math.round(dk);
+  if (dk < 60) return dk + ' dk';
+  const gun  = Math.floor(dk / 1440);
+  const saat = Math.floor((dk % 1440) / 60);
+  const dkik = dk % 60;
+  if (gun > 0) {
+    return gun + 'g ' + saat + 's ' + (dkik > 0 ? dkik + 'dk' : '');
+  }
+  return saat + 's ' + (dkik > 0 ? dkik + 'dk' : '');
 }
 
 /* ──────────── TUR / DEVİR / HIZ ──────────── */
