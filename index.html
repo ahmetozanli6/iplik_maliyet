@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -22,28 +23,28 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px}
 
 /* ─── HEADER ─── */
-.hdr{background:var(--surf);border-bottom:1px solid var(--brd);padding:0 24px;position:sticky;top:0;z-index:100;display:flex;align-items:stretch;height:56px}
-.hdr-brand{display:flex;flex-direction:column;justify-content:center;padding-right:20px;border-right:1px solid var(--brd);margin-right:4px}
+.hdr{background:var(–surf);border-bottom:1px solid var(–brd);padding:0 24px;position:sticky;top:0;z-index:100;display:flex;align-items:stretch;height:56px}
+.hdr-brand{display:flex;flex-direction:column;justify-content:center;padding-right:20px;border-right:1px solid var(–brd);margin-right:4px}
 .hdr-brand h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
-.hdr-brand p{font-size:10px;color:var(--txt2);margin-top:1px}
-.nav-btn{display:flex;align-items:center;gap:6px;padding:0 16px;border:none;background:none;font-size:13px;font-weight:500;color:var(--txt2);cursor:pointer;position:relative;white-space:nowrap;transition:color .15s}
-.nav-btn:hover{color:var(--txt)}
-.nav-btn.active{color:var(--blue)}
-.nav-btn.active::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:2px;background:var(--blue);border-radius:2px 2px 0 0}
-.nav-badge{font-size:10px;background:var(--blue);color:#fff;padding:1px 7px;border-radius:99px;font-weight:600}
+.hdr-brand p{font-size:10px;color:var(–txt2);margin-top:1px}
+.nav-btn{display:flex;align-items:center;gap:6px;padding:0 16px;border:none;background:none;font-size:13px;font-weight:500;color:var(–txt2);cursor:pointer;position:relative;white-space:nowrap;transition:color .15s}
+.nav-btn:hover{color:var(–txt)}
+.nav-btn.active{color:var(–blue)}
+.nav-btn.active::after{content:’’;position:absolute;bottom:0;left:16px;right:16px;height:2px;background:var(–blue);border-radius:2px 2px 0 0}
+.nav-badge{font-size:10px;background:var(–blue);color:#fff;padding:1px 7px;border-radius:99px;font-weight:600}
 .hdr-end{margin-left:auto;display:flex;align-items:center;gap:10px}
-.status-pill{font-size:11px;padding:4px 12px;border-radius:99px;background:var(--amber-lt);color:var(--amber);font-weight:500;white-space:nowrap;transition:all .3s}
-.status-pill.ok{background:var(--teal-lt);color:var(--teal)}
-.status-pill.err{background:var(--red-lt);color:var(--red)}
+.status-pill{font-size:11px;padding:4px 12px;border-radius:99px;background:var(–amber-lt);color:var(–amber);font-weight:500;white-space:nowrap;transition:all .3s}
+.status-pill.ok{background:var(–teal-lt);color:var(–teal)}
+.status-pill.err{background:var(–red-lt);color:var(–red)}
 
 /* ─── PAGES ─── */
 .page{display:none;max-width:1160px;margin:0 auto;padding:24px 20px 60px}
 .page.active{display:block}
 
 /* ─── CARDS ─── */
-.card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:20px 22px;margin-bottom:14px}
-.card-blue{border-left:3px solid var(--blue)}
-.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--txt2);margin-bottom:16px}
+.card{background:var(–surf);border:1px solid var(–brd);border-radius:var(–rl);padding:20px 22px;margin-bottom:14px}
+.card-blue{border-left:3px solid var(–blue)}
+.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(–txt2);margin-bottom:16px}
 
 /* ─── LAYOUT ─── */
 .two-col{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
@@ -54,159 +55,161 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 /* ─── FIELDS ─── */
 .field{display:flex;flex-direction:column;gap:5px}
-.field label{font-size:11px;font-weight:500;color:var(--txt2);display:flex;align-items:center;gap:5px}
-.field input[type="number"],.field input[type="text"]{
-  width:100%;padding:9px 11px;border:1px solid var(--brd2);border-radius:var(--rs);
-  font-size:14px;font-weight:500;color:var(--txt);background:var(--surf);
-  text-align:right;transition:border-color .15s;
-  -moz-appearance:textfield
+.field label{font-size:11px;font-weight:500;color:var(–txt2);display:flex;align-items:center;gap:5px}
+.field input[type=“number”],.field input[type=“text”]{
+width:100%;padding:9px 11px;border:1px solid var(–brd2);border-radius:var(–rs);
+font-size:14px;font-weight:500;color:var(–txt);background:var(–surf);
+text-align:right;transition:border-color .15s;
+-moz-appearance:textfield
 }
 .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none}
-.field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
-.field input.big{font-size:22px;color:var(--blue);border-color:var(--blue-bd);background:var(--blue-lt);text-align:left;padding:10px 14px}
-.auto-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--teal-lt);color:var(--teal);font-weight:600}
-.saved-note{font-size:10px;color:var(--teal);font-weight:500;margin-left:8px}
+.field input:focus{outline:none;border-color:var(–blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+.field input.big{font-size:22px;color:var(–blue);border-color:var(–blue-bd);background:var(–blue-lt);text-align:left;padding:10px 14px}
+.auto-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:var(–teal-lt);color:var(–teal);font-weight:600}
+.saved-note{font-size:10px;color:var(–teal);font-weight:500;margin-left:8px}
 
 /* ─── SEARCH ─── */
 .search-wrap{position:relative;margin-bottom:14px}
 .search-inp{
-  width:100%;padding:11px 16px;border:1px solid var(--brd2);
-  border-radius:var(--r);font-size:14px;color:var(--txt);background:var(--surf);
-  transition:border-color .15s
+width:100%;padding:11px 16px;border:1px solid var(–brd2);
+border-radius:var(–r);font-size:14px;color:var(–txt);background:var(–surf);
+transition:border-color .15s
 }
-.search-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+.search-inp:focus{outline:none;border-color:var(–blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
 
 /* ─── DROPDOWN (ARAMA LİSTESİ) ─── */
 .dd-list{
-  position:absolute;top:calc(100% + 5px);left:0;right:0;
-  z-index:9999;
-  background:var(--surf);
-  border:1px solid var(--brd2);
-  border-radius:var(--r);
-  box-shadow:0 8px 32px rgba(0,0,0,.15);
-  max-height:280px;overflow-y:auto;
-  display:none
+position:absolute;top:calc(100% + 5px);left:0;right:0;
+z-index:9999;
+background:var(–surf);
+border:1px solid var(–brd2);
+border-radius:var(–r);
+box-shadow:0 8px 32px rgba(0,0,0,.15);
+max-height:280px;overflow-y:auto;
+display:none
 }
 .dd-list.open{display:block}
 .dd-item{
-  padding:11px 16px;display:flex;justify-content:space-between;align-items:center;
-  cursor:pointer;border-bottom:1px solid var(--brd);font-size:13px;transition:background .1s
+padding:11px 16px;display:flex;justify-content:space-between;align-items:center;
+cursor:pointer;border-bottom:1px solid var(–brd);font-size:13px;transition:background .1s
 }
 .dd-item:last-child{border-bottom:none}
-.dd-item:hover,.dd-item:focus{background:var(--surf2)}
-.dd-name{font-weight:500;color:var(--txt)}
-.dd-price{font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-lt);padding:2px 9px;border-radius:99px}
+.dd-item:hover,.dd-item:focus{background:var(–surf2)}
+.dd-name{font-weight:500;color:var(–txt)}
+.dd-price{font-size:12px;font-weight:700;color:var(–blue);background:var(–blue-lt);padding:2px 9px;border-radius:99px}
 
 /* ─── BUTTONS ─── */
-.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:opacity .15s,transform .1s;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(–rs);font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:opacity .15s,transform .1s;white-space:nowrap}
 .btn:active{transform:scale(.97)}
 .btn:hover{opacity:.87}
-.btn-primary{background:var(--blue);color:#fff}
-.btn-danger{background:var(--red);color:#fff}
-.btn-ghost{background:transparent;color:var(--txt2);border-color:var(--brd2)}
+.btn-primary{background:var(–blue);color:#fff}
+.btn-danger{background:var(–red);color:#fff}
+.btn-ghost{background:transparent;color:var(–txt2);border-color:var(–brd2)}
 .btn-sm{padding:5px 12px;font-size:12px}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
 
 /* ─── METRICS ─── */
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.metric{background:var(--surf2);border-radius:var(--r);padding:14px 16px}
-.m-label{font-size:11px;color:var(--txt2);margin-bottom:5px;font-weight:500}
+.metric{background:var(–surf2);border-radius:var(–r);padding:14px 16px}
+.m-label{font-size:11px;color:var(–txt2);margin-bottom:5px;font-weight:500}
 .m-value{font-size:24px;font-weight:700;line-height:1}
-.m-unit{font-size:12px;font-weight:400;color:var(--txt2);margin-left:3px}
-.m-blue  .m-value{color:var(--blue)}
-.m-teal  .m-value{color:var(--teal)}
-.m-amber .m-value{color:var(--amber)}
-.m-red   .m-value{color:var(--red)}
+.m-unit{font-size:12px;font-weight:400;color:var(–txt2);margin-left:3px}
+.m-blue  .m-value{color:var(–blue)}
+.m-teal  .m-value{color:var(–teal)}
+.m-amber .m-value{color:var(–amber)}
+.m-red   .m-value{color:var(–red)}
 
 /* ─── COST BAR ─── */
-.cost-bar{display:flex;height:28px;border-radius:var(--rs);overflow:hidden;margin-bottom:10px}
+.cost-bar{display:flex;height:28px;border-radius:var(–rs);overflow:hidden;margin-bottom:10px}
 .cost-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;transition:width .4s ease;overflow:hidden;white-space:nowrap}
-.cost-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--txt2)}
+.cost-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(–txt2)}
 .dot{width:10px;height:10px;border-radius:2px;display:inline-block;vertical-align:middle;margin-right:4px}
 
 /* ─── DETAIL CELLS ─── */
 .detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
 @media(max-width:480px){.detail-grid{grid-template-columns:1fr 1fr}}
-.dcell{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:8px 11px;background:var(--surf2);border-radius:var(--rs)}
-.dc-lbl{color:var(--txt2)}
+.dcell{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:8px 11px;background:var(–surf2);border-radius:var(–rs)}
+.dc-lbl{color:var(–txt2)}
 .dc-val{font-weight:600}
 
 /* ─── RESULT BOXES ─── */
-.net-box{background:var(--surf2);border-radius:var(--rl);padding:18px 22px;margin-bottom:12px;display:flex;align-items:baseline;justify-content:space-between}
-.net-lbl{font-size:13px;color:var(--txt2);font-weight:500}
+.net-box{background:var(–surf2);border-radius:var(–rl);padding:18px 22px;margin-bottom:12px;display:flex;align-items:baseline;justify-content:space-between}
+.net-lbl{font-size:13px;color:var(–txt2);font-weight:500}
 .net-val{font-size:46px;font-weight:800;letter-spacing:-1px}
-.net-val .cur{font-size:22px;color:var(--txt2);font-weight:400;margin-right:2px}
+.net-val .cur{font-size:22px;color:var(–txt2);font-weight:400;margin-right:2px}
 
-.sales-box{background:var(--blue-lt);border:1px solid var(--blue-bd);border-radius:var(--rl);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sales-lbl{font-size:12px;color:var(--blue);font-weight:600}
-.sales-sub{font-size:11px;color:var(--blue);opacity:.65;margin-top:3px}
-.sales-val{font-size:32px;font-weight:800;color:var(--blue)}
+.sales-box{background:var(–blue-lt);border:1px solid var(–blue-bd);border-radius:var(–rl);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sales-lbl{font-size:12px;color:var(–blue);font-weight:600}
+.sales-sub{font-size:11px;color:var(–blue);opacity:.65;margin-top:3px}
+.sales-val{font-size:32px;font-weight:800;color:var(–blue)}
 
-.kaydet-btn{width:100%;padding:14px;background:var(--teal);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s}
+.kaydet-btn{width:100%;padding:14px;background:var(–teal);color:#fff;border:none;border-radius:var(–r);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s}
 .kaydet-btn:hover{opacity:.88}
 .kaydet-btn:active{transform:scale(.98)}
 
 /* ─── ADV PANEL ─── */
 .adv-hdr{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
-.adv-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--brd)}
+.adv-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(–brd)}
 .adv-body.open{display:block}
-.adv-toggle{font-size:12px;color:var(--txt2);background:var(--surf2);border:1px solid var(--brd);border-radius:99px;padding:4px 13px;cursor:pointer;font-weight:500}
+.adv-toggle{font-size:12px;color:var(–txt2);background:var(–surf2);border:1px solid var(–brd);border-radius:99px;padding:4px 13px;cursor:pointer;font-weight:500}
 
 /* ─── PAGE HEADER ─── */
 .ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px}
 .ph h2{font-size:20px;font-weight:700}
-.ph p{font-size:12px;color:var(--txt2);margin-top:3px}
+.ph p{font-size:12px;color:var(–txt2);margin-top:3px}
 
 /* ─── TABLES ─── */
-.tw{border:1px solid var(--brd);border-radius:var(--rl);overflow-x:auto}
+.tw{border:1px solid var(–brd);border-radius:var(–rl);overflow-x:auto}
 table.dt{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
-table.dt th{padding:11px 15px;background:var(--surf2);text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);border-bottom:1px solid var(--brd);white-space:nowrap}
-table.dt td{padding:11px 15px;border-bottom:1px solid var(--brd);vertical-align:middle}
+table.dt th{padding:11px 15px;background:var(–surf2);text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(–txt2);border-bottom:1px solid var(–brd);white-space:nowrap}
+table.dt td{padding:11px 15px;border-bottom:1px solid var(–brd);vertical-align:middle}
 table.dt tr:last-child td{border-bottom:none}
-table.dt tbody tr:hover td{background:var(--surf2)}
+table.dt tbody tr:hover td{background:var(–surf2)}
 
-.hm-tw{border:1px solid var(--brd);border-radius:var(--rl);overflow:hidden;margin-top:14px}
+.hm-tw{border:1px solid var(–brd);border-radius:var(–rl);overflow:hidden;margin-top:14px}
 table.hmt{width:100%;border-collapse:collapse;font-size:13px}
-table.hmt th{padding:11px 15px;background:var(--surf2);text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);border-bottom:1px solid var(--brd)}
-table.hmt td{padding:10px 15px;border-bottom:1px solid var(--brd);vertical-align:middle}
+table.hmt th{padding:11px 15px;background:var(–surf2);text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(–txt2);border-bottom:1px solid var(–brd)}
+table.hmt td{padding:10px 15px;border-bottom:1px solid var(–brd);vertical-align:middle}
 table.hmt tr:last-child td{border-bottom:none}
-table.hmt tbody tr:hover td{background:var(--surf2)}
+table.hmt tbody tr:hover td{background:var(–surf2)}
 
-.erow{text-align:center !important;padding:48px 20px !important;color:var(--txt3) !important;font-size:14px}
+.erow{text-align:center !important;padding:48px 20px !important;color:var(–txt3) !important;font-size:14px}
 .chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px}
-.chip-b{background:var(--blue-lt);color:var(--blue)}
-.chip-t{background:var(--teal-lt);color:var(--teal)}
+.chip-b{background:var(–blue-lt);color:var(–blue)}
+.chip-t{background:var(–teal-lt);color:var(–teal)}
 
 /* ─── UPLOAD ─── */
-.upload-zone{border:2px dashed var(--brd2);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-lt)}
+.upload-zone{border:2px dashed var(–brd2);border-radius:var(–r);padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.upload-zone:hover,.upload-zone.drag{border-color:var(–blue);background:var(–blue-lt)}
 .uz-icon{font-size:36px;margin-bottom:10px}
 .uz-title{font-size:15px;font-weight:600;margin-bottom:6px}
-.uz-hint{font-size:12px;color:var(--txt3)}
+.uz-hint{font-size:12px;color:var(–txt3)}
 
 /* ─── MODAL ─── */
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-ov.open{display:flex}
-.modal-box{background:var(--surf);border-radius:var(--rl);padding:28px;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.modal-box{background:var(–surf);border-radius:var(–rl);padding:28px;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.22)}
 .modal-box h3{font-size:17px;font-weight:700;margin-bottom:20px}
 .modal-box .field{margin-bottom:14px}
 .modal-box .field input{text-align:left}
 .modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:22px}
 
 /* ─── TOAST ─── */
-.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:500;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;max-width:320px}
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:var(–r);font-size:13px;font-weight:500;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;max-width:320px}
 .toast.show{opacity:1;transform:translateY(0)}
-.toast.t-ok{background:var(--teal)}
-.toast.t-err{background:var(--red)}
+.toast.t-ok{background:var(–teal)}
+.toast.t-err{background:var(–red)}
 
 /* ─── MISC ─── */
 .sticky-r{position:sticky;top:68px}
-hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
+hr{border:none;border-top:1px solid var(–brd);margin:14px 0}
 </style>
+
 </head>
 <body>
 
 <!-- ═══ HEADER ═══ -->
+
 <header class="hdr">
   <div class="hdr-brand">
     <h1>İplik Maliyet ERP</h1>
@@ -221,188 +224,203 @@ hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
 </header>
 
 <!-- ═══ SAYFA 1: HESAP ═══ -->
+
 <div class="page active" id="page-hesap">
   <div class="two-col">
 
-    <!-- SOL -->
+```
+<!-- SOL -->
+<div>
+  <!-- Arama -->
+  <div class="search-wrap">
+    <input type="text" class="search-inp" id="search-inp"
+           placeholder="İplik ara — FDY, FLOŞ, LİNEN... (seçince fiyat otomatik gelir)"
+           autocomplete="off" spellcheck="false">
+    <div class="dd-list" id="dd-list"></div>
+  </div>
+
+  <!-- Üretim Parametreleri -->
+  <div class="card card-blue">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="card-title" style="margin-bottom:0">Üretim Parametreleri</div>
+      <button class="btn btn-ghost btn-sm" onclick="resetUretim()">↺ Sıfırla</button>
+    </div>
+    <div class="g3">
+      <div class="field"><label>Denye</label>
+        <input type="number" id="v-denye" value="75" min="1" oninput="hesapla()"></div>
+      <div class="field"><label>Tur (T/M büküm)</label>
+        <input type="number" id="v-tur" value="800" min="1" oninput="syncHiz()"></div>
+      <div class="field"><label>Devir (RPM)</label>
+        <input type="number" id="v-devir" value="10000" min="1" oninput="syncHiz()"></div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Hız (mt/dk) <span class="auto-badge">otomatik</span></label>
+        <input type="number" id="v-hiz" value="25" step="0.01" oninput="syncDevir()">
+      </div>
+      <div class="field"><label>İğ Sayısı</label>
+        <input type="number" id="v-ig" value="256" min="1" oninput="hesapla()"></div>
+    </div>
+    <div class="field">
+      <label>Hammadde Fiyatı ($/kg)</label>
+      <input type="number" id="v-hmd" value="0.964" step="0.001" class="big" oninput="onHmdChange()">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;align-items:center">
+      <div class="field">
+        <label>KDV Oranı (%)</label>
+        <input type="number" id="v-kdv" value="10" min="0" max="100" step="1" oninput="onHmdChange()">
+      </div>
+      <div style="background:var(--amber-lt);border:1px solid #f0c060;border-radius:var(--rs);padding:10px 14px">
+        <div style="font-size:10px;color:var(--amber);font-weight:700;text-transform:uppercase;margin-bottom:4px">KDV Dahil Fiyat</div>
+        <div style="font-size:18px;font-weight:700;color:var(--amber)">$<span id="o-kdv-dahil">—</span></div>
+        <div style="font-size:10px;color:var(--amber);opacity:.7;margin-top:2px" id="o-kdv-tutar">+ $— KDV</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gider Sabitleri -->
+  <div class="card">
+    <div class="adv-hdr" onclick="toggleAdv()">
+      <div class="card-title" style="margin-bottom:0">
+        Gider Sabitleri
+        <span class="saved-note">● Supabase'e kaydedilir</span>
+      </div>
+      <button class="adv-toggle" id="adv-btn">Göster ↓</button>
+    </div>
+    <div class="adv-body" id="adv-body">
+      <div class="card-title" style="margin-top:4px">İşçilik</div>
+      <div class="g3">
+        <div class="field"><label>Personel</label>
+          <input type="number" id="v-person" value="64" oninput="saveGiderD();hesapla()"></div>
+        <div class="field"><label>Maaş ($)</label>
+          <input type="number" id="v-maas" value="900" oninput="saveGiderD();hesapla()"></div>
+        <div class="field"><label>Makine Sayısı</label>
+          <input type="number" id="v-makine" value="102" oninput="saveGiderD();hesapla()"></div>
+      </div>
+      <div class="card-title">Enerji</div>
+      <div class="g2">
+        <div class="field"><label>KW Tüketim (saatlik)</label>
+          <input type="number" id="v-kwtuk" value="6.5" step="0.1" oninput="saveGiderD();hesapla()"></div>
+        <div class="field"><label>KW Birim Fiyatı ($)</label>
+          <input type="number" id="v-kw" value="0.148" step="0.001" oninput="saveGiderD();hesapla()"></div>
+      </div>
+      <div class="card-title">Sabit Giderler ($/kg)</div>
+      <div class="g3">
+        <div class="field"><label>Amortisman</label>
+          <input type="number" id="v-amort" value="0.45" step="0.01" oninput="saveGiderD();hesapla()"></div>
+        <div class="field"><label>Bobin + Etiket</label>
+          <input type="number" id="v-bobin" value="0.115" step="0.001" oninput="saveGiderD();hesapla()"></div>
+        <div class="field"><label>Paket + Genel</label>
+          <input type="number" id="v-paket" value="0.25" step="0.01" oninput="saveGiderD();hesapla()"></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label>Fire (%)</label>
+          <input type="number" id="v-fire" value="0" step="0.1" min="0" oninput="saveGiderD();hesapla()"></div>
+        <div class="field"><label>Kar Oranı (%)</label>
+          <input type="number" id="v-kar" value="50" step="1" min="0" oninput="saveGiderD();hesapla()"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /SOL -->
+
+<!-- SAĞ: Sonuçlar -->
+<div class="sticky-r">
+  <div class="metrics-grid">
+    <div class="metric m-blue">
+      <div class="m-label">Günlük Üretim</div>
+      <div class="m-value"><span id="o-gunluk">—</span><span class="m-unit">kg/gün</span></div>
+    </div>
+    <div class="metric m-teal">
+      <div class="m-label">Aylık Üretim (28 gün)</div>
+      <div class="m-value"><span id="o-aylik">—</span><span class="m-unit">kg</span></div>
+    </div>
+    <div class="metric m-amber">
+      <div class="m-label">İşçilik / kg</div>
+      <div class="m-value">$<span id="o-iscilik">—</span></div>
+    </div>
+    <div class="metric m-red">
+      <div class="m-label">Enerji / kg</div>
+      <div class="m-value">$<span id="o-enerji">—</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Maliyet Dağılımı</div>
+    <div class="cost-bar">
+      <div class="cost-seg" id="seg-hmd" style="background:#185FA5;width:60%">HMD</div>
+      <div class="cost-seg" id="seg-isc" style="background:#BA7517;width:20%">İŞÇ</div>
+      <div class="cost-seg" id="seg-enj" style="background:#A32D2D;width:10%">ENJ</div>
+      <div class="cost-seg" id="seg-dgr" style="background:#5C6370;width:10%">DİĞ</div>
+    </div>
+    <div class="cost-legend">
+      <span><span class="dot" style="background:#185FA5"></span>Hammadde</span>
+      <span><span class="dot" style="background:#BA7517"></span>İşçilik</span>
+      <span><span class="dot" style="background:#A32D2D"></span>Enerji</span>
+      <span><span class="dot" style="background:#5C6370"></span>Diğer</span>
+    </div>
+  </div>
+
+  <div class="detail-grid">
+    <div class="dcell"><span class="dc-lbl">Hız (mt/dk)</span><span class="dc-val" id="o-hiz">—</span></div>
+    <div class="dcell"><span class="dc-lbl">Hammadde/kg</span><span class="dc-val">$<span id="o-hmd">—</span></span></div>
+    <div class="dcell"><span class="dc-lbl">Enerji/kg</span><span class="dc-val">$<span id="o-enj2">—</span></span></div>
+    <div class="dcell"><span class="dc-lbl">İşçilik/kg</span><span class="dc-val">$<span id="o-isc2">—</span></span></div>
+    <div class="dcell"><span class="dc-lbl">Diğer/kg</span><span class="dc-val">$<span id="o-dgr">—</span></span></div>
+    <div class="dcell"><span class="dc-lbl">Fab. Aylık Toplam</span><span class="dc-val"><span id="o-fab">—</span> kg</span></div>
+  </div>
+
+  <div class="net-box">
+    <div class="net-lbl">Net kg Maliyeti</div>
+    <div class="net-val"><span class="cur">$</span><span id="o-net">—</span></div>
+  </div>
+
+  <div class="sales-box">
     <div>
-      <!-- Arama -->
-      <div class="search-wrap">
-        <input type="text" class="search-inp" id="search-inp"
-               placeholder="İplik ara — FDY, FLOŞ, LİNEN... (seçince fiyat otomatik gelir)"
-               autocomplete="off" spellcheck="false">
-        <div class="dd-list" id="dd-list"></div>
-      </div>
+      <div class="sales-lbl">Satış Fiyatı</div>
+      <div class="sales-sub" id="o-kar-lbl">%50 kar ile</div>
+    </div>
+    <div class="sales-val">$<span id="o-satis">—</span></div>
+  </div>
 
-      <!-- Üretim Parametreleri -->
-      <div class="card card-blue">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <div class="card-title" style="margin-bottom:0">Üretim Parametreleri</div>
-          <button class="btn btn-ghost btn-sm" onclick="resetUretim()">↺ Sıfırla</button>
-        </div>
-        <div class="g3">
-          <div class="field"><label>Denye</label>
-            <input type="number" id="v-denye" value="75" min="1" oninput="hesapla()"></div>
-          <div class="field"><label>Tur (T/M büküm)</label>
-            <input type="number" id="v-tur" value="800" min="1" oninput="syncHiz()"></div>
-          <div class="field"><label>Devir (RPM)</label>
-            <input type="number" id="v-devir" value="10000" min="1" oninput="syncHiz()"></div>
-        </div>
-        <div class="g2">
-          <div class="field">
-            <label>Hız (mt/dk) <span class="auto-badge">otomatik</span></label>
-            <input type="number" id="v-hiz" value="25" step="0.01" oninput="syncDevir()">
-          </div>
-          <div class="field"><label>İğ Sayısı</label>
-            <input type="number" id="v-ig" value="256" min="1" oninput="hesapla()"></div>
-        </div>
-        <div class="field">
-          <label>Hammadde Fiyatı ($/kg)</label>
-          <input type="number" id="v-hmd" value="0.964" step="0.001" class="big" oninput="hesapla()">
-        </div>
+  <!-- Süre Kartı -->
+  <div id="sure-card" style="background:#1a1a2e;border-radius:var(--rl);padding:18px 22px;margin-bottom:14px;display:none">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8892b0;margin-bottom:12px">⏱ Üretim Süresi</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px">
+        <div style="font-size:11px;color:#8892b0;margin-bottom:4px">Hedef Miktar</div>
+        <div style="font-size:20px;font-weight:700;color:#ccd6f6"><span id="o-hedef-kg">—</span> <span style="font-size:12px;font-weight:400">kg</span></div>
       </div>
-
-      <!-- Gider Sabitleri -->
-      <div class="card">
-        <div class="adv-hdr" onclick="toggleAdv()">
-          <div class="card-title" style="margin-bottom:0">
-            Gider Sabitleri
-            <span class="saved-note">● Supabase'e kaydedilir</span>
-          </div>
-          <button class="adv-toggle" id="adv-btn">Göster ↓</button>
-        </div>
-        <div class="adv-body" id="adv-body">
-          <div class="card-title" style="margin-top:4px">İşçilik</div>
-          <div class="g3">
-            <div class="field"><label>Personel</label>
-              <input type="number" id="v-person" value="64" oninput="saveGiderD();hesapla()"></div>
-            <div class="field"><label>Maaş ($)</label>
-              <input type="number" id="v-maas" value="900" oninput="saveGiderD();hesapla()"></div>
-            <div class="field"><label>Makine Sayısı</label>
-              <input type="number" id="v-makine" value="102" oninput="saveGiderD();hesapla()"></div>
-          </div>
-          <div class="card-title">Enerji</div>
-          <div class="g2">
-            <div class="field"><label>KW Tüketim (saatlik)</label>
-              <input type="number" id="v-kwtuk" value="6.5" step="0.1" oninput="saveGiderD();hesapla()"></div>
-            <div class="field"><label>KW Birim Fiyatı ($)</label>
-              <input type="number" id="v-kw" value="0.148" step="0.001" oninput="saveGiderD();hesapla()"></div>
-          </div>
-          <div class="card-title">Sabit Giderler ($/kg)</div>
-          <div class="g3">
-            <div class="field"><label>Amortisman</label>
-              <input type="number" id="v-amort" value="0.45" step="0.01" oninput="saveGiderD();hesapla()"></div>
-            <div class="field"><label>Bobin + Etiket</label>
-              <input type="number" id="v-bobin" value="0.115" step="0.001" oninput="saveGiderD();hesapla()"></div>
-            <div class="field"><label>Paket + Genel</label>
-              <input type="number" id="v-paket" value="0.25" step="0.01" oninput="saveGiderD();hesapla()"></div>
-          </div>
-          <div class="g2">
-            <div class="field"><label>Fire (%)</label>
-              <input type="number" id="v-fire" value="0" step="0.1" min="0" oninput="saveGiderD();hesapla()"></div>
-            <div class="field"><label>Kar Oranı (%)</label>
-              <input type="number" id="v-kar" value="50" step="1" min="0" oninput="saveGiderD();hesapla()"></div>
-          </div>
-        </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px">
+        <div style="font-size:11px;color:#8892b0;margin-bottom:4px">Bobin Adedi</div>
+        <div style="font-size:20px;font-weight:700;color:#ccd6f6"><span id="o-bobin-adet">—</span> <span style="font-size:12px;font-weight:400">adet</span></div>
       </div>
-    </div><!-- /SOL -->
-
-    <!-- SAĞ: Sonuçlar -->
-    <div class="sticky-r">
-      <div class="metrics-grid">
-        <div class="metric m-blue">
-          <div class="m-label">Günlük Üretim</div>
-          <div class="m-value"><span id="o-gunluk">—</span><span class="m-unit">kg/gün</span></div>
-        </div>
-        <div class="metric m-teal">
-          <div class="m-label">Aylık Üretim (28 gün)</div>
-          <div class="m-value"><span id="o-aylik">—</span><span class="m-unit">kg</span></div>
-        </div>
-        <div class="metric m-amber">
-          <div class="m-label">İşçilik / kg</div>
-          <div class="m-value">$<span id="o-iscilik">—</span></div>
-        </div>
-        <div class="metric m-red">
-          <div class="m-label">Enerji / kg</div>
-          <div class="m-value">$<span id="o-enerji">—</span></div>
-        </div>
+    </div>
+    <div style="background:rgba(100,255,218,.08);border:1px solid rgba(100,255,218,.2);border-radius:var(--r);padding:14px 16px;text-align:center">
+      <div style="font-size:11px;color:#64ffda;margin-bottom:6px;font-weight:600">TOPLAM SÜRE</div>
+      <div style="font-size:36px;font-weight:800;color:#64ffda;letter-spacing:-1px" id="o-sure-main">—</div>
+      <div style="font-size:12px;color:rgba(100,255,218,.6);margin-top:4px" id="o-sure-alt">—</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+      <div style="background:rgba(255,255,255,.04);border-radius:var(--rs);padding:10px 12px">
+        <div style="font-size:10px;color:#8892b0">Tek İğ Süresi</div>
+        <div style="font-size:14px;font-weight:600;color:#ccd6f6;margin-top:3px" id="o-tek-ig">—</div>
       </div>
-
-      <div class="card">
-        <div class="card-title">Maliyet Dağılımı</div>
-        <div class="cost-bar">
-          <div class="cost-seg" id="seg-hmd" style="background:#185FA5;width:60%">HMD</div>
-          <div class="cost-seg" id="seg-isc" style="background:#BA7517;width:20%">İŞÇ</div>
-          <div class="cost-seg" id="seg-enj" style="background:#A32D2D;width:10%">ENJ</div>
-          <div class="cost-seg" id="seg-dgr" style="background:#5C6370;width:10%">DİĞ</div>
-        </div>
-        <div class="cost-legend">
-          <span><span class="dot" style="background:#185FA5"></span>Hammadde</span>
-          <span><span class="dot" style="background:#BA7517"></span>İşçilik</span>
-          <span><span class="dot" style="background:#A32D2D"></span>Enerji</span>
-          <span><span class="dot" style="background:#5C6370"></span>Diğer</span>
-        </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:var(--rs);padding:10px 12px">
+        <div style="font-size:10px;color:#8892b0">Tüm Makine</div>
+        <div style="font-size:14px;font-weight:600;color:#ccd6f6;margin-top:3px" id="o-tum-makine">—</div>
       </div>
+    </div>
+  </div>
 
-      <div class="detail-grid">
-        <div class="dcell"><span class="dc-lbl">Hız (mt/dk)</span><span class="dc-val" id="o-hiz">—</span></div>
-        <div class="dcell"><span class="dc-lbl">Hammadde/kg</span><span class="dc-val">$<span id="o-hmd">—</span></span></div>
-        <div class="dcell"><span class="dc-lbl">Enerji/kg</span><span class="dc-val">$<span id="o-enj2">—</span></span></div>
-        <div class="dcell"><span class="dc-lbl">İşçilik/kg</span><span class="dc-val">$<span id="o-isc2">—</span></span></div>
-        <div class="dcell"><span class="dc-lbl">Diğer/kg</span><span class="dc-val">$<span id="o-dgr">—</span></span></div>
-        <div class="dcell"><span class="dc-lbl">Fab. Aylık Toplam</span><span class="dc-val"><span id="o-fab">—</span> kg</span></div>
-      </div>
-
-      <div class="net-box">
-        <div class="net-lbl">Net kg Maliyeti</div>
-        <div class="net-val"><span class="cur">$</span><span id="o-net">—</span></div>
-      </div>
-
-      <div class="sales-box">
-        <div>
-          <div class="sales-lbl">Satış Fiyatı</div>
-          <div class="sales-sub" id="o-kar-lbl">%50 kar ile</div>
-        </div>
-        <div class="sales-val">$<span id="o-satis">—</span></div>
-      </div>
-
-      <!-- Süre Kartı -->
-      <div id="sure-card" style="background:#1a1a2e;border-radius:var(--rl);padding:18px 22px;margin-bottom:14px;display:none">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8892b0;margin-bottom:12px">⏱ Üretim Süresi</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px">
-            <div style="font-size:11px;color:#8892b0;margin-bottom:4px">Hedef Miktar</div>
-            <div style="font-size:20px;font-weight:700;color:#ccd6f6"><span id="o-hedef-kg">—</span> <span style="font-size:12px;font-weight:400">kg</span></div>
-          </div>
-          <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px">
-            <div style="font-size:11px;color:#8892b0;margin-bottom:4px">Bobin Adedi</div>
-            <div style="font-size:20px;font-weight:700;color:#ccd6f6"><span id="o-bobin-adet">—</span> <span style="font-size:12px;font-weight:400">adet</span></div>
-          </div>
-        </div>
-        <div style="background:rgba(100,255,218,.08);border:1px solid rgba(100,255,218,.2);border-radius:var(--r);padding:14px 16px;text-align:center">
-          <div style="font-size:11px;color:#64ffda;margin-bottom:6px;font-weight:600">TOPLAM SÜRE</div>
-          <div style="font-size:36px;font-weight:800;color:#64ffda;letter-spacing:-1px" id="o-sure-main">—</div>
-          <div style="font-size:12px;color:rgba(100,255,218,.6);margin-top:4px" id="o-sure-alt">—</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-          <div style="background:rgba(255,255,255,.04);border-radius:var(--rs);padding:10px 12px">
-            <div style="font-size:10px;color:#8892b0">Tek İğ Süresi</div>
-            <div style="font-size:14px;font-weight:600;color:#ccd6f6;margin-top:3px" id="o-tek-ig">—</div>
-          </div>
-          <div style="background:rgba(255,255,255,.04);border-radius:var(--rs);padding:10px 12px">
-            <div style="font-size:10px;color:#8892b0">Tüm Makine</div>
-            <div style="font-size:14px;font-weight:600;color:#ccd6f6;margin-top:3px" id="o-tum-makine">—</div>
-          </div>
-        </div>
-      </div>
-
-      <button class="kaydet-btn" onclick="hesabiKaydet()">💾 Bu Hesabı Geçmişe Kaydet</button>
-    </div><!-- /SAĞ -->
+  <button class="kaydet-btn" onclick="hesabiKaydet()">💾 Bu Hesabı Geçmişe Kaydet</button>
+</div><!-- /SAĞ -->
+```
 
   </div>
 </div>
 
 <!-- ═══ SAYFA 2: GEÇMİŞ ═══ -->
+
 <div class="page" id="page-gecmis">
   <div class="ph">
     <div><h2>Hesap Geçmişi</h2><p>Supabase'de kalıcı · tüm cihaz ve tarayıcılardan erişilir</p></div>
@@ -426,6 +444,7 @@ hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
 </div>
 
 <!-- ═══ SAYFA 3: HAMMADDE ═══ -->
+
 <div class="page" id="page-hammadde">
   <div class="ph">
     <div><h2>Hammadde Fiyat Listesi</h2><p>Supabase · iplik_fiyatlari tablosu</p></div>
@@ -439,6 +458,7 @@ hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
   </div>
 
   <!-- Upload panel -->
+
   <div class="card" id="upload-panel" style="display:none">
     <div class="card-title" id="up-title">Dosya Yükle</div>
     <div class="upload-zone" id="upload-zone"
@@ -457,6 +477,7 @@ hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
   </div>
 
   <!-- HM Table -->
+
   <div class="hm-tw">
     <table class="hmt">
       <thead><tr>
@@ -469,6 +490,7 @@ hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
 </div>
 
 <!-- ═══ MODAL: Ekle / Düzenle ═══ -->
+
 <div class="modal-ov" id="modal-hm">
   <div class="modal-box">
     <h3 id="modal-title">Hammadde Ekle</h3>
@@ -490,6 +512,7 @@ hr{border:none;border-top:1px solid var(--brd);margin:14px 0}
 </div>
 
 <!-- ═══ MODAL: Onay ═══ -->
+
 <div class="modal-ov" id="modal-confirm">
   <div class="modal-box">
     <h3 id="conf-title">Emin misiniz?</h3>
@@ -596,6 +619,14 @@ function hesapla() {
   st('o-fab',     Math.round(fabAylik).toLocaleString('tr-TR'));
   st('o-kar-lbl', '%' + Math.round(kar * 100) + ' kar ile');
 
+  // KDV kutusunu güncelle
+  const _hmd2 = gv('v-hmd'), _kdv2 = gv('v-kdv');
+  if (_hmd2 > 0) {
+    const _kdvT = _hmd2 * (_kdv2 / 100);
+    st('o-kdv-dahil', (_hmd2 + _kdvT).toFixed(3));
+    st('o-kdv-tutar', '+ $' + _kdvT.toFixed(3) + ' KDV (%' + Math.round(_kdv2) + ')');
+  }
+
   if (net > 0) {
     setSeg('seg-hmd', hammadde/net*100);
     setSeg('seg-isc', iscilik /net*100);
@@ -685,6 +716,22 @@ function syncDevir() {
   const hiz = gv('v-hiz'), tur = gv('v-tur');
   if (hiz > 0 && tur > 0)
     document.getElementById('v-devir').value = Math.round((hiz * tur) / 2);
+  hesapla();
+}
+
+/* ──────────── KDV HESABI ──────────── */
+function onHmdChange() {
+  const hmd = gv('v-hmd');
+  const kdv = gv('v-kdv');
+  if (hmd > 0) {
+    const kdvTutar  = hmd * (kdv / 100);
+    const kdvDahil  = hmd + kdvTutar;
+    st('o-kdv-dahil', kdvDahil.toFixed(3));
+    st('o-kdv-tutar',  '+ $' + kdvTutar.toFixed(3) + ' KDV (%' + Math.round(kdv) + ')');
+  } else {
+    st('o-kdv-dahil', '—');
+    st('o-kdv-tutar', '+ $— KDV');
+  }
   hesapla();
 }
 
@@ -1166,5 +1213,6 @@ function fmtDate(iso) {
   updateHistBadge();      // 4
 })();
 </script>
+
 </body>
 </html>
