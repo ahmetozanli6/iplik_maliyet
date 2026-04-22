@@ -47,30 +47,33 @@ font-size: 14px;
 .hdr {
 background: var(–surf);
 border-bottom: 1px solid var(–brd);
-padding: 0 24px;
+padding: 0 16px;
 position: sticky;
 top: 0;
 z-index: 100;
 display: flex;
 align-items: stretch;
 height: 56px;
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
 }
 .hdr-brand {
 display: flex;
 flex-direction: column;
 justify-content: center;
-padding-right: 20px;
+padding-right: 16px;
 border-right: 1px solid var(–brd);
 margin-right: 4px;
+flex-shrink: 0;
 }
-.hdr-brand h1 { font-size: 15px; font-weight: 700; letter-spacing: -.3px; }
-.hdr-brand p  { font-size: 10px; color: var(–txt2); margin-top: 1px; }
+.hdr-brand h1 { font-size: 14px; font-weight: 700; letter-spacing: -.3px; white-space: nowrap; }
+.hdr-brand p  { font-size: 10px; color: var(–txt2); margin-top: 1px; white-space: nowrap; }
 
 .nav-btn {
 display: flex;
 align-items: center;
-gap: 6px;
-padding: 0 16px;
+gap: 5px;
+padding: 0 12px;
 border: none;
 background: none;
 font-size: 13px;
@@ -80,13 +83,14 @@ cursor: pointer;
 position: relative;
 white-space: nowrap;
 transition: color .15s;
+flex-shrink: 0;
 }
 .nav-btn:hover { color: var(–txt); }
 .nav-btn.active { color: var(–blue); }
 .nav-btn.active::after {
 content: ‘’;
 position: absolute;
-bottom: 0; left: 16px; right: 16px;
+bottom: 0; left: 12px; right: 12px;
 height: 2px;
 background: var(–blue);
 border-radius: 2px 2px 0 0;
@@ -95,14 +99,14 @@ border-radius: 2px 2px 0 0;
 font-size: 10px;
 background: var(–blue);
 color: #fff;
-padding: 1px 7px;
+padding: 1px 6px;
 border-radius: 99px;
 font-weight: 600;
 }
-.hdr-end { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.hdr-end { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding-left: 8px; }
 .status-pill {
 font-size: 11px;
-padding: 4px 12px;
+padding: 4px 10px;
 border-radius: 99px;
 background: var(–amber-lt);
 color: var(–amber);
@@ -114,7 +118,7 @@ transition: all .3s;
 .status-pill.err { background: var(–red-lt);  color: var(–red);  }
 
 /* PAGES */
-.page { display: none; max-width: 1160px; margin: 0 auto; padding: 24px 20px 60px; }
+.page { display: none; max-width: 1160px; margin: 0 auto; padding: 16px 14px 60px; }
 .page.active { display: block; }
 
 /* CARDS */
@@ -122,8 +126,8 @@ transition: all .3s;
 background: var(–surf);
 border: 1px solid var(–brd);
 border-radius: var(–rl);
-padding: 20px 22px;
-margin-bottom: 14px;
+padding: 16px 16px;
+margin-bottom: 12px;
 }
 .card-blue { border-left: 3px solid var(–blue); }
 .card-title {
@@ -132,15 +136,27 @@ font-weight: 700;
 text-transform: uppercase;
 letter-spacing: .07em;
 color: var(–txt2);
-margin-bottom: 16px;
+margin-bottom: 14px;
 }
 
 /* LAYOUT */
-.two-col { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
-.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-@media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
-@media (max-width: 540px) { .g3 { grid-template-columns: 1fr 1fr; } }
+.two-col { display: grid; grid-template-columns: 1fr 360px; gap: 16px; align-items: start; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+@media (max-width: 900px) {
+.two-col { grid-template-columns: 1fr; }
+.sticky-r { position: static; }
+}
+@media (max-width: 560px) {
+.g3 { grid-template-columns: 1fr 1fr; }
+.page { padding: 12px 10px 60px; }
+.card { padding: 14px 12px; }
+}
+@media (max-width: 380px) {
+.g3 { grid-template-columns: 1fr; }
+.g2 { grid-template-columns: 1fr; }
+}
 
 /* FIELDS */
 .field { display: flex; flex-direction: column; gap: 5px; }
@@ -155,7 +171,7 @@ gap: 5px;
 .field input[type=“number”],
 .field input[type=“text”] {
 width: 100%;
-padding: 9px 11px;
+padding: 9px 10px;
 border: 1px solid var(–brd2);
 border-radius: var(–rs);
 font-size: 14px;
@@ -165,6 +181,7 @@ background: var(–surf);
 text-align: right;
 transition: border-color .15s;
 -moz-appearance: textfield;
+-webkit-appearance: none;
 }
 .field input::-webkit-outer-spin-button,
 .field input::-webkit-inner-spin-button { -webkit-appearance: none; }
@@ -174,30 +191,31 @@ border-color: var(–blue);
 box-shadow: 0 0 0 3px rgba(24,95,165,.1);
 }
 .field input.big {
-font-size: 22px;
+font-size: 20px;
 color: var(–blue);
 border-color: var(–blue-bd);
 background: var(–blue-lt);
 text-align: left;
-padding: 10px 14px;
+padding: 10px 12px;
 }
 .auto-badge {
 font-size: 10px; padding: 2px 7px; border-radius: 99px;
 background: var(–teal-lt); color: var(–teal); font-weight: 600;
 }
-.saved-note { font-size: 10px; color: var(–teal); font-weight: 500; margin-left: 8px; }
+.saved-note { font-size: 10px; color: var(–teal); font-weight: 500; margin-left: 6px; }
 
 /* SEARCH */
-.search-wrap { position: relative; margin-bottom: 14px; }
+.search-wrap { position: relative; margin-bottom: 12px; }
 .search-inp {
 width: 100%;
-padding: 11px 16px;
+padding: 11px 14px;
 border: 1px solid var(–brd2);
 border-radius: var(–r);
 font-size: 14px;
 color: var(–txt);
 background: var(–surf);
 transition: border-color .15s;
+-webkit-appearance: none;
 }
 .search-inp:focus {
 outline: none;
@@ -215,13 +233,14 @@ background: var(–surf);
 border: 1px solid var(–brd2);
 border-radius: var(–r);
 box-shadow: 0 8px 32px rgba(0,0,0,.15);
-max-height: 280px;
+max-height: 260px;
 overflow-y: auto;
+-webkit-overflow-scrolling: touch;
 display: none;
 }
 .dd-list.open { display: block; }
 .dd-item {
-padding: 11px 16px;
+padding: 11px 14px;
 display: flex;
 justify-content: space-between;
 align-items: center;
@@ -229,14 +248,16 @@ cursor: pointer;
 border-bottom: 1px solid var(–brd);
 font-size: 13px;
 transition: background .1s;
+gap: 8px;
 }
 .dd-item:last-child { border-bottom: none; }
 .dd-item:hover { background: var(–surf2); }
-.dd-name { font-weight: 500; color: var(–txt); }
+.dd-name { font-weight: 500; color: var(–txt); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dd-price {
 font-size: 12px; font-weight: 700;
 color: var(–blue); background: var(–blue-lt);
-padding: 2px 9px; border-radius: 99px;
+padding: 2px 8px; border-radius: 99px;
+flex-shrink: 0;
 }
 
 /* BUTTONS */
@@ -244,7 +265,7 @@ padding: 2px 9px; border-radius: 99px;
 display: inline-flex;
 align-items: center;
 gap: 5px;
-padding: 8px 16px;
+padding: 8px 14px;
 border-radius: var(–rs);
 font-size: 13px;
 font-weight: 500;
@@ -252,21 +273,22 @@ cursor: pointer;
 border: 1px solid transparent;
 transition: opacity .15s, transform .1s;
 white-space: nowrap;
+-webkit-tap-highlight-color: transparent;
 }
 .btn:active { transform: scale(.97); }
 .btn:hover  { opacity: .87; }
 .btn-primary { background: var(–blue); color: #fff; }
 .btn-danger  { background: var(–red);  color: #fff; }
 .btn-ghost   { background: transparent; color: var(–txt2); border-color: var(–brd2); }
-.btn-sm      { padding: 5px 12px; font-size: 12px; }
-.btn-row     { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-sm      { padding: 5px 10px; font-size: 12px; }
+.btn-row     { display: flex; gap: 6px; flex-wrap: wrap; }
 
 /* METRICS */
-.metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.metric { background: var(–surf2); border-radius: var(–r); padding: 14px 16px; }
-.m-label { font-size: 11px; color: var(–txt2); margin-bottom: 5px; font-weight: 500; }
-.m-value { font-size: 24px; font-weight: 700; line-height: 1; }
-.m-unit  { font-size: 12px; font-weight: 400; color: var(–txt2); margin-left: 3px; }
+.metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.metric { background: var(–surf2); border-radius: var(–r); padding: 12px 14px; }
+.m-label { font-size: 11px; color: var(–txt2); margin-bottom: 4px; font-weight: 500; }
+.m-value { font-size: 22px; font-weight: 700; line-height: 1; }
+.m-unit  { font-size: 11px; font-weight: 400; color: var(–txt2); margin-left: 2px; }
 .m-blue  .m-value { color: var(–blue); }
 .m-teal  .m-value { color: var(–teal); }
 .m-amber .m-value { color: var(–amber); }
@@ -274,49 +296,52 @@ white-space: nowrap;
 
 /* COST BAR */
 .cost-bar {
-display: flex; height: 28px; border-radius: var(–rs);
-overflow: hidden; margin-bottom: 10px;
+display: flex; height: 26px; border-radius: var(–rs);
+overflow: hidden; margin-bottom: 8px;
 }
 .cost-seg {
 display: flex; align-items: center; justify-content: center;
 font-size: 10px; font-weight: 700; color: #fff;
 transition: width .4s ease; overflow: hidden; white-space: nowrap;
 }
-.cost-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: var(–txt2); }
+.cost-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(–txt2); }
 .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; vertical-align: middle; margin-right: 4px; }
 
 /* DETAIL CELLS */
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px; }
 @media (max-width: 480px) { .detail-grid { grid-template-columns: 1fr 1fr; } }
 .dcell {
 display: flex; justify-content: space-between; align-items: center;
-font-size: 12px; padding: 8px 11px;
+font-size: 12px; padding: 8px 10px;
 background: var(–surf2); border-radius: var(–rs);
+gap: 4px;
 }
-.dc-lbl { color: var(–txt2); }
-.dc-val { font-weight: 600; }
+.dc-lbl { color: var(–txt2); flex-shrink: 0; }
+.dc-val { font-weight: 600; text-align: right; }
 
 /* RESULT BOXES */
 .net-box {
 background: var(–surf2); border-radius: var(–rl);
-padding: 18px 22px; margin-bottom: 12px;
+padding: 16px 18px; margin-bottom: 10px;
 display: flex; align-items: baseline; justify-content: space-between;
+gap: 8px;
 }
-.net-lbl { font-size: 13px; color: var(–txt2); font-weight: 500; }
-.net-val { font-size: 46px; font-weight: 800; letter-spacing: -1px; }
-.net-val .cur { font-size: 22px; color: var(–txt2); font-weight: 400; margin-right: 2px; }
+.net-lbl { font-size: 13px; color: var(–txt2); font-weight: 500; flex-shrink: 0; }
+.net-val { font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+.net-val .cur { font-size: 20px; color: var(–txt2); font-weight: 400; margin-right: 2px; }
 
 .sales-box {
 background: var(–blue-lt);
 border: 1px solid var(–blue-bd);
 border-radius: var(–rl);
-padding: 18px 22px;
+padding: 16px 18px;
 display: flex; align-items: center; justify-content: space-between;
-margin-bottom: 14px;
+margin-bottom: 12px;
+gap: 8px;
 }
 .sales-lbl { font-size: 12px; color: var(–blue); font-weight: 600; }
 .sales-sub { font-size: 11px; color: var(–blue); opacity: .65; margin-top: 3px; }
-.sales-val { font-size: 32px; font-weight: 800; color: var(–blue); }
+.sales-val { font-size: 28px; font-weight: 800; color: var(–blue); flex-shrink: 0; }
 
 .kaydet-btn {
 width: 100%; padding: 14px;
@@ -325,6 +350,7 @@ border: none; border-radius: var(–r);
 font-size: 15px; font-weight: 600;
 cursor: pointer;
 transition: opacity .15s, transform .1s;
+-webkit-tap-highlight-color: transparent;
 }
 .kaydet-btn:hover  { opacity: .88; }
 .kaydet-btn:active { transform: scale(.98); }
@@ -334,35 +360,35 @@ transition: opacity .15s, transform .1s;
 background: var(–amber-lt);
 border: 1px solid #f0c060;
 border-radius: var(–rs);
-padding: 10px 14px;
+padding: 10px 12px;
 }
 .kdv-label { font-size: 10px; color: var(–amber); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-.kdv-val   { font-size: 18px; font-weight: 700; color: var(–amber); }
+.kdv-val   { font-size: 17px; font-weight: 700; color: var(–amber); }
 .kdv-sub   { font-size: 10px; color: var(–amber); opacity: .7; margin-top: 2px; }
 
 /* SURE CARD */
 .sure-card {
 background: #1a1a2e;
 border-radius: var(–rl);
-padding: 18px 22px;
-margin-bottom: 14px;
+padding: 16px 18px;
+margin-bottom: 12px;
 display: none;
 }
 .sure-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #8892b0; margin-bottom: 12px; }
-.sure-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.sure-box   { background: rgba(255,255,255,.06); border-radius: var(–r); padding: 12px 14px; }
+.sure-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.sure-box   { background: rgba(255,255,255,.06); border-radius: var(–r); padding: 10px 12px; }
 .sure-box-lbl { font-size: 11px; color: #8892b0; margin-bottom: 4px; }
-.sure-box-val { font-size: 20px; font-weight: 700; color: #ccd6f6; }
+.sure-box-val { font-size: 18px; font-weight: 700; color: #ccd6f6; }
 .sure-box-unit { font-size: 12px; font-weight: 400; }
 .sure-main {
 background: rgba(100,255,218,.08);
 border: 1px solid rgba(100,255,218,.2);
 border-radius: var(–r);
-padding: 14px 16px;
+padding: 12px 14px;
 text-align: center;
 }
 .sure-main-lbl { font-size: 11px; color: #64ffda; margin-bottom: 6px; font-weight: 600; }
-.sure-main-val { font-size: 36px; font-weight: 800; color: #64ffda; letter-spacing: -1px; }
+.sure-main-val { font-size: 32px; font-weight: 800; color: #64ffda; letter-spacing: -1px; }
 .sure-main-sub { font-size: 12px; color: rgba(100,255,218,.6); margin-top: 4px; }
 .sure-detail-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .sure-detail { background: rgba(255,255,255,.04); border-radius: var(–rs); padding: 10px 12px; }
@@ -376,53 +402,58 @@ text-align: center;
 .adv-toggle {
 font-size: 12px; color: var(–txt2);
 background: var(–surf2); border: 1px solid var(–brd);
-border-radius: 99px; padding: 4px 13px;
+border-radius: 99px; padding: 4px 12px;
 cursor: pointer; font-weight: 500;
+flex-shrink: 0;
 }
 
 /* PAGE HEADER */
-.ph { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
-.ph h2 { font-size: 20px; font-weight: 700; }
+.ph { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.ph h2 { font-size: 18px; font-weight: 700; }
 .ph p  { font-size: 12px; color: var(–txt2); margin-top: 3px; }
 
-/* TABLES */
-.tw { border: 1px solid var(–brd); border-radius: var(–rl); overflow-x: auto; }
-table.dt { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+/* TABLES — responsive wrapper */
+.tw { border: 1px solid var(–brd); border-radius: var(–rl); overflow: hidden; }
+.tw-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(–rl); }
+
+table.dt { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 780px; }
 table.dt th {
-padding: 11px 15px; background: var(–surf2); text-align: left;
+padding: 10px 12px; background: var(–surf2); text-align: left;
 font-size: 10px; font-weight: 700; text-transform: uppercase;
 letter-spacing: .06em; color: var(–txt2);
 border-bottom: 1px solid var(–brd); white-space: nowrap;
 }
-table.dt td { padding: 11px 15px; border-bottom: 1px solid var(–brd); vertical-align: middle; }
+table.dt td { padding: 10px 12px; border-bottom: 1px solid var(–brd); vertical-align: middle; }
 table.dt tr:last-child td { border-bottom: none; }
 table.dt tbody tr:hover td { background: var(–surf2); }
 
-.hm-tw { border: 1px solid var(–brd); border-radius: var(–rl); overflow: hidden; margin-top: 14px; }
-table.hmt { width: 100%; border-collapse: collapse; font-size: 13px; }
+.hm-tw { border: 1px solid var(–brd); border-radius: var(–rl); overflow: hidden; margin-top: 12px; }
+.hm-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table.hmt { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 480px; }
 table.hmt th {
-padding: 11px 15px; background: var(–surf2); text-align: left;
+padding: 10px 12px; background: var(–surf2); text-align: left;
 font-size: 10px; font-weight: 700; text-transform: uppercase;
 letter-spacing: .06em; color: var(–txt2); border-bottom: 1px solid var(–brd);
+white-space: nowrap;
 }
-table.hmt td { padding: 10px 15px; border-bottom: 1px solid var(–brd); vertical-align: middle; }
+table.hmt td { padding: 10px 12px; border-bottom: 1px solid var(–brd); vertical-align: middle; }
 table.hmt tr:last-child td { border-bottom: none; }
 table.hmt tbody tr:hover td { background: var(–surf2); }
 
-.erow { text-align: center !important; padding: 48px 20px !important; color: var(–txt3) !important; font-size: 14px; }
-.chip { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+.erow { text-align: center !important; padding: 40px 20px !important; color: var(–txt3) !important; font-size: 14px; }
+.chip { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
 .chip-b { background: var(–blue-lt); color: var(–blue); }
 .chip-t { background: var(–teal-lt); color: var(–teal); }
 
 /* UPLOAD */
 .upload-zone {
 border: 2px dashed var(–brd2); border-radius: var(–r);
-padding: 32px 20px; text-align: center; cursor: pointer;
+padding: 28px 16px; text-align: center; cursor: pointer;
 transition: border-color .2s, background .2s;
 }
 .upload-zone:hover, .upload-zone.drag { border-color: var(–blue); background: var(–blue-lt); }
-.uz-icon  { font-size: 36px; margin-bottom: 10px; }
-.uz-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.uz-icon  { font-size: 32px; margin-bottom: 10px; }
+.uz-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 .uz-hint  { font-size: 12px; color: var(–txt3); }
 
 /* MODAL */
@@ -431,27 +462,27 @@ position: fixed; inset: 0;
 background: rgba(0,0,0,.48);
 z-index: 500; display: none;
 align-items: center; justify-content: center;
-padding: 20px;
+padding: 16px;
 }
 .modal-ov.open { display: flex; }
 .modal-box {
 background: var(–surf); border-radius: var(–rl);
-padding: 28px; max-width: 460px; width: 100%;
+padding: 22px 20px; max-width: 440px; width: 100%;
 box-shadow: 0 24px 60px rgba(0,0,0,.22);
 }
-.modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
-.modal-box .field { margin-bottom: 14px; }
+.modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+.modal-box .field { margin-bottom: 12px; }
 .modal-box .field input { text-align: left; }
-.modal-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; }
+.modal-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
 /* TOAST */
 .toast {
-position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+position: fixed; bottom: 20px; right: 16px; z-index: 9999;
 background: #1a1a1a; color: #fff;
-padding: 12px 20px; border-radius: var(–r);
+padding: 11px 18px; border-radius: var(–r);
 font-size: 13px; font-weight: 500;
 opacity: 0; transform: translateY(10px);
-transition: all .25s; pointer-events: none; max-width: 320px;
+transition: all .25s; pointer-events: none; max-width: 300px;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.t-ok  { background: var(–teal); }
@@ -459,7 +490,17 @@ transition: all .25s; pointer-events: none; max-width: 320px;
 
 /* MISC */
 .sticky-r { position: sticky; top: 68px; }
-hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
+hr { border: none; border-top: 1px solid var(–brd); margin: 12px 0; }
+
+/* Mobile action buttons — prevent overflow */
+@media (max-width: 560px) {
+.ph { flex-direction: column; }
+.btn-row { width: 100%; }
+.btn-row .btn { flex: 1; justify-content: center; min-width: 0; font-size: 11px; padding: 6px 6px; }
+.net-val { font-size: 32px; }
+.sales-val { font-size: 22px; }
+.metrics-grid .m-value { font-size: 18px; }
+}
 </style>
 
 </head>
@@ -470,7 +511,7 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
 <header class="hdr">
   <div class="hdr-brand">
     <h1>İplik Maliyet ERP</h1>
-    <p>v3.2 · Supabase Kalıcı Senkron</p>
+    <p>v3.2 · Supabase Senkron</p>
   </div>
   <button class="nav-btn active" id="tab-hesap"    onclick="showPage('hesap')">🧮 Hesap</button>
   <button class="nav-btn"        id="tab-gecmis"   onclick="showPage('gecmis')">📋 Geçmiş <span class="nav-badge" id="hist-badge">0</span></button>
@@ -492,14 +533,14 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
   <!-- Arama -->
   <div class="search-wrap">
     <input type="text" class="search-inp" id="search-inp"
-           placeholder="İplik ara — FDY, FLOŞ, LİNEN... (seçince fiyat otomatik gelir)"
+           placeholder="İplik ara — FDY, FLOŞ, LİNEN..."
            autocomplete="off" spellcheck="false">
     <div class="dd-list" id="dd-list"></div>
   </div>
 
   <!-- Üretim Parametreleri -->
   <div class="card card-blue">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <div class="card-title" style="margin-bottom:0">Üretim Parametreleri</div>
       <button class="btn btn-ghost btn-sm" onclick="resetUretim()">↺ Sıfırla</button>
     </div>
@@ -510,7 +551,7 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
         <input type="number" id="v-denye" value="75" min="1" oninput="hesapla()">
       </div>
       <div class="field">
-        <label>Tur (T/M büküm)</label>
+        <label>Tur (T/M)</label>
         <input type="number" id="v-tur" value="800" min="1" oninput="syncHiz()">
       </div>
       <div class="field">
@@ -549,7 +590,7 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
     </div>
 
     <hr>
-    <div class="card-title" style="margin-bottom:12px">⏱ Üretim Süresi Hesabı</div>
+    <div class="card-title" style="margin-bottom:10px">⏱ Üretim Süresi Hesabı</div>
     <div class="g2" style="margin-bottom:0">
       <div class="field">
         <label>Hedef Miktar (kg)</label>
@@ -676,7 +717,7 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
     <div class="dcell"><span class="dc-lbl">Enerji/kg</span><span class="dc-val">$<span id="o-enj2">—</span></span></div>
     <div class="dcell"><span class="dc-lbl">İşçilik/kg</span><span class="dc-val">$<span id="o-isc2">—</span></span></div>
     <div class="dcell"><span class="dc-lbl">Diğer/kg</span><span class="dc-val">$<span id="o-dgr">—</span></span></div>
-    <div class="dcell"><span class="dc-lbl">Fab. Aylık Toplam</span><span class="dc-val"><span id="o-fab">—</span> kg</span></div>
+    <div class="dcell"><span class="dc-lbl">Fab. Aylık</span><span class="dc-val"><span id="o-fab">—</span> kg</span></div>
   </div>
 
   <div class="net-box">
@@ -733,23 +774,25 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
 
 <div class="page" id="page-gecmis">
   <div class="ph">
-    <div><h2>Hesap Geçmişi</h2><p>Supabase'de kalıcı · tüm cihaz ve tarayıcılardan erişilir</p></div>
+    <div><h2>Hesap Geçmişi</h2><p>Supabase'de kalıcı · tüm cihazlardan erişilir</p></div>
     <div class="btn-row">
-      <button class="btn btn-ghost btn-sm" onclick="exportHistXlsx()">📊 Excel'e Aktar</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportHistXlsx()">📊 Excel</button>
       <button class="btn btn-danger btn-sm" onclick="clearHistory()">🗑️ Tümünü Sil</button>
     </div>
   </div>
   <div class="tw">
-    <table class="dt">
-      <thead><tr>
-        <th>Tarih / Saat</th><th>İplik</th><th>Denye</th><th>Tur</th><th>Devir</th>
-        <th>Hız</th><th>Günlük Ürt.</th><th>İşçilik/kg</th><th>Enerji/kg</th>
-        <th>Net Maliyet</th><th>Satış Fiyatı</th><th></th>
-      </tr></thead>
-      <tbody id="hist-body">
-        <tr><td colspan="12" class="erow">Yükleniyor...</td></tr>
-      </tbody>
-    </table>
+    <div class="tw-scroll">
+      <table class="dt">
+        <thead><tr>
+          <th>Tarih / Saat</th><th>İplik</th><th>Denye</th><th>Tur</th><th>Devir</th>
+          <th>Hız</th><th>Günlük</th><th>İşçilik/kg</th><th>Enerji/kg</th>
+          <th>Net Maliyet</th><th>Satış</th><th></th>
+        </tr></thead>
+        <tbody id="hist-body">
+          <tr><td colspan="12" class="erow">Yükleniyor...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -759,11 +802,11 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
   <div class="ph">
     <div><h2>Hammadde Fiyat Listesi</h2><p>Supabase · iplik_fiyatlari tablosu</p></div>
     <div class="btn-row">
-      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Yeni Ekle</button>
-      <button class="btn btn-ghost btn-sm"   onclick="exportHmXlsx()">📊 Excel'e Aktar</button>
-      <button class="btn btn-ghost btn-sm"   onclick="startUpload('excel')">📁 Excel Yükle</button>
-      <button class="btn btn-ghost btn-sm"   onclick="startUpload('pdf')">📄 PDF Yükle</button>
-      <button class="btn btn-danger btn-sm"  onclick="clearAllHm()">🗑️ Tümünü Sil</button>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ekle</button>
+      <button class="btn btn-ghost btn-sm"   onclick="exportHmXlsx()">📊 Excel</button>
+      <button class="btn btn-ghost btn-sm"   onclick="startUpload('excel')">📁 Yükle</button>
+      <button class="btn btn-ghost btn-sm"   onclick="startUpload('pdf')">📄 PDF</button>
+      <button class="btn btn-danger btn-sm"  onclick="clearAllHm()">🗑️ Sil</button>
     </div>
   </div>
 
@@ -778,20 +821,22 @@ hr { border: none; border-top: 1px solid var(–brd); margin: 14px 0; }
       <div class="uz-title" id="up-desc">Dosyayı buraya sürükleyin veya tıklayın</div>
       <div class="uz-hint" id="up-hint">Excel: 1. sütun cins · 2. sütun fiyat</div>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+    <div style="display:flex;justify-content:flex-end;margin-top:10px">
       <button class="btn btn-ghost btn-sm" onclick="closeUpload()">İptal</button>
     </div>
     <input type="file" id="file-inp" style="display:none" onchange="onFilePick(event)">
   </div>
 
   <div class="hm-tw">
-    <table class="hmt">
-      <thead><tr>
-        <th>#</th><th>Cins / Kod</th><th>Fiyat ($/kg)</th><th>Güncelleme</th>
-        <th style="text-align:right">İşlem</th>
-      </tr></thead>
-      <tbody id="hm-body"><tr><td colspan="5" class="erow">Yükleniyor...</td></tr></tbody>
-    </table>
+    <div class="hm-scroll">
+      <table class="hmt">
+        <thead><tr>
+          <th>#</th><th>Cins / Kod</th><th>Fiyat ($/kg)</th><th>Güncelleme</th>
+          <th style="text-align:right">İşlem</th>
+        </tr></thead>
+        <tbody id="hm-body"><tr><td colspan="5" class="erow">Yükleniyor...</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -849,10 +894,6 @@ let uploadMode = null;
 let advOpen    = false;
 let giderTimer = null;
 
-/*
-  LAST: Son hesaplanan değerleri saklar.
-  Kaydet butonu DOM'dan değil buradan okur — asla textContent parse etmez.
-*/
 let LAST = {
   denye:0, tur:0, devir:0, hiz:0, ig:0, hmd:0,
   gunluk:0, aylik:0, hammadde:0, iscilik:0,
@@ -883,24 +924,7 @@ function showPage(name) {
   if (name === 'hammadde') renderHm();
 }
 
-/* ── HESAP ENGINE ─────────────────────────────────────────
-   Formüller (Excel tablosundan):
-
-   HIZ (mt/dk)   = (DEVİR × 2) / TUR
-   GÜNLÜK KG     = HIZ × 60 × 24 × (DENYE/9000) × İĞ / 1000
-   AYLIK KG      = GÜNLÜK × 28
-   İŞÇİLİK/kg    = (PERSONEL × MAAŞ × 1.1 / MAKİNE) / AYLIK
-   ENERJİ/kg     = (KW_TÜK × 24 / GÜNLÜK) × KW_BİRİM
-   HAMMADDE/kg   = HMD × (1 + FIRE/100)
-   DİĞER/kg      = AMORTİSMAN + BOBİN + PAKET
-   NET/kg        = HAMMADDE + İŞÇİLİK + ENERJİ + DİĞER
-   SATIŞ/kg      = NET × (1 + KAR/100)
-
-   SÜRE:
-   TEK_İĞ_KG_DK = HIZ × (DENYE/9000) / 1000
-   TUM_KG_DK    = TEK_İĞ_KG_DK × İĞ_SAYISI
-   SÜRE (dk)    = HEDEF_KG / TUM_KG_DK
-──────────────────────────────────────────────────────── */
+/* ── HESAP ENGINE ── */
 function hesapla() {
   const denye  = gv('v-denye');
   const hiz    = gv('v-hiz');
@@ -929,10 +953,8 @@ function hesapla() {
   const net      = hammadde + iscilik + enerji + diger;
   const satis    = net * (1 + kar);
 
-  /* Kaydet için global state */
   LAST = { denye, tur, devir, hiz, ig, hmd, gunluk, aylik, hammadde, iscilik, enerji, diger, net, satis, kar: gv('v-kar') };
 
-  /* DOM güncelle */
   st('o-gunluk',  f(gunluk, 2));
   st('o-aylik',   Math.round(aylik).toLocaleString('tr-TR'));
   st('o-iscilik', f(iscilik));
@@ -947,7 +969,6 @@ function hesapla() {
   st('o-fab',     Math.round(fabAylik).toLocaleString('tr-TR'));
   st('o-kar-lbl', '%' + Math.round(kar * 100) + ' kar ile');
 
-  /* KDV */
   const hmd2 = gv('v-hmd'), kdv2 = gv('v-kdv');
   if (hmd2 > 0) {
     const kdvT = hmd2 * (kdv2 / 100);
@@ -955,7 +976,6 @@ function hesapla() {
     st('o-kdv-tutar', '+ $' + kdvT.toFixed(3) + ' KDV (%' + Math.round(kdv2) + ')');
   }
 
-  /* Maliyet bar */
   if (net > 0) {
     setSeg('seg-hmd', hammadde / net * 100);
     setSeg('seg-isc', iscilik  / net * 100);
@@ -963,21 +983,17 @@ function hesapla() {
     setSeg('seg-dgr', diger    / net * 100);
   }
 
-  /* Üretim süresi */
   const hedef   = gv('v-hedef');
   const bobinGr = gv('v-bobin-gr');
   const sureCard = document.getElementById('sure-card');
 
   if (hedef > 0 && hiz > 0 && denye > 0 && ig > 0) {
     sureCard.style.display = 'block';
-
-    const tekIgKgDk  = hiz * (denye / 9000) / 1000;   // tek iğ kg/dk
-    const tumIgKgDk  = tekIgKgDk * ig;                  // tüm iğler kg/dk
+    const tekIgKgDk  = hiz * (denye / 9000) / 1000;
+    const tumIgKgDk  = tekIgKgDk * ig;
     const tekSureDk  = tekIgKgDk > 0 ? hedef / tekIgKgDk : 0;
     const tumSureDk  = tumIgKgDk > 0 ? hedef / tumIgKgDk : 0;
-
     const bobinAdet  = bobinGr > 0 ? Math.ceil((hedef * 1000) / bobinGr).toLocaleString('tr-TR') : '—';
-
     st('o-hedef-kg',   hedef.toLocaleString('tr-TR'));
     st('o-bobin-adet', bobinAdet);
     st('o-sure-main',  formatSure(tumSureDk));
@@ -997,7 +1013,6 @@ function setSeg(id, pct) {
   el.textContent = p > 9 ? Math.round(p) + '%' : '';
 }
 
-/* Dakikayı okunabilir stringe çevir */
 function formatSure(dk) {
   if (!dk || dk <= 0) return '—';
   dk = Math.round(dk);
@@ -1118,7 +1133,7 @@ async function loadHistory() {
     if (error) throw error;
     updateHistBadge(data.length);
     if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="12" class="erow">Henüz kayıt yok.<br>Hesap sayfasında "Geçmişe Kaydet" butonunu kullanın.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" class="erow">Henüz kayıt yok.</td></tr>';
       return;
     }
     tbody.innerHTML = data.map(r => `
@@ -1217,7 +1232,7 @@ async function refreshIplikler() {
 function renderHm() {
   const tbody = document.getElementById('hm-body');
   if (!iplikler.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="erow">Veri yok. Supabase bağlantısını veya tabloyu kontrol edin.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="erow">Veri yok.</td></tr>';
     return;
   }
   tbody.innerHTML = iplikler.map((item, i) => `
@@ -1258,9 +1273,9 @@ async function saveHm() {
   const cins  = document.getElementById('modal-cins').value.trim().toUpperCase();
   const fiyat = parseFloat(document.getElementById('modal-fiyat').value);
   const id    = document.getElementById('modal-edit-id').value;
-  if (!cins)                  { toast('Cins boş bırakılamaz', 'err'); return; }
-  if (isNaN(fiyat)||fiyat<=0){ toast('Geçerli bir fiyat girin', 'err'); return; }
-  if (!sb)                    { toast('Supabase bağlı değil', 'err'); return; }
+  if (!cins)                   { toast('Cins boş bırakılamaz', 'err'); return; }
+  if (isNaN(fiyat)||fiyat<=0) { toast('Geçerli bir fiyat girin', 'err'); return; }
+  if (!sb)                     { toast('Supabase bağlı değil', 'err'); return; }
   try {
     let error;
     if (id) ({ error } = await sb.from('iplik_fiyatlari').update({ cins, fiyat }).eq('id', id));
@@ -1313,7 +1328,7 @@ function startUpload(mode) {
     document.getElementById('up-title').textContent = 'Excel / CSV Yükle';
     document.getElementById('up-icon').textContent  = '📊';
     document.getElementById('up-desc').textContent  = 'Excel veya CSV sürükleyin ya da tıklayın';
-    document.getElementById('up-hint').textContent  = '1. sütun: cins · 2. sütun: fiyat (başlık satırı otomatik atlanır)';
+    document.getElementById('up-hint').textContent  = '1. sütun: cins · 2. sütun: fiyat';
   } else {
     fi.accept = '.pdf';
     document.getElementById('up-title').textContent = 'PDF Yükle';
@@ -1408,12 +1423,7 @@ async function bulkInsert(records) {
   } catch (e) { toast('Yükleme hatası: ' + e.message, 'err'); }
 }
 
-/* ── ARAMA / DROPDOWN ─────────────────────────────────────
-   - Boşlukla ayrılmış token'lar → her biri ayrı aranır
-   - "36" → cins içinde "36" geçen hepsi
-   - "50 36" → hem "50" hem "36" geçenler önce, biri geçenler sonra
-   - Büyük/küçük harf duyarsız, Türkçe karakterler olduğu gibi aranır
-──────────────────────────────────────────────────────────── */
+/* ── ARAMA / DROPDOWN ── */
 const searchInp = document.getElementById('search-inp');
 const ddList    = document.getElementById('dd-list');
 
@@ -1425,9 +1435,7 @@ function closeDd() {
 searchInp.addEventListener('input', function () {
   const raw = this.value.trim();
   if (!raw) { closeDd(); return; }
-
   const tokens = raw.toUpperCase().split(/\s+/).filter(Boolean);
-
   const hits = iplikler
     .map(i => {
       const cins    = (i.cins || '').toUpperCase();
@@ -1441,9 +1449,7 @@ searchInp.addEventListener('input', function () {
     })
     .slice(0, 25)
     .map(x => x.item);
-
   if (!hits.length) { closeDd(); return; }
-
   ddList.innerHTML = hits.map(item =>
     `<div class="dd-item" data-cins="${esc(item.cins)}" data-fiyat="${item.fiyat}">
       <span class="dd-name">${esc(item.cins)}</span>
@@ -1453,14 +1459,13 @@ searchInp.addEventListener('input', function () {
   ddList.classList.add('open');
 });
 
-/* Event delegation — tek listener yeterli */
 ddList.addEventListener('click', function (e) {
   const item = e.target.closest('.dd-item');
   if (!item) return;
   searchInp.value = item.dataset.cins;
   document.getElementById('v-hmd').value = parseFloat(item.dataset.fiyat).toFixed(3);
   closeDd();
-  onHmdChange(); /* KDV + hesapla */
+  onHmdChange();
 });
 
 document.addEventListener('click', e => {
@@ -1501,13 +1506,7 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' });
 }
 
-/* ── INIT ────────────────────────────────────────
-   Sıra:
-   1. Supabase bağlan + iplik listesini çek
-   2. Gider sabitlerini Supabase'den yükle
-   3. Tur/devir → hız senkronu → hesapla
-   4. Geçmiş badge güncelle
-─────────────────────────────────────────────────── */
+/* ── INIT ── */
 (async function init() {
   await initSb();
   await loadGider();
