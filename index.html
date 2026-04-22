@@ -223,16 +223,14 @@ border-color: var(–blue);
 box-shadow: 0 0 0 3px rgba(24,95,165,.1);
 }
 
-/* DROPDOWN */
+/* DROPDOWN — fixed portal, never clipped by parent overflow */
 .dd-list {
-position: absolute;
-top: calc(100% + 5px);
-left: 0; right: 0;
-z-index: 9999;
+position: fixed;
+z-index: 99999;
 background: var(–surf);
 border: 1px solid var(–brd2);
 border-radius: var(–r);
-box-shadow: 0 8px 32px rgba(0,0,0,.15);
+box-shadow: 0 8px 40px rgba(0,0,0,.22);
 max-height: 260px;
 overflow-y: auto;
 -webkit-overflow-scrolling: touch;
@@ -240,7 +238,7 @@ display: none;
 }
 .dd-list.open { display: block; }
 .dd-item {
-padding: 11px 14px;
+padding: 12px 14px;
 display: flex;
 justify-content: space-between;
 align-items: center;
@@ -251,7 +249,7 @@ transition: background .1s;
 gap: 8px;
 }
 .dd-item:last-child { border-bottom: none; }
-.dd-item:hover { background: var(–surf2); }
+.dd-item:hover, .dd-item:active { background: var(–blue-lt); }
 .dd-name { font-weight: 500; color: var(–txt); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dd-price {
 font-size: 12px; font-weight: 700;
@@ -1432,6 +1430,13 @@ function closeDd() {
   ddList.innerHTML = '';
 }
 
+function positionDd() {
+  const rect = searchInp.getBoundingClientRect();
+  ddList.style.top   = (rect.bottom + 4) + 'px';
+  ddList.style.left  = rect.left + 'px';
+  ddList.style.width = rect.width + 'px';
+}
+
 searchInp.addEventListener('input', function () {
   const raw = this.value.trim();
   if (!raw) { closeDd(); return; }
@@ -1456,8 +1461,12 @@ searchInp.addEventListener('input', function () {
       <span class="dd-price">$${f(item.fiyat)}</span>
     </div>`
   ).join('');
+  positionDd();
   ddList.classList.add('open');
 });
+
+window.addEventListener('scroll', () => { if (ddList.classList.contains('open')) positionDd(); }, true);
+window.addEventListener('resize', () => { if (ddList.classList.contains('open')) positionDd(); });
 
 ddList.addEventListener('click', function (e) {
   const item = e.target.closest('.dd-item');
