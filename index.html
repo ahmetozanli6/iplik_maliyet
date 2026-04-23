@@ -66,15 +66,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .saved-note{font-size:10px;color:var(–teal);font-weight:500;margin-left:6px}
 
 /* SEARCH */
-.search-wrap{margin-bottom:12px}
+.search-wrap{margin-bottom:12px;position:relative}
 .search-inp{width:100%;padding:12px 14px;border:1.5px solid var(–brd2);border-radius:var(–r);font-size:14px;color:var(–txt);background:var(–surf);-webkit-appearance:none;transition:border-color .15s;display:block}
 .search-inp:focus{outline:none;border-color:var(–blue);box-shadow:0 0 0 3px rgba(24,95,165,.12)}
 
-/* DROPDOWN PORTAL — direct child of body, nothing can clip it */
-#dd-portal{position:fixed;z-index:99999;display:none;background:var(–surf);border:1px solid var(–blue-bd);border-radius:var(–r);box-shadow:0 16px 56px rgba(0,0,0,.25);overflow:hidden;max-height:55vh}
+/* DROPDOWN — sayfanın içinde, search-wrap altında, fixed değil absolute */
+#dd-portal{
+position:fixed;
+z-index:9999;
+display:none;
+background:var(–surf);
+border:1.5px solid var(–blue-bd);
+border-radius:var(–r);
+box-shadow:0 8px 32px rgba(0,0,0,.18);
+overflow:hidden;
+max-height:50vh;
+}
 #dd-portal.open{display:block}
-#dd-scroll{overflow-y:auto;max-height:55vh;-webkit-overflow-scrolling:touch}
-.dd-item{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-bottom:1px solid var(–brd);font-size:13px;gap:10px;-webkit-tap-highlight-color:transparent;background:var(–surf)}
+#dd-scroll{overflow-y:auto;max-height:50vh;-webkit-overflow-scrolling:touch}
+.dd-item{
+padding:12px 14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;
+border-bottom:1px solid var(–brd);
+font-size:13px;
+gap:10px;
+-webkit-tap-highlight-color:transparent;
+background:var(–surf);
+}
 .dd-item:last-child{border-bottom:none}
 .dd-item:hover,.dd-item:active{background:var(–blue-lt)}
 .dd-name{font-weight:500;color:var(–txt);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -206,7 +227,7 @@ hr{border:none;border-top:1px solid var(–brd);margin:12px 0}
 </head>
 <body>
 
-<!-- Dropdown portal: body'nin doğrudan çocuğu -->
+<!-- Dropdown portal -->
 
 <div id="dd-portal">
   <div id="dd-scroll"></div>
@@ -233,15 +254,14 @@ hr{border:none;border-top:1px solid var(–brd);margin:12px 0}
 
 <div class="page active" id="page-hesap">
   <div class="two-col">
+    <div>
+      <div class="search-wrap">
+        <input type="text" class="search-inp" id="search-inp"
+               placeholder="İplik ara — FDY, FLOŞ, LİNEN..."
+               autocomplete="off" spellcheck="false">
+      </div>
 
 ```
-<div>
-  <div class="search-wrap">
-    <input type="text" class="search-inp" id="search-inp"
-           placeholder="İplik ara — FDY, FLOŞ, LİNEN..."
-           autocomplete="off" spellcheck="false">
-  </div>
-
   <div class="card card-blue">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div class="card-title" style="margin-bottom:0">Üretim Parametreleri</div>
@@ -404,7 +424,11 @@ hr{border:none;border-top:1px solid var(–brd);margin:12px 0}
   </div>
   <div class="card" id="upload-panel" style="display:none">
     <div class="card-title" id="up-title">Dosya Yükle</div>
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDrop(event)">
+    <div class="upload-zone" id="upload-zone"
+         onclick="document.getElementById('file-inp').click()"
+         ondragover="event.preventDefault();this.classList.add('drag')"
+         ondragleave="this.classList.remove('drag')"
+         ondrop="onDrop(event)">
       <div class="uz-icon" id="up-icon">📁</div>
       <div class="uz-title" id="up-desc">Dosyayı buraya sürükleyin veya tıklayın</div>
       <div class="uz-hint" id="up-hint">Excel: 1. sütun cins · 2. sütun fiyat</div>
@@ -518,6 +542,7 @@ function hesapla(){
     st('o-tek-ig',fmtDk(tekDk));st('o-tum-makine',fmtDk(tumDk));
   } else { sc.style.display='none'; }
 }
+
 function setSeg(id,pct){const el=document.getElementById(id);if(!el)return;const p=Math.max(0,Math.min(100,+pct||0));el.style.width=p.toFixed(1)+'%';el.textContent=p>9?Math.round(p)+'%':'';}
 function fmtDk(dk){if(!dk||dk<=0)return '—';dk=Math.round(dk);if(dk<60)return dk+' dk';const g=Math.floor(dk/1440),s=Math.floor((dk%1440)/60),d=dk%60;if(g>0)return g+'g '+s+'s'+(d>0?' '+d+'dk':'');return s+'s'+(d>0?' '+d+'dk':'');}
 function syncHiz(){const tur=gv('v-tur'),devir=gv('v-devir');if(tur>0&&devir>0)document.getElementById('v-hiz').value=f((devir*2)/tur,2);hesapla();}
@@ -546,7 +571,16 @@ async function loadHistory(){
     if(error)throw error;
     updateHistBadge(data.length);
     if(!data.length){tbody.innerHTML='<tr><td colspan="12" class="erow">Henüz kayıt yok.</td></tr>';return;}
-    tbody.innerHTML=data.map(r=>`<tr><td style="white-space:nowrap;font-size:11px;color:var(--txt2)">${fmtDate(r.tarih)}</td><td><strong>${esc(r.iplik)}</strong></td><td>${r.denye??'—'}</td><td>${r.tur??'—'}</td><td>${r.devir??'—'}</td><td>${f(r.hiz,2)}</td><td>${f(r.gunluk,2)} kg</td><td>$${f(r.iscilik)}</td><td>$${f(r.enerji)}</td><td><span class="chip chip-b">$${f(r.net)}</span></td><td><span class="chip chip-t">$${f(r.satis,2)}</span></td><td><button class="btn btn-danger btn-sm" onclick="delHistRow(${r.id})">Sil</button></td></tr>`).join('');
+    tbody.innerHTML=data.map(r=>`<tr>
+      <td style="white-space:nowrap;font-size:11px;color:var(--txt2)">${fmtDate(r.tarih)}</td>
+      <td><strong>${esc(r.iplik)}</strong></td>
+      <td>${r.denye??'—'}</td><td>${r.tur??'—'}</td><td>${r.devir??'—'}</td>
+      <td>${f(r.hiz,2)}</td><td>${f(r.gunluk,2)} kg</td>
+      <td>$${f(r.iscilik)}</td><td>$${f(r.enerji)}</td>
+      <td><span class="chip chip-b">$${f(r.net)}</span></td>
+      <td><span class="chip chip-t">$${f(r.satis,2)}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="delHistRow(${r.id})">Sil</button></td>
+    </tr>`).join('');
   }catch(e){tbody.innerHTML=`<tr><td colspan="12" class="erow">Hata: ${esc(e.message)}</td></tr>`;}
 }
 async function delHistRow(id){try{const {error}=await sb.from('erp_gecmis').delete().eq('id',id);if(error)throw error;toast('Kayıt silindi','err');loadHistory();}catch(e){toast('Hata: '+e.message,'err');}}
@@ -556,15 +590,32 @@ async function updateHistBadge(n){if(n!==undefined){document.getElementById('his
 
 async function initSb(){
   const pill=document.getElementById('status-pill');
-  try{sb=supabase.createClient(SB_URL,SB_KEY);const {data,error}=await sb.from('iplik_fiyatlari').select('*').order('cins');if(error)throw error;iplikler=data||[];pill.textContent=iplikler.length+' iplik · bağlı';pill.classList.add('ok');}
-  catch(e){pill.textContent='Bağlantı hatası';pill.classList.add('err');}
+  try{
+    sb=supabase.createClient(SB_URL,SB_KEY);
+    const {data,error}=await sb.from('iplik_fiyatlari').select('*').order('cins');
+    if(error)throw error;
+    iplikler=data||[];
+    pill.textContent=iplikler.length+' iplik · bağlı';
+    pill.classList.add('ok');
+  }catch(e){pill.textContent='Bağlantı hatası';pill.classList.add('err');}
 }
 async function refreshIplikler(){if(!sb)return;const {data}=await sb.from('iplik_fiyatlari').select('*').order('cins');iplikler=data||[];document.getElementById('status-pill').textContent=iplikler.length+' iplik · bağlı';renderHm();}
 
 function renderHm(){
   const tbody=document.getElementById('hm-body');
   if(!iplikler.length){tbody.innerHTML='<tr><td colspan="5" class="erow">Veri yok.</td></tr>';return;}
-  tbody.innerHTML=iplikler.map((item,i)=>`<tr><td style="color:var(--txt3);font-size:11px">${i+1}</td><td><strong>${esc(item.cins)}</strong></td><td><strong>$${f(item.fiyat)}</strong></td><td style="font-size:11px;color:var(--txt2)">${item.updated_at?new Date(item.updated_at).toLocaleDateString('tr-TR'):'—'}</td><td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-ghost btn-sm" onclick="openEditModal(${item.id},'${esc(item.cins)}',${item.fiyat})">Düzenle</button><button class="btn btn-danger btn-sm" onclick="delHm(${item.id},'${esc(item.cins)}')">Sil</button></div></td></tr>`).join('');
+  tbody.innerHTML=iplikler.map((item,i)=>`<tr>
+    <td style="color:var(--txt3);font-size:11px">${i+1}</td>
+    <td><strong>${esc(item.cins)}</strong></td>
+    <td><strong>$${f(item.fiyat)}</strong></td>
+    <td style="font-size:11px;color:var(--txt2)">${item.updated_at?new Date(item.updated_at).toLocaleDateString('tr-TR'):'—'}</td>
+    <td style="text-align:right">
+      <div style="display:flex;gap:6px;justify-content:flex-end">
+        <button class="btn btn-ghost btn-sm" onclick="openEditModal(${item.id},'${esc(item.cins)}',${item.fiyat})">Düzenle</button>
+        <button class="btn btn-danger btn-sm" onclick="delHm(${item.id},'${esc(item.cins)}')">Sil</button>
+      </div>
+    </td>
+  </tr>`).join('');
 }
 function openAddModal(){document.getElementById('modal-title').textContent='Hammadde Ekle';document.getElementById('modal-cins').value='';document.getElementById('modal-fiyat').value='';document.getElementById('modal-edit-id').value='';document.getElementById('modal-hm').classList.add('open');setTimeout(()=>document.getElementById('modal-cins').focus(),80);}
 function openEditModal(id,cins,fiyat){document.getElementById('modal-title').textContent='Hammadde Düzenle';document.getElementById('modal-cins').value=cins;document.getElementById('modal-fiyat').value=fiyat;document.getElementById('modal-edit-id').value=id;document.getElementById('modal-hm').classList.add('open');setTimeout(()=>document.getElementById('modal-fiyat').focus(),80);}
@@ -582,7 +633,7 @@ async function parseExcel(file){toast('Excel okunuyor...','ok');try{const buf=aw
 async function parsePdf(file){toast('PDF işleniyor...','ok');if(!window.pdfjsLib){toast('PDF.js yüklenemedi','err');return;}try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;let text='';for(let p=1;p<=pdf.numPages;p++){const pg=await pdf.getPage(p);const c=await pg.getTextContent();text+=c.items.map(i=>i.str).join(' ')+'\n';}const records=[];text.split(/[\n\r]+/).forEach(line=>{const m=line.match(/([A-ZÇĞİÖŞÜa-zçğışöü\/\d\s\-\.]{3,60}?)\s+\$?([\d]+[.,][\d]{2,4})\b/);if(m){const cins=m[1].trim().toUpperCase();const fiyat=parseFloat(m[2].replace(',','.'));if(cins.length>2&&!isNaN(fiyat)&&fiyat>0&&fiyat<10000)records.push({cins,fiyat});}});if(!records.length){toast("PDF'ten veri çıkarılamadı",'err');return;}await bulkInsert(records);}catch(e){toast('PDF hatası: '+e.message,'err');}}
 async function bulkInsert(records){if(!sb){toast('Supabase bağlı değil','err');return;}try{const {error}=await sb.from('iplik_fiyatlari').insert(records);if(error)throw error;closeUpload();await refreshIplikler();toast(`✅ ${records.length} kayıt eklendi`);}catch(e){toast('Yükleme hatası: '+e.message,'err');}}
 
-/* ── DROPDOWN PORTAL ── */
+/* ── DROPDOWN — fixed konumlandırma ── */
 const searchInp=document.getElementById('search-inp');
 const ddPortal=document.getElementById('dd-portal');
 const ddScroll=document.getElementById('dd-scroll');
@@ -591,9 +642,11 @@ function closeDd(){ddPortal.classList.remove('open');ddScroll.innerHTML='';}
 
 function positionDd(){
   const r=searchInp.getBoundingClientRect();
-  ddPortal.style.top=(r.bottom+4)+'px';
+  ddPortal.style.top=(r.bottom+window.scrollY+4)+'px';
   ddPortal.style.left=r.left+'px';
   ddPortal.style.width=r.width+'px';
+  // fixed pozisyon için scroll'u dikkate alma
+  ddPortal.style.top=(r.bottom+4)+'px';
 }
 
 searchInp.addEventListener('input',function(){
@@ -601,7 +654,7 @@ searchInp.addEventListener('input',function(){
   if(!raw){closeDd();return;}
   const tokens=raw.toUpperCase().split(/\s+/).filter(Boolean);
   const hits=iplikler
-    .map(i=>{const cins=(i.cins||'').toUpperCase();const matched=tokens.filter(t=>cins.includes(t)).length;return {item:i,matched};})
+    .map(i=>{const cins=(i.cins||'').toUpperCase();const matched=tokens.filter(t=>cins.includes(t)).length;return{item:i,matched};})
     .filter(x=>x.matched>0)
     .sort((a,b)=>{if(b.matched!==a.matched)return b.matched-a.matched;return a.item.cins.localeCompare(b.item.cins,'tr');})
     .slice(0,25).map(x=>x.item);
